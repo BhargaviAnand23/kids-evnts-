@@ -560,6 +560,99 @@ export const dbService = {
     setLocalStorageData('kids_event_parents', updated)
   },
 
+  // --- SAVED EVENTS (WISHLIST) ---
+  async getSavedEvents(parentId: string): Promise<any[]> {
+    const organizations = await this.getOrganizations()
+    let savedList: any[] = []
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('saved_events')
+        .select('*, event:events(*)')
+        .eq('parent_id', parentId)
+        .order('created_at', { ascending: false })
+
+      if (!error && data) {
+        savedList = data.map((item: any) => ({
+          ...item,
+          event: item.event ? {
+            ...item.event,
+            organizer: organizations.find(o => o.id === item.event.organizer_id) || null
+          } : null
+        }))
+      }
+    }
+
+    if (!savedList || savedList.length === 0) {
+      const allSaved = getLocalStorageData<any[]>('kids_event_saved_events', [])
+      savedList = allSaved.filter(s => s.parent_id === parentId)
+    }
+
+    return savedList
+  },
+
+  async isEventSaved(parentId: string, eventId: string): Promise<boolean> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('saved_events')
+        .select('id')
+        .eq('parent_id', parentId)
+        .eq('event_id', eventId)
+        .maybeSingle()
+
+      if (!error && data) return true
+    }
+
+    const allSaved = getLocalStorageData<any[]>('kids_event_saved_events', [])
+    return allSaved.some(s => s.parent_id === parentId && s.event_id === eventId)
+  },
+
+  async saveEvent(parentId: string, eventId: string): Promise<void> {
+    const targetEvent = await this.getEventById(eventId)
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('saved_events')
+        .insert([{ parent_id: parentId, event_id: eventId }])
+
+      if (error && error.code !== '23505') {
+        console.error('Supabase save event error:', error)
+      }
+    }
+
+    const allSaved = getLocalStorageData<any[]>('kids_event_saved_events', [])
+    if (!allSaved.some(s => s.parent_id === parentId && s.event_id === eventId)) {
+      allSaved.push({
+        id: crypto.randomUUID(),
+        parent_id: parentId,
+        event_id: eventId,
+        event: targetEvent,
+        created_at: new Date().toISOString()
+      })
+      setLocalStorageData('kids_event_saved_events', allSaved)
+    }
+  },
+
+  async unsaveEvent(parentId: string, eventId: string): Promise<void> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('saved_events')
+        .delete()
+        .eq('parent_id', parentId)
+        .eq('event_id', eventId)
+
+      if (error) console.error('Supabase unsave event error:', error)
+    }
+
+    const allSaved = getLocalStorageData<any[]>('kids_event_saved_events', [])
+    const updated = allSaved.filter(s => !(s.parent_id === parentId && s.event_id === eventId))
+    setLocalStorageData('kids_event_saved_events', updated)
+  },
+
   // --- ORGANIZATION ADMINS ---
   async getOrganizationAdminProfile(authUserId: string): Promise<OrganizationAdmin | null> {
     if (isSupabaseConfigured()) {
@@ -701,6 +794,24 @@ export const dbService = {
     
     if (isSupabaseConfigured()) {
       const supabase = createClient()
+      // Check seat availability to prevent overbooking/race conditions
+      const { data: event, error: eventErr } = await supabase
+        .from('events')
+        .select('seats_available')
+        .eq('id', bookingData.event_id)
+        .single()
+      
+      if (eventErr || !event) throw new Error('Event not found')
+      if (event.seats_available <= 0) {
+        throw new Error('Sorry, this event is sold out! Please join the waitlist.')
+      }
+
+      // Decrement seats_available
+      await supabase
+        .from('events')
+        .update({ seats_available: Math.max(0, event.seats_available - 1) })
+        .eq('id', bookingData.event_id)
+
       const { data, error } = await supabase.from('bookings').insert([{
         ...bookingData,
         status: 'confirmed',
@@ -773,51 +884,6 @@ export const dbService = {
       }
     }
     return null
-  },
-
-  // --- WISHLIST / SAVED EVENTS ---
-  async getSavedEvents(parentId: string): Promise<any[]> {
-    if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data, error } = await supabase.from('saved_events').select('*, event:events(*)').eq('parent_id', parentId)
-      if (!error && data) return data
-    }
-    const saved = getLocalStorageData<any[]>('kids_event_saved_events', [])
-    const events = await this.getEvents()
-    return saved
-      .filter(s => s.parent_id === parentId)
-      .map(s => ({
-        ...s,
-        event: events.find(e => e.id === s.event_id)
-      }))
-  },
-
-  async saveEvent(parentId: string, eventId: string): Promise<any> {
-    if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data, error } = await supabase.from('saved_events').insert([{ parent_id: parentId, event_id: eventId }]).select().single()
-      if (error) throw error
-      return data
-    }
-    const saved = getLocalStorageData<any[]>('kids_event_saved_events', [])
-    const existing = saved.find(s => s.parent_id === parentId && s.event_id === eventId)
-    if (existing) return existing
-    const newEntry = { id: crypto.randomUUID(), parent_id: parentId, event_id: eventId, created_at: new Date().toISOString() }
-    saved.push(newEntry)
-    setLocalStorageData('kids_event_saved_events', saved)
-    return newEntry
-  },
-
-  async unsaveEvent(parentId: string, eventId: string): Promise<void> {
-    if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { error } = await supabase.from('saved_events').delete().eq('parent_id', parentId).eq('event_id', eventId)
-      if (error) throw error
-      return
-    }
-    const saved = getLocalStorageData<any[]>('kids_event_saved_events', [])
-    const updated = saved.filter(s => !(s.parent_id === parentId && s.event_id === eventId))
-    setLocalStorageData('kids_event_saved_events', updated)
   },
 
   // --- WAITLIST ---

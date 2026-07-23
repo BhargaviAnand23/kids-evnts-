@@ -7,7 +7,12 @@
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
   }
-  
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
   body {
     @apply bg-white text-slate-900 antialiased selection:bg-purple-200 selection:text-purple-900;
   }

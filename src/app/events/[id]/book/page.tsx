@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft, ShieldCheck, Loader2, AlertCircle,
-  Plus, UserRound, Phone, FileText
+  Plus, UserRound, Phone, FileText, CheckSquare, Square
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -22,7 +22,7 @@ export default function BookEventPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [parent, setParent] = useState<Parent | null>(null);
   const [children, setChildren] = useState<Child[]>([]);
-  const [selectedChildId, setSelectedChildId] = useState('');
+  const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [emergencyName, setEmergencyName] = useState('');
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [medicalNotes, setMedicalNotes] = useState('');
@@ -54,58 +54,76 @@ export default function BookEventPage() {
         setParent(profile);
         const kids = await dbService.getChildren(profile.id);
         setChildren(kids);
-        if (kids.length > 0) setSelectedChildId(kids[0].id);
+        if (kids.length > 0) setSelectedChildIds([kids[0].id]);
       }
       setLoading(false);
     };
     load();
   }, [eventId, router]);
 
+  const toggleChildSelection = (id: string) => {
+    setSelectedChildIds(prev =>
+      prev.includes(id)
+        ? prev.filter(item => item !== id)
+        : [...prev, id]
+    );
+  };
+
   const handleBook = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!parent) { setError('You must be logged in as a parent to book.'); return; }
-    if (!selectedChildId || selectedChildId === 'new') {
-      setError('Please select or add a child first from your Profile page.'); return;
+    if (selectedChildIds.length === 0) {
+      setError('Please select at least one child to book.'); return;
     }
     if (!event) return;
 
+    if (selectedChildIds.length > event.seats_available) {
+      setError(`Only ${event.seats_available} seat(s) remaining for this event.`);
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const booking = await dbService.createBooking({
-        event_id: event.id,
-        child_id: selectedChildId,
-        parent_id: parent.id,
-      });
+      const createdBookingIds: string[] = [];
 
-      // Fire-and-forget booking confirmation notification + email
-      const selectedChild = children.find(c => c.id === selectedChildId);
-      const platformFee = 50;
-      const gst = Math.round(event.price * 0.18);
-      const total = event.price + platformFee + gst;
-      fetch('/api/notify/booking-confirmation', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          parentId: parent.id,
-          parentEmail: parent.email,
-          parentName: parent.name,
-          eventTitle: event.title,
-          eventDate: event.event_date,
-          eventTime: event.event_time,
-          eventLocation: event.location,
-          childName: selectedChild?.name || '',
-          bookingReference: booking.booking_reference,
-          paidAmount: event.price > 0 ? total : null,
-        }),
-      }).catch(() => {}); // never block navigation on notification failure
+      for (const childId of selectedChildIds) {
+        const booking = await dbService.createBooking({
+          event_id: event.id,
+          child_id: childId,
+          parent_id: parent.id,
+        });
+        createdBookingIds.push(booking.id);
 
-      router.push(`/events/${event.id}/book/confirmation?booking=${booking.id}`);
+        // Fire confirmation notification for each child
+        const childObj = children.find(c => c.id === childId);
+        const perChildFee = 50 / selectedChildIds.length;
+        const perChildGst = Math.round(event.price * 0.18);
+        const childTotal = event.price + perChildFee + perChildGst;
+
+        fetch('/api/notify/booking-confirmation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parentId: parent.id,
+            parentEmail: parent.email,
+            parentName: parent.name,
+            eventTitle: event.title,
+            eventDate: event.event_date,
+            eventTime: event.event_time,
+            eventLocation: event.location,
+            childName: childObj?.name || '',
+            bookingReference: booking.booking_reference,
+            paidAmount: event.price > 0 ? childTotal : null,
+          }),
+        }).catch(() => {});
+      }
+
+      router.push(`/events/${event.id}/book/confirmation?booking=${createdBookingIds[0]}`);
     } catch (err: any) {
-      // Surface seat-unavailability errors from the Postgres trigger clearly
       const msg = err.message || '';
-      if (msg.toLowerCase().includes('seats') || msg.toLowerCase().includes('available')) {
+      if (msg.toLowerCase().includes('seats') || msg.toLowerCase().includes('available') || msg.toLowerCase().includes('sold out')) {
         setError('Sorry — this event just sold out while you were booking. Please join the waitlist.');
       } else {
         setError(msg || 'Booking failed. Please try again.');
@@ -113,7 +131,6 @@ export default function BookEventPage() {
       setSubmitting(false);
     }
   };
-
 
   if (loading) {
     return (
@@ -123,15 +140,15 @@ export default function BookEventPage() {
     );
   }
 
-  if (notLoggedIn) {
+  if (notLoggedIn || !event) {
     return (
       <div className="bg-slate-50 min-h-screen flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <UserRound className="w-14 h-14 text-purple-300 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Log in to book</h1>
-          <p className="text-slate-500 mb-6">You need a parent account to book activities for your children.</p>
+          <AlertCircle className="w-14 h-14 text-purple-600 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-slate-900 mb-2">Login Required to Book</h1>
+          <p className="text-slate-500 mb-6">Please log in to your parent account to book spots for your children.</p>
           <div className="flex gap-3 justify-center">
-            <Button asChild><Link href={`/login?redirect=/events/${eventId}/book`}>Log In</Link></Button>
+            <Button asChild><Link href="/login">Log In</Link></Button>
             <Button variant="outline" asChild><Link href="/signup">Sign Up</Link></Button>
           </div>
         </div>
@@ -139,30 +156,36 @@ export default function BookEventPage() {
     );
   }
 
-  if (!event) return null;
-
+  const ticketCount = selectedChildIds.length || 1;
+  const subtotal = event.price * ticketCount;
   const platformFee = 50;
-  const gst = Math.round(event.price * 0.18);
-  const total = event.price + platformFee + gst;
+  const gst = Math.round(event.price * 0.18) * ticketCount;
+  const total = subtotal + platformFee + gst;
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-8 md:pt-10 pb-24">
-      <div className="max-w-5xl mx-auto px-6 md:px-16 lg:px-24">
-        <Link href={`/events/${eventId}`} className="inline-flex items-center text-slate-500 hover:text-purple-600 text-sm font-medium mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Event
+    <div className="bg-slate-50 min-h-screen py-10">
+      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+        <Link href={`/events/${event.id}`} className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-purple-600 mb-8 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Event Details
         </Link>
 
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 sm:mb-8">Complete Your Booking</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">Checkout</h1>
 
         <form onSubmit={handleBook}>
-          <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Main Form */}
+            <div className="w-full lg:w-2/3 space-y-6">
 
-            {/* Form Content */}
-            <div className="w-full lg:w-2/3 space-y-8">
-
-              {/* Child Selection */}
+              {/* Children Selection */}
               <Card>
-                <CardHeader><CardTitle>Child Details</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span>Select Children to Book ({selectedChildIds.length} selected)</span>
+                    <Link href="/dashboard/parent/profile" className="text-xs font-semibold text-purple-600 hover:underline flex items-center">
+                      <Plus className="w-3.5 h-3.5 mr-1" /> Add New Child
+                    </Link>
+                  </CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-4">
                   {error && (
                     <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
@@ -170,36 +193,53 @@ export default function BookEventPage() {
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Select Child</label>
-                      {children.length === 0 ? (
-                        <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700">
-                          No children in your profile yet.{' '}
-                          <Link href="/dashboard/parent/profile" className="font-bold underline">Add a child</Link> first, then come back to book.
-                        </div>
-                      ) : (
-                        <select
-                          className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                          value={selectedChildId}
-                          onChange={e => setSelectedChildId(e.target.value)}
-                          required
-                        >
-                          {children.map(c => (
-                            <option key={c.id} value={c.id}>{c.name} ({c.age} yrs)</option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
+                  <div>
+                    {children.length === 0 ? (
+                      <div className="p-4 bg-orange-50 border border-orange-200 rounded-xl text-sm text-orange-700">
+                        No children in your profile yet.{' '}
+                        <Link href="/dashboard/parent/profile" className="font-bold underline">Add a child profile</Link> first to complete booking.
+                      </div>
+                    ) : (
+                      <div className="space-y-2.5">
+                        {children.map(c => {
+                          const isSelected = selectedChildIds.includes(c.id);
+                          return (
+                            <div
+                              key={c.id}
+                              onClick={() => toggleChildSelection(c.id)}
+                              className={`flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition-all ${
+                                isSelected ? 'border-purple-600 bg-purple-50/60 shadow-sm' : 'border-slate-200 bg-white hover:border-slate-300'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className={`w-5 h-5 rounded flex items-center justify-center ${isSelected ? 'bg-purple-600 text-white' : 'text-slate-300'}`}>
+                                  {isSelected ? <CheckSquare className="w-5 h-5 text-purple-600 fill-purple-600" /> : <Square className="w-5 h-5" />}
+                                </div>
+                                <UserRound className="w-5 h-5 text-slate-400" />
+                                <div>
+                                  <p className="font-semibold text-slate-900 text-sm">{c.name}</p>
+                                  <p className="text-xs text-slate-500">{c.age} years old</p>
+                                </div>
+                              </div>
+                              <span className="text-xs font-bold text-purple-700 bg-purple-100 px-3 py-1 rounded-full">
+                                {isSelected ? 'Selected' : 'Select'}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                     <div>
                       <label className="text-sm font-semibold text-slate-700 mb-2 block">Emergency Contact Name</label>
                       <Input placeholder="E.g. Grandparent or Guardian" value={emergencyName} onChange={e => setEmergencyName(e.target.value)} />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Emergency Contact Number</label>
-                    <Input icon={<Phone className="w-4 h-4" />} placeholder="+91 98765 43210" type="tel" value={emergencyPhone} onChange={e => setEmergencyPhone(e.target.value)} />
+                    <div>
+                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Emergency Phone Number</label>
+                      <Input icon={<Phone className="w-4 h-4" />} placeholder="+91 98765 43210" type="tel" value={emergencyPhone} onChange={e => setEmergencyPhone(e.target.value)} />
+                    </div>
                   </div>
 
                   <div>
@@ -207,7 +247,7 @@ export default function BookEventPage() {
                       <FileText className="w-4 h-4" /> Any medical conditions or allergies?
                     </label>
                     <textarea
-                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[100px]"
+                      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[90px]"
                       placeholder="Leave blank if none"
                       value={medicalNotes}
                       onChange={e => setMedicalNotes(e.target.value)}
@@ -225,7 +265,7 @@ export default function BookEventPage() {
                       <div className="flex items-center">
                         <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')}
                           className="w-5 h-5 text-purple-600 border-slate-300 focus:ring-purple-500" />
-                        <span className="ml-3 font-semibold text-slate-900">UPI / QR Code</span>
+                        <span className="ml-3 font-semibold text-slate-900">UPI / Instant QR</span>
                       </div>
                       <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/UPI-Logo-vector.svg" alt="UPI" className="h-6" />
                     </label>
@@ -258,8 +298,8 @@ export default function BookEventPage() {
                   </div>
                   <div className="space-y-3 py-6 border-y border-slate-700 mb-6">
                     <div className="flex justify-between text-sm">
-                      <span className="text-slate-300">1x Ticket</span>
-                      <span className="font-semibold">₹{event.price.toLocaleString('en-IN')}</span>
+                      <span className="text-slate-300">{ticketCount}x Ticket(s)</span>
+                      <span className="font-semibold">₹{subtotal.toLocaleString('en-IN')}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-slate-300">Platform Fee</span>
@@ -277,10 +317,10 @@ export default function BookEventPage() {
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white mb-4"
-                    disabled={submitting || children.length === 0}
+                    className="w-full h-14 bg-purple-500 hover:bg-purple-600 text-white mb-4 font-bold"
+                    disabled={submitting || selectedChildIds.length === 0}
                   >
-                    {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing…</> : 'Pay & Confirm'}
+                    {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing…</> : `Pay ₹${total.toLocaleString('en-IN')} & Confirm`}
                   </Button>
                   <div className="flex items-center justify-center text-xs text-slate-400">
                     <ShieldCheck className="w-4 h-4 mr-1 text-green-400" />

@@ -210,9 +210,31 @@ export default function BookingConfirmationPage() {
           <Button variant="outline" size="lg" className="w-full sm:w-auto h-14" onClick={handleDownload}>
             <Download className="w-5 h-5 mr-2" /> Download Ticket
           </Button>
+          {booking?.event && (
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto h-14 border-purple-200 text-purple-700 hover:bg-purple-50"
+              onClick={() => {
+                const ev = booking.event;
+                if (!ev) return;
+                const title = encodeURIComponent(ev.title);
+                const details = encodeURIComponent(`Kidspire Booking Ref: ${booking.booking_reference}. Child: ${booking.child?.name || 'Kid'}`);
+                const loc = encodeURIComponent(ev.location || 'Online');
+                const dateObj = new Date(ev.event_date);
+                const yyyy = dateObj.getFullYear();
+                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const dd = String(dateObj.getDate()).padStart(2, '0');
+                const dates = `${yyyy}${mm}${dd}T090000Z/${yyyy}${mm}${dd}T110000Z`;
+                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${loc}`, '_blank');
+              }}
+            >
+              <Calendar className="w-5 h-5 mr-2 text-purple-600" /> Add to Calendar
+            </Button>
+          )}
           <Button size="lg" className="w-full sm:w-auto h-14" asChild>
             <Link href="/explore">
-              Explore More Events <ArrowRight className="w-5 h-5 ml-2" />
+              Explore More <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
           </Button>
         </div>

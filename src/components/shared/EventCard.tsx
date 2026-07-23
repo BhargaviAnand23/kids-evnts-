@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, MapPin, Users, Heart, Flame, Sparkles, TrendingUp, Leaf, Star, ArrowRight } from 'lucide-react';
 import { Event } from '@/types';
@@ -26,16 +26,71 @@ const BADGE_CONFIG: Record<BadgeType, { label: string; bg: string; Icon: React.E
   trending: { label: 'Trending', bg: 'bg-purple-600', Icon: TrendingUp },
 };
 
-// ── Wishlist heart ──
-function WishlistHeart({ eventId }: { eventId: string }) {
+import { useRouter } from 'next/navigation';
+import { authService } from '@/services/auth';
+import { dbService } from '@/services/db';
+
+export function WishlistHeart({ eventId, className = '' }: { eventId: string; className?: string }) {
+  const router = useRouter();
   const [liked, setLiked] = useState(false);
+  const [parentId, setParentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const checkSaved = async () => {
+      const user = await authService.getCurrentUser();
+      if (!user) return;
+      const profile = await dbService.getParentProfile(user.id);
+      if (!profile || !active) return;
+      setParentId(profile.id);
+      const isSaved = await dbService.isEventSaved(profile.id, eventId);
+      if (active) setLiked(isSaved);
+    };
+    checkSaved();
+    return () => { active = false; };
+  }, [eventId]);
+
+  const handleClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    let pid = parentId;
+    if (!pid) {
+      const user = await authService.getCurrentUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      const profile = await dbService.getParentProfile(user.id);
+      if (!profile) {
+        router.push('/login');
+        return;
+      }
+      pid = profile.id;
+      setParentId(profile.id);
+    }
+
+    const nextState = !liked;
+    setLiked(nextState);
+    try {
+      if (nextState) {
+        await dbService.saveEvent(pid, eventId);
+      } else {
+        await dbService.unsaveEvent(pid, eventId);
+      }
+    } catch (err) {
+      console.error('Failed to update wishlist:', err);
+      setLiked(!nextState);
+    }
+  };
+
   return (
     <button
       aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
-      onClick={e => { e.preventDefault(); e.stopPropagation(); setLiked(l => !l); }}
+      onClick={handleClick}
       className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
-        liked ? 'bg-red-500 text-white scale-110' : 'bg-white/90 text-slate-400 hover:text-red-400'
-      }`}
+        liked ? 'bg-red-500 text-white scale-110' : 'bg-white/90 text-slate-400 hover:text-red-500 hover:bg-white'
+      } ${className}`}
     >
       <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
     </button>

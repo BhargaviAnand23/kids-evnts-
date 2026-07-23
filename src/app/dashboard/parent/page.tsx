@@ -416,11 +416,16 @@ export default function ParentDashboard() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-3">
-                                <Badge
-                                  className={booking.status === 'cancelled' ? 'bg-slate-100 text-slate-600' : 'bg-green-50 text-green-700'}
-                                >
-                                  {booking.status === 'cancelled' ? 'Cancelled' : 'Completed'}
-                                </Badge>
+                                <div className="flex items-center gap-2">
+                                  <Badge className={booking.status === 'cancelled' ? 'bg-slate-100 text-slate-600' : 'bg-green-50 text-green-700'}>
+                                    {booking.status === 'cancelled' ? 'Cancelled' : 'Completed'}
+                                  </Badge>
+                                  {booking.status === 'cancelled' && (
+                                    <Badge className="bg-amber-50 text-amber-800 border border-amber-200 font-medium">
+                                      {booking.payment_status === 'refunded' ? 'Refund Processed ✓' : 'Refund Pending (5-7 Days)'}
+                                    </Badge>
+                                  )}
+                                </div>
                                 {/* Leave Review button for completed (non-cancelled) past events */}
                                 {isPast && !alreadyReviewed && (
                                   <button

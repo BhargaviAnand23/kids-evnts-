@@ -8,6 +8,8 @@ import { dbService as db } from '@/services/db';
 import { notFound } from 'next/navigation';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@/utils/event';
+import { WishlistHeart } from '@/components/shared/EventCard';
+import { BookOrWaitlistButton } from '@/components/shared/BookOrWaitlistButton';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
@@ -51,9 +53,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
             <button className="p-2 text-slate-400 hover:text-purple-600 rounded-full hover:bg-slate-50 transition-colors">
               <Share2 className="w-5 h-5" />
             </button>
-            <button className="p-2 text-slate-400 hover:text-red-500 rounded-full hover:bg-slate-50 transition-colors">
-              <Heart className="w-5 h-5" />
-            </button>
+            <WishlistHeart eventId={event.id} />
           </div>
         </div>
       </div>
@@ -256,15 +256,12 @@ export default async function EventDetailPage({ params }: { params: { id: string
                   </div>
                 </div>
 
-                {eventData.listing_type === 'webinar' ? (
-                  <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/20" asChild>
-                    <a href={eventData.join_link || '#'} target="_blank" rel="noopener noreferrer">Join Online Webinar</a>
-                  </Button>
-                ) : (
-                  <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14" asChild>
-                    <Link href={`/events/${event.id}/book`}>Book Now</Link>
-                  </Button>
-                )}
+                <BookOrWaitlistButton
+                  eventId={event.id}
+                  seatsAvailable={event.seats_available}
+                  listingType={eventData.listing_type}
+                  joinLink={eventData.join_link}
+                />
                 <p className="text-center text-xs text-slate-400 mt-4">You won't be charged yet</p>
               </CardContent>
             </Card>
