@@ -89,3 +89,48 @@ UPDATE public.events SET age_bracket = 'teens' WHERE age_bracket = 'young_adults
 
 ALTER TABLE public.events DROP CONSTRAINT IF EXISTS events_age_bracket_check;
 ALTER TABLE public.events ADD CONSTRAINT events_age_bracket_check CHECK (age_bracket IN ('early_years', 'kids', 'teens'));
+
+-- 12. EVENT SEATING TIERS
+CREATE TABLE IF NOT EXISTS public.event_seating_tiers (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    event_id TEXT REFERENCES public.events(id) ON DELETE CASCADE NOT NULL,
+    tier_name TEXT NOT NULL,
+    tier_price NUMERIC(10, 2) NOT NULL,
+    tier_seats_total INTEGER NOT NULL,
+    tier_seats_available INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS tier_id TEXT REFERENCES public.event_seating_tiers(id) ON DELETE SET NULL;
+ALTER TABLE public.bookings ADD COLUMN IF NOT EXISTS tier_name TEXT;
+
+-- RLS Policies for event_seating_tiers
+ALTER TABLE public.event_seating_tiers ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access to seating tiers for approved events" ON public.event_seating_tiers;
+CREATE POLICY "Allow public read access to seating tiers for approved events" ON public.event_seating_tiers
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.events e
+            WHERE e.id = public.event_seating_tiers.event_id AND e.status = 'approved'
+        )
+    );
+
+DROP POLICY IF EXISTS "Organization admins can manage own event seating tiers" ON public.event_seating_tiers;
+CREATE POLICY "Organization admins can manage own event seating tiers" ON public.event_seating_tiers
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.events e
+            JOIN public.organization_admins oa ON e.organizer_id = oa.organization_id
+            WHERE oa.auth_user_id = auth.uid() AND e.id = public.event_seating_tiers.event_id
+        )
+    );
+
+DROP POLICY IF EXISTS "Super admins can manage all seating tiers" ON public.event_seating_tiers;
+CREATE POLICY "Super admins can manage all seating tiers" ON public.event_seating_tiers
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.super_admins sa
+            WHERE sa.auth_user_id = auth.uid()
+        )
+    );

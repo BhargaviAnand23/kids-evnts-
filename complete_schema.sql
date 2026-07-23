@@ -232,6 +232,37 @@ CREATE POLICY "Super admins can manage all events" ON public.events
         )
     );
 
+-- Event Seating Tiers
+ALTER TABLE public.event_seating_tiers ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access to seating tiers for approved events" ON public.event_seating_tiers;
+CREATE POLICY "Allow public read access to seating tiers for approved events" ON public.event_seating_tiers
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM public.events e
+            WHERE e.id = public.event_seating_tiers.event_id AND e.status = 'approved'
+        )
+    );
+
+DROP POLICY IF EXISTS "Organization admins can manage own event seating tiers" ON public.event_seating_tiers;
+CREATE POLICY "Organization admins can manage own event seating tiers" ON public.event_seating_tiers
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.events e
+            JOIN public.organization_admins oa ON e.organizer_id = oa.organization_id
+            WHERE oa.auth_user_id = auth.uid() AND e.id = public.event_seating_tiers.event_id
+        )
+    );
+
+DROP POLICY IF EXISTS "Super admins can manage all seating tiers" ON public.event_seating_tiers;
+CREATE POLICY "Super admins can manage all seating tiers" ON public.event_seating_tiers
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM public.super_admins sa
+            WHERE sa.auth_user_id = auth.uid()
+        )
+    );
+
 -- Parents & Children
 DROP POLICY IF EXISTS "Parents can view own profile" ON public.parents;
 CREATE POLICY "Parents can view own profile" ON public.parents FOR SELECT USING (auth_user_id = auth.uid());
