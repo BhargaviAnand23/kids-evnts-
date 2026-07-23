@@ -110,6 +110,72 @@ export function Categories() {
             </Link>
           ))}
         </div>
+
+        {/* Divider */}
+        <div className="my-16 border-t border-slate-100" />
+
+        {/* Browse by Type */}
+        <div className="mb-8 sm:mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 tracking-tight">Browse by Activity Type</h2>
+          <p className="text-slate-600 text-base">Select from these four listing types to find matching opportunities for your child.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[
+            {
+              name: 'Events',
+              description: 'Single-day programs, camps, and local school events.',
+              link: '/explore?type=event',
+              colorClass: 'from-purple-500 to-indigo-600 shadow-purple-500/20',
+              icon: '🎉',
+            },
+            {
+              name: 'Competitions',
+              description: 'Tournaments, sports meets, championships, and talent shows.',
+              link: '/explore?type=competition',
+              colorClass: 'from-amber-500 to-orange-600 shadow-amber-500/20',
+              icon: '🏆',
+            },
+            {
+              name: 'Courses',
+              description: 'Multi-week programs, structured classes, and masterclasses.',
+              link: '/explore?type=course',
+              colorClass: 'from-emerald-500 to-teal-600 shadow-emerald-500/20',
+              icon: '📚',
+            },
+            {
+              name: 'Webinars',
+              description: 'Online learning sessions, parent talks, and virtual seminars.',
+              link: '/explore?type=webinar',
+              colorClass: 'from-blue-500 to-sky-600 shadow-blue-500/20',
+              icon: '💻',
+            },
+          ].map((type) => (
+            <Link
+              key={type.name}
+              href={type.link}
+              className="group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Corner accent gradient circle */}
+              <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
+              
+              <div>
+                <div className="text-3xl mb-4">{type.icon}</div>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">
+                  {type.name}
+                </h3>
+                <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                  {type.description}
+                </p>
+              </div>
+
+              <span className="text-xs font-semibold text-purple-600 flex items-center gap-1.5 group-hover:underline">
+                Explore Listings
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -11,6 +11,33 @@ export const ageBracketNames: Record<string, string> = {
   'young_adults': 'Ages 18+',
 };
 
+export const listingTypeNames: Record<string, string> = {
+  event: 'Event',
+  competition: 'Competition',
+  course: 'Course',
+  webinar: 'Webinar'
+};
+
+export function getTypeBadgeStyle(type: string | undefined): string {
+  const t = type || 'event';
+  switch (t) {
+    case 'competition':
+      return 'bg-amber-50 text-amber-700 border-amber-200';
+    case 'course':
+      return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    case 'webinar':
+      return 'bg-blue-50 text-blue-700 border-blue-200';
+    case 'event':
+    default:
+      return 'bg-purple-50 text-purple-700 border-purple-200';
+  }
+}
+
+export function getListingTypeDisplayName(type: string | undefined): string {
+  const t = type || 'event';
+  return listingTypeNames[t] || 'Event';
+}
+
 // ── Data-driven badge ──
 type BadgeType = 'hot' | 'popular' | 'new' | 'trending';
 
@@ -102,12 +129,15 @@ export function EventCard({ event }: { event: Event }) {
 
         {/* Body */}
         <div className="p-5 flex flex-col flex-1">
-          {/* Category pill + age */}
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-full">
+          {/* Type Badge + Category pill + age */}
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getTypeBadgeStyle(event.listing_type)}`}>
+              {getListingTypeDisplayName(event.listing_type)}
+            </span>
+            <span className="text-[11px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
               {event.category}
             </span>
-            <span className="flex items-center text-xs text-slate-500 font-medium">
+            <span className="flex items-center text-xs text-slate-500 font-medium ml-auto">
               <Users className="w-3.5 h-3.5 mr-1 text-slate-400" />
               {ageBracketNames[event.age_bracket] || 'All ages'}
             </span>
@@ -129,10 +159,31 @@ export function EventCard({ event }: { event: Event }) {
           </div>
 
           {/* Location */}
-          <div className="flex items-center text-sm text-slate-600 mb-4">
+          <div className="flex items-center text-sm text-slate-600 mb-3">
             <MapPin className="w-4 h-4 mr-2 text-slate-400 shrink-0" />
-            <span className="truncate">{event.location}</span>
+            <span className="truncate">
+              {event.is_online ? 'Online Webinar' : (event.location || 'Online')}
+            </span>
           </div>
+
+          {/* Type-Specific Extras */}
+          {event.listing_type === 'competition' && event.prize_details && (
+            <div className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-2.5 py-1.5 mb-3 flex items-center gap-1.5 shrink-0">
+              <span className="shrink-0">🏆 Prize:</span>
+              <span className="truncate">{event.prize_details}</span>
+            </div>
+          )}
+
+          {event.listing_type === 'course' && (event.session_count || event.session_frequency) && (
+            <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-lg px-2.5 py-1.5 mb-3 flex items-center gap-1.5 shrink-0">
+              <span className="shrink-0">📚 Schedule:</span>
+              <span className="truncate">
+                {event.session_count ? `${event.session_count} ` : ''}
+                {event.session_frequency || 'weekly'} sessions
+                {event.course_duration_weeks ? ` (${event.course_duration_weeks} weeks)` : ''}
+              </span>
+            </div>
+          )}
 
           {/* Price + Book Now */}
           <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
@@ -144,7 +195,7 @@ export function EventCard({ event }: { event: Event }) {
               onClick={e => e.stopPropagation()}
               className="px-4 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-sm font-semibold rounded-full transition-all duration-150 shadow-sm shadow-purple-500/30 shrink-0"
             >
-              Book Now
+              {event.listing_type === 'webinar' ? 'Join Online' : 'Book Now'}
             </button>
           </div>
         </div>

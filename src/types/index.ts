@@ -57,6 +57,8 @@ export interface Child {
 
 export type AgeBracket = 'early_kids' | 'kids' | 'teens' | 'young_adults'
 
+export type ListingType = 'event' | 'competition' | 'course' | 'webinar';
+
 export interface Event {
   id: string
   organizer_id: string
@@ -66,7 +68,7 @@ export interface Event {
   age_bracket: AgeBracket
   event_date: string
   event_time: string
-  location: string
+  location?: string | null
   price: number
   seats_total: number
   seats_available: number
@@ -78,6 +80,24 @@ export interface Event {
   created_at: string
   organizer?: Organization | null
   school?: School | null
+  
+  // New listing type specific fields
+  listing_type?: ListingType
+  
+  // Competitions
+  registration_deadline?: string | null
+  prize_details?: string | null
+  eligibility_rules?: string | null
+  
+  // Courses
+  session_count?: number | null
+  session_frequency?: string | null
+  course_duration_weeks?: number | null
+  curriculum_outline?: string | null
+  
+  // Webinars
+  is_online?: boolean
+  join_link?: string | null
 }
 
 export interface Booking {

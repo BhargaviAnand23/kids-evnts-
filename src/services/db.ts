@@ -85,12 +85,14 @@ export const SEED_EVENTS: Event[] = [
     created_at: new Date().toISOString(),
     status: 'approved',
     is_sponsored: true,
-    sponsor_tier: 'featured'
+    sponsor_tier: 'featured',
+    listing_type: 'event',
+    is_online: false
   },
   {
     id: 'evt-2',
     organizer_id: 'org-dance-academy',
-    title: 'Beginner Hip Hop Dance',
+    title: 'Beginner Hip Hop Dance Course',
     description: 'A high-energy dance class for kids to learn basic hip hop routines and improve coordination.',
     category: 'Dance',
     age_bracket: 'kids',
@@ -102,7 +104,12 @@ export const SEED_EVENTS: Event[] = [
     seats_available: 12,
     image_url: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=800&auto=format&fit=crop&q=60',
     created_at: new Date().toISOString(),
-    status: 'approved'
+    status: 'approved',
+    listing_type: 'course',
+    session_count: 8,
+    session_frequency: 'Weekly',
+    course_duration_weeks: 8,
+    curriculum_outline: '1. Introduction & Basic Rhythm\n2. Isolation Exercises\n3. Footwork Drills\n4. Choreography Session A\n5. Choreography Session B\n6. Expression & Staging\n7. Dress Rehearsal\n8. Final Showcase for Parents'
   },
   {
     id: 'evt-3',
@@ -121,13 +128,15 @@ export const SEED_EVENTS: Event[] = [
     created_at: new Date().toISOString(),
     status: 'approved',
     is_sponsored: true,
-    sponsor_tier: 'premium'
+    sponsor_tier: 'premium',
+    listing_type: 'event',
+    is_online: false
   },
   {
     id: 'evt-4',
     organizer_id: 'org-martial-arts',
-    title: 'Intro to Karate',
-    description: 'Learn discipline, focus, and self-defense in a fun, safe environment.',
+    title: 'Kidspire Karate Championship',
+    description: 'A friendly introductory tournament for kids to showcase their skills, focus, and form in a safe, guided environment. All participants receive badges!',
     category: 'Martial Arts',
     age_bracket: 'kids',
     event_date: '2026-08-26',
@@ -138,24 +147,31 @@ export const SEED_EVENTS: Event[] = [
     seats_available: 20,
     image_url: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=800&auto=format&fit=crop&q=60',
     created_at: new Date().toISOString(),
-    status: 'approved'
+    status: 'approved',
+    listing_type: 'competition',
+    registration_deadline: '2026-08-24T23:59:00Z',
+    prize_details: 'Trophy for 1st Place, Medals for top 3, certificates for all participants',
+    eligibility_rules: 'Yellow belt and above, age 6-12 only'
   },
   {
     id: 'evt-5',
     organizer_id: 'org-youth-soccer',
-    title: 'Youth Basketball League Tryouts',
-    description: 'Try out for the upcoming fall basketball league. Drills, scrimmages, and skill assessments.',
-    category: 'Basketball',
+    title: 'Introduction to STEM & Robotics Webinar',
+    description: 'An interactive online webinar explaining basic coding, electronics, and robotics concepts for kids and parents. Zoom login details will be shared on booking.',
+    category: 'STEM & Tech',
     age_bracket: 'kids',
     event_date: '2026-08-28',
     event_time: '10:00:00',
-    location: 'Community Rec Center',
-    price: 10.00,
-    seats_total: 40,
-    seats_available: 15,
-    image_url: 'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=800&auto=format&fit=crop&q=60',
+    location: 'Online (Zoom Meeting)',
+    price: 0.00,
+    seats_total: 100,
+    seats_available: 95,
+    image_url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&auto=format&fit=crop&q=60',
     created_at: new Date().toISOString(),
-    status: 'approved'
+    status: 'approved',
+    listing_type: 'webinar',
+    is_online: true,
+    join_link: 'https://zoom.us/j/9876543210'
   }
 ]
 
@@ -289,7 +305,6 @@ export const dbService = {
     return newOrg
   },
 
-  // --- EVENTS ---
   async getEvents(filters?: {
     category?: string
     ageBracket?: string
@@ -297,6 +312,7 @@ export const dbService = {
     organizerId?: string
     status?: 'pending_review' | 'approved' | 'rejected' | 'all'
     keyword?: string
+    listingType?: string
   }): Promise<Event[]> {
     const organizations = await this.getOrganizations()
     let events: Event[] = []
@@ -319,6 +335,9 @@ export const dbService = {
       }
       if (filters?.status !== 'all') {
         query = query.eq('status', filters?.status || 'approved')
+      }
+      if (filters?.listingType && filters.listingType !== 'All') {
+        query = query.eq('listing_type', filters.listingType.toLowerCase())
       }
       if (filters?.keyword) {
         const kw = `%${filters.keyword}%`
@@ -360,13 +379,16 @@ export const dbService = {
       const targetStatus = filters?.status || 'approved'
       events = events.filter(e => e.status === targetStatus)
     }
+    if (filters?.listingType && filters.listingType !== 'All') {
+      events = events.filter(e => (e.listing_type || 'event') === filters.listingType!.toLowerCase())
+    }
     if (filters?.keyword) {
       const kw = filters.keyword.toLowerCase()
       events = events.filter(e =>
         e.title.toLowerCase().includes(kw) ||
         (e.description || '').toLowerCase().includes(kw) ||
         e.category.toLowerCase().includes(kw) ||
-        e.location.toLowerCase().includes(kw)
+        (e.location || '').toLowerCase().includes(kw)
       )
     }
 

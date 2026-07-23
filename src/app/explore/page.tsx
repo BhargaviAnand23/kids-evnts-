@@ -22,6 +22,7 @@ function ExploreContent() {
   const qParam = searchParams.get('q') || '';
   const categoryParam = searchParams.get('category') || '';
   const ageBracketParam = searchParams.get('ageBracket') || '';
+  const typeParam = searchParams.get('type') || '';
 
   // Local controlled input — stays in sync with URL param
   const [keywordInput, setKeywordInput] = useState(qParam);
@@ -33,13 +34,14 @@ function ExploreContent() {
     ? categoryParam.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
     : '';
 
-  const loadEvents = useCallback(async (keyword: string, category: string, ageBracket: string) => {
+  const loadEvents = useCallback(async (keyword: string, category: string, ageBracket: string, listingType: string) => {
     setLoading(true);
     try {
       const result = await dbService.getEvents({
         keyword: keyword || undefined,
         category: category || undefined,
         ageBracket: ageBracket || undefined,
+        listingType: listingType || undefined,
       });
       setEvents(result);
     } catch (e) {
@@ -51,14 +53,15 @@ function ExploreContent() {
 
   useEffect(() => {
     setKeywordInput(qParam);
-    loadEvents(qParam, categoryFilter, ageBracketParam);
-  }, [qParam, categoryParam, ageBracketParam, loadEvents, categoryFilter]);
+    loadEvents(qParam, categoryFilter, ageBracketParam, typeParam);
+  }, [qParam, categoryParam, ageBracketParam, typeParam, loadEvents, categoryFilter]);
 
   const applySearch = () => {
     const params = new URLSearchParams();
     if (keywordInput.trim()) params.set('q', keywordInput.trim());
     if (categoryParam) params.set('category', categoryParam);
     if (ageBracketParam) params.set('ageBracket', ageBracketParam);
+    if (typeParam) params.set('type', typeParam);
     router.push(`/explore?${params.toString()}`);
   };
 
@@ -74,7 +77,7 @@ function ExploreContent() {
     router.push(`/events/${randomEvent.id}`);
   };
 
-  const hasActiveFilters = qParam || categoryParam || ageBracketParam;
+  const hasActiveFilters = qParam || categoryParam || ageBracketParam || typeParam;
 
   return (
     <div className="bg-slate-50 min-h-screen pt-8 md:pt-10 pb-24">
@@ -165,6 +168,40 @@ function ExploreContent() {
                     </div>
                   </div>
 
+                  {/* Activity Type */}
+                  <div>
+                    <label className="text-sm font-semibold text-slate-700 mb-3 block">Activity Type</label>
+                    <div className="space-y-2">
+                      {['Event', 'Competition', 'Course', 'Webinar'].map((type) => {
+                        const typeVal = type.toLowerCase();
+                        const isSelected = typeParam === typeVal;
+                        const buildHref = (newVal?: string) => {
+                          const p = new URLSearchParams();
+                          if (qParam) p.set('q', qParam);
+                          if (categoryParam) p.set('category', categoryParam);
+                          if (ageBracketParam) p.set('ageBracket', ageBracketParam);
+                          if (newVal) p.set('type', newVal);
+                          return `/explore?${p.toString()}`;
+                        };
+                        return (
+                          <Link
+                            key={type}
+                            href={isSelected ? buildHref() : buildHref(typeVal)}
+                            className="flex items-center space-x-3 cursor-pointer group"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              readOnly
+                              className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                            />
+                            <span className={`text-sm ${isSelected ? 'font-bold text-purple-700' : 'text-slate-600 group-hover:text-purple-600'}`}>{type}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Categories */}
                   <div>
                     <label className="text-sm font-semibold text-slate-700 mb-3 block">Categories</label>
@@ -172,13 +209,18 @@ function ExploreContent() {
                       {CATEGORIES.map((cat) => {
                         const catSlug = cat.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
                         const isSelected = categoryFilter.toLowerCase() === cat.toLowerCase();
+                        const buildHref = (newVal?: string) => {
+                          const p = new URLSearchParams();
+                          if (qParam) p.set('q', qParam);
+                          if (ageBracketParam) p.set('ageBracket', ageBracketParam);
+                          if (typeParam) p.set('type', typeParam);
+                          if (newVal) p.set('category', newVal);
+                          return `/explore?${p.toString()}`;
+                        };
                         return (
                           <Link
                             key={cat}
-                            href={isSelected
-                              ? `/explore${qParam ? `?q=${encodeURIComponent(qParam)}` : ''}`
-                              : `/explore?category=${catSlug}${qParam ? `&q=${encodeURIComponent(qParam)}` : ''}`
-                            }
+                            href={isSelected ? buildHref() : buildHref(catSlug)}
                             className="flex items-center space-x-3 cursor-pointer group"
                           >
                             <input
@@ -204,6 +246,7 @@ function ExploreContent() {
                           const p = new URLSearchParams();
                           if (qParam) p.set('q', qParam);
                           if (categoryParam) p.set('category', categoryParam);
+                          if (typeParam) p.set('type', typeParam);
                           if (newKey) p.set('ageBracket', newKey);
                           return `/explore?${p.toString()}`;
                         };
@@ -243,21 +286,52 @@ function ExploreContent() {
                 {qParam && (
                   <span className="inline-flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                     "{qParam}"
-                    <Link href={`/explore${categoryParam ? `?category=${categoryParam}` : ''}${ageBracketParam ? `${categoryParam ? '&' : '?'}ageBracket=${ageBracketParam}` : ''}`}
+                    <Link href={`/explore?${(() => {
+                      const p = new URLSearchParams();
+                      if (categoryParam) p.set('category', categoryParam);
+                      if (ageBracketParam) p.set('ageBracket', ageBracketParam);
+                      if (typeParam) p.set('type', typeParam);
+                      return p.toString();
+                    })()}`}
                       className="hover:text-purple-200">✕</Link>
                   </span>
                 )}
                 {categoryFilter && (
                   <span className="inline-flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                     {categoryFilter}
-                    <Link href={`/explore${qParam ? `?q=${encodeURIComponent(qParam)}` : ''}${ageBracketParam ? `${qParam ? '&' : '?'}ageBracket=${ageBracketParam}` : ''}`}
+                    <Link href={`/explore?${(() => {
+                      const p = new URLSearchParams();
+                      if (qParam) p.set('q', qParam);
+                      if (ageBracketParam) p.set('ageBracket', ageBracketParam);
+                      if (typeParam) p.set('type', typeParam);
+                      return p.toString();
+                    })()}`}
                       className="hover:text-purple-200">✕</Link>
                   </span>
                 )}
                 {ageBracketParam && ageBracketNames[ageBracketParam as keyof typeof ageBracketNames] && (
                   <span className="inline-flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
                     {ageBracketNames[ageBracketParam as keyof typeof ageBracketNames]}
-                    <Link href={`/explore${qParam ? `?q=${encodeURIComponent(qParam)}` : ''}${categoryParam ? `${qParam ? '&' : '?'}category=${categoryParam}` : ''}`}
+                    <Link href={`/explore?${(() => {
+                      const p = new URLSearchParams();
+                      if (qParam) p.set('q', qParam);
+                      if (categoryParam) p.set('category', categoryParam);
+                      if (typeParam) p.set('type', typeParam);
+                      return p.toString();
+                    })()}`}
+                      className="hover:text-purple-200">✕</Link>
+                  </span>
+                )}
+                {typeParam && (
+                  <span className="inline-flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                    {typeParam.charAt(0).toUpperCase() + typeParam.slice(1)}
+                    <Link href={`/explore?${(() => {
+                      const p = new URLSearchParams();
+                      if (qParam) p.set('q', qParam);
+                      if (categoryParam) p.set('category', categoryParam);
+                      if (ageBracketParam) p.set('ageBracket', ageBracketParam);
+                      return p.toString();
+                    })()}`}
                       className="hover:text-purple-200">✕</Link>
                   </span>
                 )}

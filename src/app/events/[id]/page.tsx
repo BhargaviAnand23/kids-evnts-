@@ -7,6 +7,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { dbService as db } from '@/services/db';
 import { notFound } from 'next/navigation';
 import { AdBanner } from '@/components/ui/AdBanner';
+import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@/components/shared/EventCard';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
@@ -24,7 +25,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
     age_bracket: eventData.age_bracket,
     date: new Date(eventData.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
     time: eventData.event_time,
-    location: eventData.location,
+    location: eventData.is_online ? 'Online Webinar' : (eventData.location || 'Online'),
     price: eventData.price,
     rating: 4.8, // Mocked rating
     reviews: 124, // Mocked reviews
@@ -66,17 +67,20 @@ export default async function EventDetailPage({ params }: { params: { id: string
               <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
             </div>
 
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4 flex-wrap">
               {eventData.is_sponsored && (
                 <Badge className="bg-purple-600 text-white font-bold shadow-md">
                   ★ Sponsored Activity
                 </Badge>
               )}
+              <span className={`text-xs font-bold px-3 py-1 rounded-full border shadow-sm ${getTypeBadgeStyle(eventData.listing_type)}`}>
+                {getListingTypeDisplayName(eventData.listing_type)}
+              </span>
               <Badge variant="pill" className="bg-purple-100 text-purple-800">
                 {event.category}
               </Badge>
               <Badge variant="pill" className="bg-orange-50 text-orange-700">
-                <Users className="w-3.5 h-3.5 mr-1" /> {event.age_bracket}
+                <Users className="w-3.5 h-3.5 mr-1" /> {ageBracketNames[event.age_bracket] || 'All Ages'}
               </Badge>
             </div>
 
@@ -115,6 +119,98 @@ export default async function EventDetailPage({ params }: { params: { id: string
                 ))}
               </ul>
             </div>
+
+            {/* Competitions Section */}
+            {eventData.listing_type === 'competition' && (
+              <div className="mb-8 bg-amber-50/50 border border-amber-100 rounded-[24px] p-6 md:p-8">
+                <h3 className="text-xl font-bold text-amber-900 mb-4 flex items-center gap-2">
+                  <span>🏆</span> Competition Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {eventData.registration_deadline && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Registration Deadline</h4>
+                      <p className="text-slate-600 text-sm">
+                        {new Date(eventData.registration_deadline).toLocaleDateString('en-IN', {
+                          weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                  {eventData.prize_details && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Prize Details</h4>
+                      <p className="text-slate-600 text-sm whitespace-pre-line">{eventData.prize_details}</p>
+                    </div>
+                  )}
+                </div>
+                {eventData.eligibility_rules && (
+                  <div className="mt-6 border-t border-amber-100 pt-6">
+                    <h4 className="font-bold text-slate-800 text-sm mb-2">Rules & Eligibility</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-line">{eventData.eligibility_rules}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Courses Section */}
+            {eventData.listing_type === 'course' && (
+              <div className="mb-8 bg-emerald-50/50 border border-emerald-100 rounded-[24px] p-6 md:p-8">
+                <h3 className="text-xl font-bold text-emerald-900 mb-4 flex items-center gap-2">
+                  <span>📚</span> Course Syllabus & Schedule
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  {eventData.session_count && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Total Sessions</h4>
+                      <p className="text-slate-600 text-sm">{eventData.session_count} Sessions</p>
+                    </div>
+                  )}
+                  {eventData.session_frequency && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Frequency</h4>
+                      <p className="text-slate-600 text-sm">{eventData.session_frequency}</p>
+                    </div>
+                  )}
+                  {eventData.course_duration_weeks && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Duration</h4>
+                      <p className="text-slate-600 text-sm">{eventData.course_duration_weeks} Weeks</p>
+                    </div>
+                  )}
+                </div>
+                {eventData.curriculum_outline && (
+                  <div className="border-t border-emerald-100 pt-6">
+                    <h4 className="font-bold text-slate-800 text-sm mb-2">Curriculum Outline</h4>
+                    <p className="text-slate-600 text-sm whitespace-pre-line">{eventData.curriculum_outline}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Webinars Section */}
+            {eventData.listing_type === 'webinar' && (
+              <div className="mb-8 bg-blue-50/50 border border-blue-100 rounded-[24px] p-6 md:p-8">
+                <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+                  <span>💻</span> Webinar Information
+                </h3>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-bold text-slate-800 text-sm mb-1">Platform</h4>
+                    <p className="text-slate-600 text-sm">Online (Zoom/Meet/YouTube Live)</p>
+                  </div>
+                  {eventData.join_link && (
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm mb-1">Direct Link</h4>
+                      <a href={eventData.join_link} target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold hover:underline text-sm break-all">
+                        {eventData.join_link}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar Booking Card */}
@@ -160,9 +256,15 @@ export default async function EventDetailPage({ params }: { params: { id: string
                   </div>
                 </div>
 
-                <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14" asChild>
-                  <Link href={`/events/${event.id}/book`}>Book Now</Link>
-                </Button>
+                {eventData.listing_type === 'webinar' ? (
+                  <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14 bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-500/20" asChild>
+                    <a href={eventData.join_link || '#'} target="_blank" rel="noopener noreferrer">Join Online Webinar</a>
+                  </Button>
+                ) : (
+                  <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14" asChild>
+                    <Link href={`/events/${event.id}/book`}>Book Now</Link>
+                  </Button>
+                )}
                 <p className="text-center text-xs text-slate-400 mt-4">You won't be charged yet</p>
               </CardContent>
             </Card>
