@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Calendar, MapPin, Users, Heart, Flame, Sparkles, TrendingUp, Leaf, Star, ArrowRight } from 'lucide-react';
 import { Event } from '@/types';
 
-import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName, listingTypeNames } from '@/utils/event';
-export { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName, listingTypeNames };
+import { ageBracketNames, ageBracketDisplayNames, getTypeBadgeStyle, getListingTypeDisplayName, listingTypeNames } from '@/utils/event';
+export { ageBracketNames, ageBracketDisplayNames, getTypeBadgeStyle, getListingTypeDisplayName, listingTypeNames };
 
 // ── Data-driven badge ──
 type BadgeType = 'hot' | 'popular' | 'new' | 'trending';

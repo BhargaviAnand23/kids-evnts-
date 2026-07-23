@@ -9,7 +9,7 @@ export default function HowItWorksPage() {
       num: '01',
       title: 'Discover & Filter Activities',
       icon: <Search className="w-8 h-8 text-purple-600" />,
-      desc: 'Browse hundreds of sports camps, dance academies, swimming lessons, chess clubs, and art workshops. Filter by category, age group (0-5, 6-12, 13-17), location, or price.'
+      desc: 'Browse hundreds of sports camps, dance academies, swimming lessons, chess clubs, and art workshops. Filter by category, age group (3-5, 6-12, 13-18), location, or price.'
     },
     {
       num: '02',

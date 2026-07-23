@@ -55,7 +55,7 @@ export interface Child {
   school?: School | null
 }
 
-export type AgeBracket = 'early_kids' | 'kids' | 'teens' | 'young_adults'
+export type AgeBracket = 'early_years' | 'kids' | 'teens';
 
 export type ListingType = 'event' | 'competition' | 'course' | 'webinar';
 

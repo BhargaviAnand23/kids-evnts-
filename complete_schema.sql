@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS public.events (
     title TEXT NOT NULL,
     description TEXT,
     category TEXT NOT NULL,
-    age_bracket TEXT NOT NULL CHECK (age_bracket IN ('early_kids', 'kids', 'teens', 'young_adults')),
+    age_bracket TEXT NOT NULL CHECK (age_bracket IN ('early_years', 'kids', 'teens')),
     event_date DATE NOT NULL,
     event_time TIME WITHOUT TIME ZONE NOT NULL,
     location TEXT,

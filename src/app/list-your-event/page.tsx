@@ -295,9 +295,9 @@ export default function ListYourEventPage() {
                       onChange={handleChange}
                       className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     >
-                      <option value="early_kids">Early Kids (0-5 yrs)</option>
+                      <option value="early_years">Early Years (3-5 yrs)</option>
                       <option value="kids">Kids (6-12 yrs)</option>
-                      <option value="teens">Teens (13-17 yrs)</option>
+                      <option value="teens">Teens (13-18 yrs)</option>
                     </select>
                   </div>
 

@@ -29,8 +29,8 @@ export default function SafetyPolicyPage() {
             All listed events must maintain adequate coach-to-student ratios based on age brackets:
           </p>
           <ul className="list-disc pl-6 space-y-2">
-            <li><strong>Early Kids (0-5 yrs):</strong> Maximum 1 instructor per 5 toddlers. Parent/guardian presence required for water and high-energy sessions.</li>
-            <li><strong>Kids & Teens (6-17 yrs):</strong> Maximum 1 instructor per 10 participants. Certified First-Aid kit and trained personnel present on-site.</li>
+            <li><strong>Early Years (3-5 yrs):</strong> Maximum 1 instructor per 5 children. Parent/guardian presence required for water and high-energy sessions.</li>
+            <li><strong>Kids & Teens (6-18 yrs):</strong> Maximum 1 instructor per 10 participants. Certified First-Aid kit and trained personnel present on-site.</li>
             <li>Emergency contact phone numbers are made accessible on the digital check-in roster for immediate contact if needed.</li>
           </ul>
 

@@ -19,7 +19,7 @@ export default function FaqPage() {
     },
     {
       q: 'What age groups are supported on Kidspire?',
-      a: 'We support activities for Early Kids (0-5), Kids (6-12), Teens (13-17), and Young Adults (18+). Each listing clearly specifies the recommended age group.'
+      a: 'We support activities for Early Years (3-5), Kids (6-12), and Teens (13-18). Each listing clearly specifies the recommended age group.'
     },
     {
       q: 'Can I add multiple children to my parent account?',

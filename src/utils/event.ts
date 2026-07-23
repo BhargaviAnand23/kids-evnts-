@@ -1,8 +1,17 @@
 export const ageBracketNames: Record<string, string> = {
-  'early_kids': 'Ages 0–5',
-  'kids':       'Ages 6–12',
-  'teens':      'Ages 13–17',
-  'young_adults': 'Ages 18+',
+  'early_years':  'Ages 3–5',
+  'early_kids':   'Ages 3–5',
+  'kids':         'Ages 6–12',
+  'teens':        'Ages 13–18',
+  'young_adults': 'Ages 13–18',
+};
+
+export const ageBracketDisplayNames: Record<string, string> = {
+  'early_years':  'Early Years',
+  'early_kids':   'Early Years',
+  'kids':         'Kids',
+  'teens':        'Teens',
+  'young_adults': 'Teens',
 };
 
 export const listingTypeNames: Record<string, string> = {

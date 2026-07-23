@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { dbService } from '@/services/db';
-import { EventCard, ageBracketNames } from '@/components/shared/EventCard';
+import { EventCard, ageBracketNames, ageBracketDisplayNames } from '@/components/shared/EventCard';
 import { AnimatedList } from '@/components/animations/AnimatedList';
 import type { Event } from '@/types';
 
@@ -240,7 +240,7 @@ function ExploreContent() {
                   <div>
                     <label className="text-sm font-semibold text-slate-700 mb-3 block">Age Group</label>
                     <div className="space-y-2">
-                      {Object.entries(ageBracketNames).map(([key, name]) => {
+                      {Object.entries({ early_years: 'Early Years (3–5)', kids: 'Kids (6–12)', teens: 'Teens (13–18)' }).map(([key, name]) => {
                         const isSelected = ageBracketParam === key;
                         const buildHref = (newKey?: string) => {
                           const p = new URLSearchParams();
@@ -309,9 +309,9 @@ function ExploreContent() {
                       className="hover:text-purple-200">✕</Link>
                   </span>
                 )}
-                {ageBracketParam && ageBracketNames[ageBracketParam as keyof typeof ageBracketNames] && (
+                {ageBracketParam && (ageBracketDisplayNames[ageBracketParam] || ageBracketNames[ageBracketParam]) && (
                   <span className="inline-flex items-center gap-1.5 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
-                    {ageBracketNames[ageBracketParam as keyof typeof ageBracketNames]}
+                    {ageBracketDisplayNames[ageBracketParam] || ageBracketNames[ageBracketParam]}
                     <Link href={`/explore?${(() => {
                       const p = new URLSearchParams();
                       if (qParam) p.set('q', qParam);

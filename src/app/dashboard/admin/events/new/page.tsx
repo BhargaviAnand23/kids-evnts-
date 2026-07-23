@@ -209,10 +209,9 @@ export default function NewEventPage() {
                   <label htmlFor="age_bracket" className="text-sm font-medium text-slate-700">Age Bracket</label>
                   <select id="age_bracket" name="age_bracket" value={formData.age_bracket} onChange={handleChange}
                     className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500">
-                    <option value="early_kids">Early Kids (0–5)</option>
+                    <option value="early_years">Early Years (3–5)</option>
                     <option value="kids">Kids (6–12)</option>
-                    <option value="teens">Teens (13–17)</option>
-                    <option value="young_adults">Young Adults (18+)</option>
+                    <option value="teens">Teens (13–18)</option>
                   </select>
                 </div>
                 <div className="space-y-2">

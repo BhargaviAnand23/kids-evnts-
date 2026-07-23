@@ -23,10 +23,9 @@ const NAV_LINKS = [
 ];
 
 const ageBracketLabel = (age: number) => {
-  if (age <= 5) return 'Early Kids (0-5)';
+  if (age <= 5) return 'Early Years (3-5)';
   if (age <= 12) return 'Kids (6-12)';
-  if (age <= 17) return 'Teens (13-17)';
-  return 'Young Adult (18+)';
+  return 'Teens (13-18)';
 };
 
 export default function ProfileKidsPage() {

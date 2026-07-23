@@ -71,7 +71,7 @@ const CATEGORIES = [
       },
       {
         q: 'What age groups are events available for?',
-        a: 'Events are categorized into four age brackets: Early Kids (0–5 years), Kids (6–12 years), Teens (13–17 years), and Young Adults (18+). Use the age filter on the Explore page to find events suitable for your child.'
+        a: 'Events are categorized into three age brackets: Early Years (3–5 years), Kids (6–12 years), and Teens (13–18 years). Use the age filter on the Explore page to find events suitable for your child.'
       },
       {
         q: 'What happens if an event is cancelled by the organizer?',

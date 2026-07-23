@@ -82,3 +82,10 @@ DROP POLICY IF EXISTS "Parents can view own notifications" ON public.notificatio
 CREATE POLICY "Parents can view own notifications" ON public.notifications FOR SELECT USING (
     EXISTS (SELECT 1 FROM public.parents p WHERE p.auth_user_id = auth.uid() AND p.id = public.notifications.parent_id)
 );
+
+-- Age bracket migration for 3-18 range: early_years (3-5), kids (6-12), teens (13-18)
+UPDATE public.events SET age_bracket = 'early_years' WHERE age_bracket = 'early_kids';
+UPDATE public.events SET age_bracket = 'teens' WHERE age_bracket = 'young_adults';
+
+ALTER TABLE public.events DROP CONSTRAINT IF EXISTS events_age_bracket_check;
+ALTER TABLE public.events ADD CONSTRAINT events_age_bracket_check CHECK (age_bracket IN ('early_years', 'kids', 'teens'));
