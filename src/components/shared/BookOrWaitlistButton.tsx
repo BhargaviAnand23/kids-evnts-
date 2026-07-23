@@ -14,9 +14,10 @@ interface Props {
   seatsAvailable: number;
   listingType?: string;
   joinLink?: string | null;
+  selectedTierId?: string;
 }
 
-export function BookOrWaitlistButton({ eventId, seatsAvailable, listingType, joinLink }: Props) {
+export function BookOrWaitlistButton({ eventId, seatsAvailable, listingType, joinLink, selectedTierId }: Props) {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [children, setChildren] = useState<Child[]>([]);
@@ -36,9 +37,10 @@ export function BookOrWaitlistButton({ eventId, seatsAvailable, listingType, joi
   }
 
   if (seatsAvailable > 0) {
+    const bookUrl = selectedTierId ? `/events/${eventId}/book?tierId=${selectedTierId}` : `/events/${eventId}/book`;
     return (
       <Button size="lg" className="w-full text-sm md:text-base h-12 md:h-14" asChild>
-        <Link href={`/events/${eventId}/book`}>Book Now</Link>
+        <Link href={bookUrl}>Book Now</Link>
       </Button>
     );
   }

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft, ShieldCheck, Loader2, AlertCircle,
   Plus, UserRound, Phone, FileText, CheckSquare, Square
@@ -17,12 +17,14 @@ import type { Event, Child, Parent } from '@/types';
 export default function BookEventPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const eventId = params.id as string;
 
   const [event, setEvent] = useState<Event | null>(null);
   const [parent, setParent] = useState<Parent | null>(null);
   const [children, setChildren] = useState<Child[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
+  const [selectedTierId, setSelectedTierId] = useState<string>('');
   const [emergencyName, setEmergencyName] = useState('');
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [medicalNotes, setMedicalNotes] = useState('');
@@ -32,6 +34,17 @@ export default function BookEventPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notLoggedIn, setNotLoggedIn] = useState(false);
+
+  const isEventListing = (event?.listing_type || 'event') === 'event';
+  const hasTiers = isEventListing && Array.isArray(event?.seating_tiers) && event!.seating_tiers!.length > 0;
+
+  useEffect(() => {
+    if (event && hasTiers && !selectedTierId) {
+      const tierIdFromUrl = searchParams.get('tierId');
+      const foundTier = event.seating_tiers!.find(t => t.id === tierIdFromUrl);
+      setSelectedTierId(foundTier ? foundTier.id : event.seating_tiers![0].id);
+    }
+  }, [event, hasTiers, searchParams, selectedTierId]);
 
   useEffect(() => {
     const load = async () => {
@@ -93,14 +106,16 @@ export default function BookEventPage() {
           event_id: event.id,
           child_id: childId,
           parent_id: parent.id,
+          tier_id: selectedTier ? selectedTier.id : undefined,
+          tier_name: selectedTier ? selectedTier.tier_name : undefined,
         });
         createdBookingIds.push(booking.id);
 
         // Fire confirmation notification for each child
         const childObj = children.find(c => c.id === childId);
         const perChildFee = 50 / selectedChildIds.length;
-        const perChildGst = Math.round(event.price * 0.18);
-        const childTotal = event.price + perChildFee + perChildGst;
+        const perChildGst = Math.round(unitPrice * 0.18);
+        const childTotal = unitPrice + perChildFee + perChildGst;
 
         fetch('/api/notify/booking-confirmation', {
           method: 'POST',
@@ -156,10 +171,15 @@ export default function BookEventPage() {
     );
   }
 
+  const selectedTier = hasTiers
+    ? event?.seating_tiers?.find(t => t.id === selectedTierId) || event?.seating_tiers?.[0]
+    : null;
+
+  const unitPrice = selectedTier ? selectedTier.tier_price : (event?.price || 0);
   const ticketCount = selectedChildIds.length || 1;
-  const subtotal = event.price * ticketCount;
+  const subtotal = unitPrice * ticketCount;
   const platformFee = 50;
-  const gst = Math.round(event.price * 0.18) * ticketCount;
+  const gst = Math.round(unitPrice * 0.18) * ticketCount;
   const total = subtotal + platformFee + gst;
 
   return (
@@ -175,6 +195,40 @@ export default function BookEventPage() {
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Left Main Form */}
             <div className="w-full lg:w-2/3 space-y-6">
+
+              {/* Seating Tier Selection (if Event has seating tiers) */}
+              {hasTiers && (
+                <Card className="border-purple-200 bg-purple-50/40">
+                  <CardHeader>
+                    <CardTitle className="text-purple-900 text-base">Seating Tier Selected</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {event.seating_tiers!.map(tier => {
+                      const isSelected = selectedTierId === tier.id;
+                      const isSoldOut = tier.tier_seats_available <= 0;
+                      return (
+                        <div
+                          key={tier.id}
+                          onClick={() => !isSoldOut && setSelectedTierId(tier.id)}
+                          className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-center justify-between ${
+                            isSoldOut
+                              ? 'opacity-50 border-slate-200 bg-slate-100 cursor-not-allowed'
+                              : isSelected
+                              ? 'border-purple-600 bg-white ring-2 ring-purple-600/30 shadow-sm'
+                              : 'border-slate-200 bg-white hover:border-purple-300'
+                          }`}
+                        >
+                          <div>
+                            <p className="font-bold text-slate-900 text-sm">{tier.tier_name}</p>
+                            <p className="text-xs text-slate-500">{isSoldOut ? 'Sold Out' : `${tier.tier_seats_available} seats left`}</p>
+                          </div>
+                          <span className="text-base font-extrabold text-purple-700">₹{tier.tier_price}</span>
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Children Selection */}
               <Card>
@@ -295,6 +349,11 @@ export default function BookEventPage() {
                     <p className="text-slate-400 text-sm">
                       {new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · {event.event_time}
                     </p>
+                    {selectedTier && (
+                      <span className="inline-block mt-2 text-xs font-bold bg-purple-900/80 text-purple-200 border border-purple-700/60 px-2.5 py-1 rounded-md">
+                        Tier: {selectedTier.tier_name} (₹{selectedTier.tier_price}/child)
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-3 py-6 border-y border-slate-700 mb-6">
                     <div className="flex justify-between text-sm">

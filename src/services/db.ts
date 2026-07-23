@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, Review } from '@/types'
+import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, Review, SeatingTier } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -431,8 +431,14 @@ export const dbService = {
       const supabase = createClient()
       const { data, error } = await supabase.from('events').select('*').eq('id', id).single()
       if (!error && data) {
+        let seating_tiers: SeatingTier[] = [];
+        if ((data.listing_type || 'event') === 'event') {
+          const { data: tiers } = await supabase.from('event_seating_tiers').select('*').eq('event_id', data.id);
+          if (tiers && tiers.length > 0) seating_tiers = tiers;
+        }
         return {
           ...data,
+          seating_tiers,
           image_url: sanitizeImageUrl(data.image_url),
           organizer: organizations.find(o => o.id === data.organizer_id) || null
         }
@@ -441,8 +447,13 @@ export const dbService = {
     const events = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
     const event = events.find(e => e.id === id || e.id === `evt-${id}` || e.id.replace('evt-', '') === id) || null
     if (event) {
+      const allTiers = getLocalStorageData<SeatingTier[]>('kids_event_seating_tiers', [])
+      const seating_tiers = (event.listing_type || 'event') === 'event' 
+        ? allTiers.filter(t => t.event_id === event.id) 
+        : []
       return {
         ...event,
+        seating_tiers,
         image_url: sanitizeImageUrl(event.image_url),
         organizer: organizations.find(o => o.id === event.organizer_id) || null
       }
@@ -450,9 +461,20 @@ export const dbService = {
     return event
   },
 
+  async getSeatingTiersByEventId(eventId: string): Promise<SeatingTier[]> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase.from('event_seating_tiers').select('*').eq('event_id', eventId)
+      if (!error && data) return data
+    }
+    const tiers = getLocalStorageData<SeatingTier[]>('kids_event_seating_tiers', [])
+    return tiers.filter(t => t.event_id === eventId)
+  },
+
   async createEvent(eventData: Omit<Event, 'id' | 'created_at' | 'status' | 'rejection_reason'>): Promise<Event> {
+    const { seating_tiers, ...cleanEventData } = eventData;
     const newEventData = {
-      ...eventData,
+      ...cleanEventData,
       status: 'pending_review' as const,
       rejection_reason: null
     }
@@ -461,6 +483,17 @@ export const dbService = {
       const supabase = createClient()
       const { data, error } = await supabase.from('events').insert([newEventData]).select().single()
       if (error) throw error
+
+      if ((data.listing_type || 'event') === 'event' && seating_tiers && seating_tiers.length > 0) {
+        const tierInserts = seating_tiers.map(t => ({
+          event_id: data.id,
+          tier_name: t.tier_name,
+          tier_price: t.tier_price,
+          tier_seats_total: t.tier_seats_total,
+          tier_seats_available: t.tier_seats_total
+        }))
+        await supabase.from('event_seating_tiers').insert(tierInserts)
+      }
       return data
     }
 
@@ -469,8 +502,25 @@ export const dbService = {
       ...newEventData,
       id: crypto.randomUUID(),
       created_at: new Date().toISOString(),
-    status: 'approved'
+      status: 'approved'
     }
+
+    if ((newEvent.listing_type || 'event') === 'event' && seating_tiers && seating_tiers.length > 0) {
+      const allTiers = getLocalStorageData<SeatingTier[]>('kids_event_seating_tiers', [])
+      const createdTiers: SeatingTier[] = seating_tiers.map(t => ({
+        id: crypto.randomUUID(),
+        event_id: newEvent.id,
+        tier_name: t.tier_name,
+        tier_price: t.tier_price,
+        tier_seats_total: t.tier_seats_total,
+        tier_seats_available: t.tier_seats_total,
+        created_at: new Date().toISOString()
+      }))
+      allTiers.push(...createdTiers)
+      setLocalStorageData('kids_event_seating_tiers', allTiers)
+      newEvent.seating_tiers = createdTiers
+    }
+
     events.push(newEvent)
     setLocalStorageData('kids_event_events', events)
     return newEvent
@@ -815,7 +865,31 @@ export const dbService = {
     
     if (isSupabaseConfigured()) {
       const supabase = createClient()
-      // Check seat availability to prevent overbooking/race conditions
+
+      // If tier_id is specified, perform tier seat check and decrement
+      if (bookingData.tier_id) {
+        const { data: tier, error: tierErr } = await supabase
+          .from('event_seating_tiers')
+          .select('*')
+          .eq('id', bookingData.tier_id)
+          .single()
+        
+        if (tierErr || !tier) throw new Error('Selected seating tier not found')
+        if (tier.tier_seats_available <= 0) {
+          throw new Error(`Sorry, the ${tier.tier_name} tier is sold out!`)
+        }
+
+        await supabase
+          .from('event_seating_tiers')
+          .update({ tier_seats_available: Math.max(0, tier.tier_seats_available - 1) })
+          .eq('id', bookingData.tier_id)
+
+        if (!bookingData.tier_name) {
+          bookingData.tier_name = tier.tier_name;
+        }
+      }
+
+      // Check overall seat availability to prevent overbooking/race conditions
       const { data: event, error: eventErr } = await supabase
         .from('events')
         .select('seats_available')
@@ -841,6 +915,22 @@ export const dbService = {
       }]).select().single()
       if (error) throw error
       return data
+    }
+
+    // LocalStorage fallback
+    if (bookingData.tier_id) {
+      const tiers = getLocalStorageData<SeatingTier[]>('kids_event_seating_tiers', [])
+      const tierIdx = tiers.findIndex(t => t.id === bookingData.tier_id)
+      if (tierIdx !== -1) {
+        if (tiers[tierIdx].tier_seats_available <= 0) {
+          throw new Error(`Sorry, the ${tiers[tierIdx].tier_name} tier is sold out!`)
+        }
+        tiers[tierIdx].tier_seats_available = Math.max(0, tiers[tierIdx].tier_seats_available - 1)
+        setLocalStorageData('kids_event_seating_tiers', tiers)
+        if (!bookingData.tier_name) {
+          bookingData.tier_name = tiers[tierIdx].tier_name;
+        }
+      }
     }
 
     const bookings = getLocalStorageData<Booking[]>('kids_event_bookings', [])

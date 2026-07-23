@@ -10,6 +10,7 @@ import { AdBanner } from '@/components/ui/AdBanner';
 import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@/utils/event';
 import { WishlistHeart } from '@/components/shared/EventCard';
 import { BookOrWaitlistButton } from '@/components/shared/BookOrWaitlistButton';
+import { EventDetailSidebar } from '@/components/events/EventDetailSidebar';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
@@ -213,62 +214,12 @@ export default async function EventDetailPage({ params }: { params: { id: string
             )}
           </div>
 
-          {/* Sidebar Booking Column — sticky wrapper ensures Card + AdBanner stick together without overlap */}
-          <div className="w-full lg:w-1/3 space-y-6 sticky top-24 self-start">
-            <Card className="border-2 border-purple-100 shadow-xl shadow-purple-900/5">
-              <CardContent className="p-8">
-                <div className="flex items-end justify-between mb-6 pb-6 border-b border-slate-100">
-                  <div>
-                    <span className="text-sm text-slate-500 font-medium">Price per child</span>
-                    <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">₹{event.price}</div>
-                  </div>
-                </div>
-
-                <div className="space-y-5 mb-8">
-                  <div className="flex items-start">
-                    <Calendar className="w-5 h-5 text-purple-600 mr-4 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-slate-900 text-sm md:text-base">Date</h4>
-                      <p className="text-slate-600 text-sm">{event.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <Clock className="w-5 h-5 text-purple-600 mr-4 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-slate-900 text-sm md:text-base">Time</h4>
-                      <p className="text-slate-600 text-sm">{event.time}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start">
-                    <MapPin className="w-5 h-5 text-purple-600 mr-4 mt-0.5" />
-                    <div>
-                      <h4 className="font-semibold text-slate-900 text-sm md:text-base">Location</h4>
-                      <p className="text-slate-600 text-sm">{event.location}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-orange-50 rounded-2xl p-4 mb-6 flex items-start">
-                  <Users className="w-5 h-5 text-orange-500 mr-3 shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-semibold text-orange-900 text-sm">Hurry, filling fast!</h4>
-                    <p className="text-orange-700 text-xs mt-1">Only {event.seats_available} out of {event.seats_total} seats remaining.</p>
-                  </div>
-                </div>
-
-                <BookOrWaitlistButton
-                  eventId={event.id}
-                  seatsAvailable={event.seats_available}
-                  listingType={eventData.listing_type}
-                  joinLink={eventData.join_link}
-                />
-                <p className="text-center text-xs text-slate-400 mt-4">You won't be charged yet</p>
-              </CardContent>
-            </Card>
-
-            {/* Sidebar Ad Placement */}
-            <AdBanner slot="event-detail-sidebar" format="vertical" />
-          </div>
+          {/* Sidebar Booking Column */}
+          <EventDetailSidebar
+            eventData={eventData}
+            formattedDate={event.date}
+            formattedLocation={event.location}
+          />
 
         </div>
       </div>

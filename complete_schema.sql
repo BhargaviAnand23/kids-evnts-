@@ -106,6 +106,17 @@ CREATE TABLE IF NOT EXISTS public.events (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+-- 6b. EVENT SEATING TIERS (Applicable only when listing_type = 'event')
+CREATE TABLE IF NOT EXISTS public.event_seating_tiers (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    event_id TEXT REFERENCES public.events(id) ON DELETE CASCADE NOT NULL,
+    tier_name TEXT NOT NULL,
+    tier_price NUMERIC(10, 2) NOT NULL,
+    tier_seats_total INTEGER NOT NULL,
+    tier_seats_available INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- Ensure all new columns exist on existing events table (Idempotent upgrades)
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS listing_type TEXT DEFAULT 'event' CHECK (listing_type IN ('event', 'competition', 'course', 'webinar'));
 ALTER TABLE public.events ADD COLUMN IF NOT EXISTS registration_deadline TIMESTAMP WITH TIME ZONE;
@@ -129,6 +140,8 @@ CREATE TABLE IF NOT EXISTS public.bookings (
     parent_id TEXT REFERENCES public.parents(id) ON DELETE CASCADE NOT NULL,
     status TEXT DEFAULT 'confirmed' NOT NULL CHECK (status IN ('pending', 'confirmed', 'cancelled')),
     payment_status TEXT DEFAULT 'paid' NOT NULL CHECK (payment_status IN ('pending', 'paid', 'refunded')),
+    tier_id TEXT REFERENCES public.event_seating_tiers(id) ON DELETE SET NULL,
+    tier_name TEXT,
     booking_reference TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );

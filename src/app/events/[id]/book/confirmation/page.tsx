@@ -144,6 +144,9 @@ export default function BookingConfirmationPage() {
                     {booking?.event?.category && (
                       <Badge variant="pill" className="mt-1 bg-purple-100 text-purple-800 text-xs">{booking.event.category}</Badge>
                     )}
+                    {booking?.tier_name && (
+                      <Badge variant="pill" className="mt-1 ml-1.5 bg-indigo-100 text-indigo-800 text-xs">Tier: {booking.tier_name}</Badge>
+                    )}
                   </div>
                   <div className="flex items-start gap-2">
                     <Calendar className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />

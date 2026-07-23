@@ -59,6 +59,16 @@ export type AgeBracket = 'early_years' | 'kids' | 'teens';
 
 export type ListingType = 'event' | 'competition' | 'course' | 'webinar';
 
+export interface SeatingTier {
+  id: string
+  event_id: string
+  tier_name: string
+  tier_price: number
+  tier_seats_total: number
+  tier_seats_available: number
+  created_at?: string
+}
+
 export interface Event {
   id: string
   organizer_id: string
@@ -98,6 +108,9 @@ export interface Event {
   // Webinars
   is_online?: boolean
   join_link?: string | null
+  
+  // VIP / General Seating Tiers (strictly for listing_type === 'event')
+  seating_tiers?: SeatingTier[]
 }
 
 export interface Booking {
@@ -107,6 +120,8 @@ export interface Booking {
   parent_id: string
   status: 'pending' | 'confirmed' | 'cancelled'
   payment_status: 'pending' | 'paid' | 'refunded'
+  tier_id?: string | null
+  tier_name?: string | null
   booking_reference: string
   created_at: string
   event?: Event

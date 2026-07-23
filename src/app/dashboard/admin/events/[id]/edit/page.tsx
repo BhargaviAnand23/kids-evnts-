@@ -23,6 +23,7 @@ export default function EditEventPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [seatingTiers, setSeatingTiers] = useState<{ tier_name: string; tier_price: number; tier_seats_total: number }[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -82,6 +83,14 @@ export default function EditEventPage() {
         const hours = String(d.getHours()).padStart(2, '0');
         const minutes = String(d.getMinutes()).padStart(2, '0');
         deadlineStr = `${year}-${month}-${day}T${hours}:${minutes}`;
+      }
+
+      if (event.seating_tiers && event.seating_tiers.length > 0) {
+        setSeatingTiers(event.seating_tiers.map(t => ({
+          tier_name: t.tier_name,
+          tier_price: t.tier_price,
+          tier_seats_total: t.tier_seats_total
+        })));
       }
 
       setFormData({
@@ -151,6 +160,18 @@ export default function EditEventPage() {
 
       // Webinars
       join_link: isWebinar ? formData.join_link : null,
+
+      // Seating Tiers (Event only)
+      seating_tiers: formData.listing_type === 'event' && seatingTiers.length > 0
+        ? seatingTiers.map(t => ({
+            id: '',
+            event_id: eventId,
+            tier_name: t.tier_name,
+            tier_price: t.tier_price,
+            tier_seats_total: t.tier_seats_total,
+            tier_seats_available: t.tier_seats_total
+          }))
+        : undefined,
 
       // Re-submit for review if we edit
       status: 'pending_review' as const,
@@ -308,16 +329,80 @@ export default function EditEventPage() {
                 </div>
               </div>
 
-              {/* Event Specific: Location and Seats */}
+              {/* Event Specific: Location, Seats & Seating Tiers */}
               {formData.listing_type === 'event' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
-                  <div className="space-y-2">
-                    <label htmlFor="location" className="text-sm font-medium text-slate-700">Location / Venue</label>
-                    <Input id="location" name="location" required value={formData.location} onChange={handleChange} placeholder="e.g. Greenwood Sports Complex, Chennai" />
+                <div className="space-y-4 border-t border-slate-100 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="location" className="text-sm font-medium text-slate-700">Location / Venue</label>
+                      <Input id="location" name="location" required value={formData.location} onChange={handleChange} placeholder="e.g. Greenwood Sports Complex, Chennai" />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="seats_total" className="text-sm font-medium text-slate-700">Total Seats</label>
+                      <Input id="seats_total" name="seats_total" type="number" required value={formData.seats_total} onChange={handleChange} min={1} />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="seats_total" className="text-sm font-medium text-slate-700">Total Seats</label>
-                    <Input id="seats_total" name="seats_total" type="number" required value={formData.seats_total} onChange={handleChange} min={1} />
+
+                  {/* Seating Tiers Section (Only for Event) */}
+                  <div className="bg-purple-50/60 p-4 rounded-xl border border-purple-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-sm text-purple-900">Seating Tiers (VIP / General)</h4>
+                        <p className="text-xs text-purple-600">Optionally define custom tiers (e.g. VIP, Premium, General) with separate pricing & seats.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSeatingTiers(prev => [...prev, { tier_name: prev.length === 0 ? 'VIP' : 'General', tier_price: prev.length === 0 ? 500 : 250, tier_seats_total: 10 }])}
+                        className="text-xs font-semibold bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-colors"
+                      >
+                        + Add Tier
+                      </button>
+                    </div>
+
+                    {seatingTiers.map((tier, idx) => (
+                      <div key={idx} className="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-purple-100 shadow-sm">
+                        <input
+                          type="text"
+                          placeholder="Tier Name (VIP / General)"
+                          value={tier.tier_name}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_name = e.target.value;
+                            setSeatingTiers(updated);
+                          }}
+                          className="flex-1 text-xs border border-slate-200 rounded px-2.5 py-1.5 font-medium"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Price (₹)"
+                          value={tier.tier_price}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_price = parseFloat(e.target.value) || 0;
+                            setSeatingTiers(updated);
+                          }}
+                          className="w-24 text-xs border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Seats"
+                          value={tier.tier_seats_total}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_seats_total = parseInt(e.target.value) || 1;
+                            setSeatingTiers(updated);
+                          }}
+                          className="w-20 text-xs border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSeatingTiers(prev => prev.filter((_, i) => i !== idx))}
+                          className="text-xs text-red-500 hover:text-red-700 px-2 font-bold"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
