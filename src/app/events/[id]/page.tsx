@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { dbService as db } from '@/services/db';
 import { notFound } from 'next/navigation';
 import { AdBanner } from '@/components/ui/AdBanner';
-import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@/components/shared/EventCard';
+import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@/utils/event';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
