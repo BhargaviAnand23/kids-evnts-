@@ -213,9 +213,9 @@ export default async function EventDetailPage({ params }: { params: { id: string
             )}
           </div>
 
-          {/* Sidebar Booking Card */}
-          <div className="w-full lg:w-1/3">
-            <Card className="sticky top-28 border-2 border-purple-100 shadow-xl shadow-purple-900/5">
+          {/* Sidebar Booking Column — sticky wrapper ensures Card + AdBanner stick together without overlap */}
+          <div className="w-full lg:w-1/3 space-y-6 sticky top-24 self-start">
+            <Card className="border-2 border-purple-100 shadow-xl shadow-purple-900/5">
               <CardContent className="p-8">
                 <div className="flex items-end justify-between mb-6 pb-6 border-b border-slate-100">
                   <div>
@@ -267,7 +267,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
             </Card>
 
             {/* Sidebar Ad Placement */}
-            <AdBanner slot="event-detail-sidebar" format="vertical" className="mt-8" />
+            <AdBanner slot="event-detail-sidebar" format="vertical" />
           </div>
 
         </div>

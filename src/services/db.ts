@@ -49,7 +49,7 @@ const SEED_ORGANIZATIONS: Organization[] = [
     id: 'org-swimming-club',
     name: 'Blue Wave Aquatics',
     type: 'club',
-    logo_url: 'https://images.unsplash.com/photo-1519315901367-f34f815b6719?w=100&auto=format&fit=crop&q=60',
+    logo_url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=100&auto=format&fit=crop&q=60',
     contact_email: 'info@bluewave.org',
     address: 'Community Pool, Northgate',
     verified: true,
@@ -124,7 +124,7 @@ export const SEED_EVENTS: Event[] = [
     price: 25.00,
     seats_total: 12,
     seats_available: 5,
-    image_url: 'https://images.unsplash.com/photo-1519315901367-f34f815b6719?w=800&auto=format&fit=crop&q=60',
+    image_url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop&q=60',
     created_at: new Date().toISOString(),
     status: 'approved',
     is_sponsored: true,
@@ -396,9 +396,18 @@ export const dbService = {
       events = SEED_EVENTS.filter(e => e.status === 'approved')
     }
 
+    // Helper to sanitize broken legacy image URLs (e.g. photo-1519315901367-f34f815b6719 which returns 404)
+    const sanitizeImageUrl = (url?: string | null) => {
+      if (!url || url.includes('photo-1519315901367-f34f815b6719') || url.includes('photo-1560090995-01c3288b99d4')) {
+        return 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop&q=60';
+      }
+      return url;
+    };
+
     // Attach organizer info and sort sponsored events to top
     const mapped = events.map(event => ({
       ...event,
+      image_url: sanitizeImageUrl(event.image_url),
       organizer: event.organizer || organizations.find(o => o.id === event.organizer_id) || SEED_ORGANIZATIONS[0]
     }))
 
@@ -411,12 +420,20 @@ export const dbService = {
 
   async getEventById(id: string): Promise<Event | null> {
     const organizations = await this.getOrganizations()
+    const sanitizeImageUrl = (url?: string | null) => {
+      if (!url || url.includes('photo-1519315901367-f34f815b6719') || url.includes('photo-1560090995-01c3288b99d4')) {
+        return 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop&q=60';
+      }
+      return url;
+    };
+
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       const { data, error } = await supabase.from('events').select('*').eq('id', id).single()
       if (!error && data) {
         return {
           ...data,
+          image_url: sanitizeImageUrl(data.image_url),
           organizer: organizations.find(o => o.id === data.organizer_id) || null
         }
       }
@@ -424,7 +441,11 @@ export const dbService = {
     const events = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
     const event = events.find(e => e.id === id || e.id === `evt-${id}` || e.id.replace('evt-', '') === id) || null
     if (event) {
-      event.organizer = organizations.find(o => o.id === event.organizer_id) || null
+      return {
+        ...event,
+        image_url: sanitizeImageUrl(event.image_url),
+        organizer: organizations.find(o => o.id === event.organizer_id) || null
+      }
     }
     return event
   },

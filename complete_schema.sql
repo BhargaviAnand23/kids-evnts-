@@ -338,3 +338,8 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Fix broken legacy Unsplash image URL for Weekend Swim Lessons
+UPDATE public.events 
+SET image_url = 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=800&auto=format&fit=crop&q=60' 
+WHERE id = 'evt-3' OR image_url LIKE '%photo-1519315901367%';

@@ -16,13 +16,19 @@ export function Footer() {
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Make Every Weekend Special?</h2>
               <p className="text-purple-100 text-base leading-relaxed">Join Kidspire today and discover hundreds of engaging sports, arts, and hobby activities for your child.</p>
             </div>
-            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto relative z-10">
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-slate-100 whitespace-nowrap border-none" asChild>
-                <Link href="/explore">Explore Activities</Link>
-              </Button>
-              <Button size="lg" variant="outline" className="text-white border-white/30 hover:bg-white/10 hover:border-white whitespace-nowrap bg-transparent" asChild>
-                <Link href="/signup">Sign Up Free</Link>
-              </Button>
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto relative z-10">
+              <Link
+                href="/explore"
+                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-sm md:text-base bg-white text-purple-700 hover:bg-slate-100 shadow-md transition-all whitespace-nowrap"
+              >
+                Explore Activities
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-sm md:text-base border-2 border-white/80 text-white hover:bg-white/15 hover:border-white transition-all whitespace-nowrap"
+              >
+                Sign Up Free
+              </Link>
             </div>
           </div>
         </FadeContent>

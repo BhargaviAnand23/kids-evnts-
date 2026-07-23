@@ -182,24 +182,33 @@ export function Header() {
             <span className="text-sm font-medium whitespace-nowrap">Chennai</span>
           </div>
 
-          {/* Icons */}
-          <div className="flex items-center space-x-3 xl:space-x-4 text-slate-500 shrink-0">
-            <Link href="/explore" className="hover:text-purple-600 transition-colors" title="Search">
+          {/* Icons Group — Search, Wishlist Heart, Notification Bell aligned on exact horizontal flex baseline */}
+          <div className="flex items-center space-x-1 sm:space-x-1.5 text-slate-500 shrink-0">
+            <Link
+              href="/explore"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 hover:text-purple-600 transition-colors"
+              title="Search"
+            >
               <Search className="w-5 h-5" />
             </Link>
-            <Link href="/dashboard/parent/saved" className="hover:text-purple-600 transition-colors" title="Wishlist">
+            <Link
+              href="/dashboard/parent/saved"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 hover:text-purple-600 transition-colors"
+              title="Wishlist"
+            >
               <Heart className="w-5 h-5" />
             </Link>
             {/* Notification Bell — real data for logged-in parents */}
-            <div ref={notifRef} className="relative">
+            <div ref={notifRef} className="relative flex items-center justify-center">
               <button
                 onClick={() => setNotifOpen(v => !v)}
-                className="relative hover:text-purple-600 transition-colors"
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 hover:text-purple-600 transition-colors relative"
                 title="Notifications"
+                aria-label="Notifications"
               >
                 <Bell className="w-5 h-5" />
                 {notifications.length > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white border-2 border-white">
+                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white border-2 border-white">
                     {notifications.length > 9 ? '9+' : notifications.length}
                   </span>
                 )}
