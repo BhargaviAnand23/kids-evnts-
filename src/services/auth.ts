@@ -109,6 +109,9 @@ export const authService = {
       
       if (error) throw error
       if (!data.user) throw new Error('Sign up failed')
+      if (data.user.identities && data.user.identities.length === 0) {
+        throw new Error('User already registered')
+      }
 
       const userId = data.user.id
       let finalOrgId = organizationId

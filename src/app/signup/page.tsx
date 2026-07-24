@@ -13,6 +13,32 @@ import type { OrganizationType } from '@/types';
 
 type Role = 'parent' | 'admin';
 
+interface SignupError {
+  text: string;
+  isDuplicateEmail?: boolean;
+}
+
+function isDuplicateEmailError(err: any): boolean {
+  if (!err) return false;
+  const message = typeof err === 'string'
+    ? err
+    : (err.message || err.error_description || err.code || JSON.stringify(err));
+  const lowerMsg = message.toLowerCase();
+
+  const isDuplicateCode = ['user_already_exists', 'email_exists', 'email_already_in_use', 'email_taken', 'already_registered'].includes(err.code?.toLowerCase());
+
+  const isDuplicateText =
+    lowerMsg.includes('already registered') ||
+    lowerMsg.includes('already exists') ||
+    lowerMsg.includes('already in use') ||
+    lowerMsg.includes('user already') ||
+    lowerMsg.includes('email_exists') ||
+    lowerMsg.includes('user_already_exists') ||
+    (lowerMsg.includes('email') && (lowerMsg.includes('exist') || lowerMsg.includes('taken') || lowerMsg.includes('registered')));
+
+  return Boolean(isDuplicateCode || isDuplicateText);
+}
+
 export default function SignupPage() {
   const router = useRouter();
   const [role, setRole] = useState<Role>('parent');
@@ -23,7 +49,7 @@ export default function SignupPage() {
   const [orgName, setOrgName] = useState('');
   const [orgType, setOrgType] = useState<OrganizationType>('club');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<SignupError | null>(null);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
@@ -32,19 +58,19 @@ export default function SignupPage() {
     setError(null);
 
     if (!name || !email || !password) {
-      setError('Please fill in all fields.');
+      setError({ text: 'Please fill in all fields.' });
       return;
     }
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError({ text: 'Password must be at least 6 characters.' });
       return;
     }
     if (role === 'admin' && !orgName.trim()) {
-      setError('Please enter your organization or academy name.');
+      setError({ text: 'Please enter your organization or academy name.' });
       return;
     }
     if (!termsAccepted) {
-      setError('You must agree to the Terms of Service and Privacy Policy to continue.');
+      setError({ text: 'You must agree to the Terms of Service and Privacy Policy to continue.' });
       return;
     }
 
@@ -70,7 +96,17 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      setError(err.message || 'Sign up failed. Please try again.');
+      if (isDuplicateEmailError(err)) {
+        setError({
+          text: 'This email is already registered. Please log in instead, or use a different email address.',
+          isDuplicateEmail: true
+        });
+      } else {
+        setError({
+          text: err.message || 'Sign up failed. Please try again.',
+          isDuplicateEmail: false
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -114,7 +150,7 @@ export default function SignupPage() {
             <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
               <button
                 type="button"
-                onClick={() => setRole('parent')}
+                onClick={() => { setRole('parent'); setError(null); }}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
                   role === 'parent'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -125,7 +161,7 @@ export default function SignupPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setRole('admin')}
+                onClick={() => { setRole('admin'); setError(null); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   role === 'admin'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -138,9 +174,21 @@ export default function SignupPage() {
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               {error && (
-                <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
-                  <span>{error}</span>
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
+                  <div className="flex-1 leading-relaxed">
+                    {error.isDuplicateEmail ? (
+                      <span>
+                        This email is already registered. Please{' '}
+                        <Link href="/login" className="font-bold underline text-red-800 hover:text-red-950 transition-colors">
+                          Log In
+                        </Link>{' '}
+                        instead, or use a different email address.
+                      </span>
+                    ) : (
+                      <span>{error.text}</span>
+                    )}
+                  </div>
                 </div>
               )}
 
