@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="50%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#6D28D9" />
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#F3E8FF" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#4C1D95" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background squircle -->
+  <rect x="16" y="16" width="480" height="480" rx="128" fill="url(#bgGrad)" />
+
+  <!-- Outer subtle glowing ring -->
+  <rect x="32" y="32" width="448" height="448" rx="112" fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="8" />
+
+  <!-- Main Kidspire 4-point Sparkle Star -->
+  <path d="M256 72 L288 224 L440 256 L288 288 L256 440 L224 288 L72 256 L224 224 Z" fill="url(#starGrad)" filter="url(#shadow)" />
+
+  <!-- Secondary Gold Sparkle at Top-Right -->
+  <path d="M376 104 L390 144 L430 158 L390 172 L376 212 L362 172 L322 158 L362 144 Z" fill="#FBBF24" opacity="0.95" />
+</svg>
