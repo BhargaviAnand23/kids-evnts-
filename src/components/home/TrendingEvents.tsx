@@ -7,6 +7,8 @@ import { dbService as db, SEED_EVENTS } from '@/services/db';
 import { Event } from '@/types';
 
 
+import { ZigzagDivider } from '@/components/ui/SectionDividers';
+
 // ── Main TrendingEvents section ──
 export function TrendingEvents() {
   const [activeTab, setActiveTab] = useState('All');
@@ -52,8 +54,8 @@ export function TrendingEvents() {
   }, [activeTab]);
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+    <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">
+      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 mb-10">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
@@ -91,6 +93,8 @@ export function TrendingEvents() {
           ))}
         </div>
       </div>
+
+      <ZigzagDivider className="text-purple-200/40" />
     </section>
   );
 }

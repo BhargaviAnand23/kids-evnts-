@@ -79,3 +79,71 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* ── Micro-Animations for Category Icons & Polish ── */
+@keyframes bounceSubtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes wiggleSubtle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes floatSubtle {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(3px, -4px); }
+}
+
+@keyframes mascotBounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.03); }
+}
+
+@keyframes mascotWave {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(15deg); }
+  75% { transform: rotate(-10deg); }
+}
+
+@keyframes meterShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 2.2s ease-in-out infinite;
+}
+
+.animate-wiggle-subtle {
+  animation: wiggleSubtle 2.5s ease-in-out infinite;
+}
+
+.animate-pulse-subtle {
+  animation: pulseSubtle 3s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: floatSubtle 3.5s ease-in-out infinite;
+}
+
+.animate-mascot-bounce {
+  animation: mascotBounce 1.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.animate-mascot-wave {
+  transform-origin: bottom right;
+  animation: mascotWave 1.4s ease-in-out infinite;
+}
+
+.animate-meter-shine {
+  animation: meterShine 2.5s linear infinite;
+}
+

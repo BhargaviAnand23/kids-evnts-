@@ -97,14 +97,123 @@ export function WishlistHeart({ eventId, className = '' }: { eventId: string; cl
   );
 }
 
+// ── Game Meter Progress Bar Component ──
+export function SeatsGameMeter({
+  seatsTotal = 20,
+  seatsAvailable = 20,
+  compact = false
+}: {
+  seatsTotal?: number;
+  seatsAvailable?: number;
+  compact?: boolean;
+}) {
+  const total = Math.max(1, seatsTotal || 20);
+  const available = Math.max(0, seatsAvailable ?? total);
+  const filled = Math.min(total, Math.max(0, total - available));
+  const percentFilled = Math.round((filled / total) * 100);
+
+  const isFull = available === 0;
+  const isAlmostFull = available > 0 && available <= 5;
+
+  let gradient = 'from-purple-500 via-amber-400 to-emerald-500';
+  let badgeText = `${available} seats left`;
+
+  if (isFull) {
+    gradient = 'from-rose-500 to-red-600';
+    badgeText = 'Sold Out';
+  } else if (isAlmostFull) {
+    gradient = 'from-amber-500 to-rose-500';
+    badgeText = `Only ${available} left!`;
+  }
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-slate-100/80 text-[10px]">
+        <div className="w-12 sm:w-14 h-2 bg-slate-200 rounded-full overflow-hidden relative shrink-0">
+          <div
+            className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500 relative overflow-hidden`}
+            style={{ width: `${percentFilled}%` }}
+          >
+            <div className="absolute inset-0 bg-white/35 animate-meter-shine" />
+          </div>
+        </div>
+        <span className={`font-bold whitespace-nowrap ${isFull ? 'text-red-600' : isAlmostFull ? 'text-amber-700' : 'text-slate-700'}`}>
+          {badgeText}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5">
+      <div className="flex items-center justify-between text-xs mb-1.5 font-bold">
+        <span className="text-slate-700 flex items-center gap-1">
+          <span>⚡ Seats Filled</span>
+        </span>
+        <span className={isFull ? 'text-red-600 font-extrabold' : isAlmostFull ? 'text-amber-600 font-extrabold' : 'text-slate-600'}>
+          {isFull ? 'Sold Out' : `${filled}/${total} (${percentFilled}%)`}
+        </span>
+      </div>
+      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden relative shadow-inner">
+        <div
+          className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500 relative overflow-hidden`}
+          style={{ width: `${percentFilled}%` }}
+        >
+          <div className="absolute inset-0 bg-white/35 animate-meter-shine" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── The shared event card ──
 export function EventCard({ event }: { event: Event }) {
   const badge = getEventBadge(event);
   const { label, bg, Icon } = BADGE_CONFIG[badge];
 
+  // 3D Tilt state
+  const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setTilt({ x: x * 8, y: -y * 8, active: true });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0, active: false });
+  };
+
+  // Age-bracket contextual styling (Requirement 7: Early Years playful/rounded vs Teens clean)
+  const isEarlyYears = event.age_bracket === 'early_years';
+  const isTeens = event.age_bracket === 'teens';
+
+  const cardRadiusClass = isEarlyYears
+    ? 'rounded-[28px] border-2 border-amber-200/50 shadow-amber-900/5'
+    : isTeens
+    ? 'rounded-2xl border border-slate-200/80 shadow-slate-900/5'
+    : 'rounded-[24px] border border-slate-100 shadow-purple-900/5';
+
+  const ageBadgeStyle = isEarlyYears
+    ? 'bg-amber-100 text-amber-900 font-bold border border-amber-300/60 rounded-full px-2.5 py-0.5'
+    : isTeens
+    ? 'bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200/60 rounded-md px-2 py-0.5'
+    : 'bg-slate-100 text-slate-700 font-medium rounded-full px-2 py-0.5';
+
   return (
     <Link href={`/events/${event.id}`} className="group block h-full">
-      <div className="bg-white rounded-[24px] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 h-full flex flex-col electric-border-hover">
+      <div
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{
+          transform: tilt.active
+            ? `perspective(1000px) rotateX(${tilt.y}deg) rotateY(${tilt.x}deg) scale3d(1.02, 1.02, 1.02)`
+            : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
+          transition: tilt.active ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
+        }}
+        className={`bg-white overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 h-full flex flex-col electric-border-hover ${cardRadiusClass}`}
+      >
 
         {/* Image */}
         <div className="relative h-48 overflow-hidden shrink-0">
@@ -123,7 +232,7 @@ export function EventCard({ event }: { event: Event }) {
           </div>
 
           {/* Wishlist — top right */}
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 z-10">
             <WishlistHeart eventId={event.id} />
           </div>
 
@@ -136,19 +245,14 @@ export function EventCard({ event }: { event: Event }) {
             </div>
           )}
 
-          {/* Seats warning */}
-          {event.seats_available > 0 && event.seats_available <= 5 && (
-            <div className="absolute bottom-3 right-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 shadow">
-                Only {event.seats_available} left!
-              </span>
-            </div>
-          )}
-          {event.seats_available === 0 && (
-            <div className="absolute bottom-3 right-3">
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600 shadow">Sold Out</span>
-            </div>
-          )}
+          {/* Seats Game Meter Progress Bar — bottom right overlay */}
+          <div className="absolute bottom-3 right-3 z-10">
+            <SeatsGameMeter
+              compact
+              seatsTotal={event.seats_total || 20}
+              seatsAvailable={event.seats_available}
+            />
+          </div>
         </div>
 
         {/* Body */}
@@ -161,7 +265,7 @@ export function EventCard({ event }: { event: Event }) {
             <span className="text-[11px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
               {event.category}
             </span>
-            <span className="flex items-center text-xs text-slate-500 font-medium ml-auto">
+            <span className={`flex items-center text-xs ml-auto ${ageBadgeStyle}`}>
               <Users className="w-3.5 h-3.5 mr-1 text-slate-400" />
               {ageBracketNames[event.age_bracket] || 'All ages'}
             </span>

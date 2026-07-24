@@ -5,6 +5,7 @@ import { Calendar, Clock, MapPin, Users, Ticket } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { BookOrWaitlistButton } from '@/components/shared/BookOrWaitlistButton';
+import { SeatsGameMeter } from '@/components/shared/EventCard';
 import type { Event } from '@/types';
 
 interface Props {
@@ -111,15 +112,12 @@ export function EventDetailSidebar({ eventData, formattedDate, formattedLocation
             </div>
           </div>
 
-          {/* Seats Urgency Banner */}
-          <div className="bg-orange-50 rounded-2xl p-4 mb-6 flex items-start">
-            <Users className="w-5 h-5 text-orange-500 mr-3 shrink-0 mt-0.5" />
-            <div>
-              <h4 className="font-semibold text-orange-900 text-sm">Hurry, filling fast!</h4>
-              <p className="text-orange-700 text-xs mt-1">
-                Only {seatsAvail} out of {seatsTotal} seats remaining{selectedTier ? ` for ${selectedTier.tier_name}` : ''}.
-              </p>
-            </div>
+          {/* Seats Urgency Banner & Game Meter */}
+          <div className="mb-6">
+            <SeatsGameMeter
+              seatsTotal={seatsTotal}
+              seatsAvailable={seatsAvail}
+            />
           </div>
 
           <BookOrWaitlistButton

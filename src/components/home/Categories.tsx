@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { WavyDivider } from '@/components/ui/SectionDividers';
 
 const categories = [
   {
@@ -8,66 +9,88 @@ const categories = [
     link: '/explore?category=football',
     photo: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-green-800/60',
+    icon: '⚽',
+    animClass: 'animate-bounce-subtle',
   },
   {
     name: 'Basketball',
     link: '/explore?category=basketball',
     photo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-orange-700/60',
+    icon: '🏀',
+    animClass: 'animate-bounce-subtle',
   },
   {
     name: 'Dance',
     link: '/explore?category=dance',
     photo: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-pink-700/60',
+    icon: '💃',
+    animClass: 'animate-wiggle-subtle',
   },
   {
     name: 'Swimming',
     link: '/explore?category=swimming',
     photo: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-blue-700/60',
+    icon: '🏊',
+    animClass: 'animate-float-subtle',
   },
   {
     name: 'Skating',
     link: '/explore?category=skating',
     photo: 'https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-teal-700/60',
+    icon: '🛼',
+    animClass: 'animate-float-subtle',
   },
   {
     name: 'Chess',
     link: '/explore?category=chess',
     photo: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-slate-700/60',
+    icon: '♟️',
+    animClass: 'animate-pulse-subtle',
   },
   {
     name: 'Cricket',
     link: '/explore?category=cricket',
     photo: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-sky-700/60',
+    icon: '🏏',
+    animClass: 'animate-bounce-subtle',
   },
   {
     name: 'Music',
     link: '/explore?category=music',
     photo: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-purple-700/60',
+    icon: '🎵',
+    animClass: 'animate-wiggle-subtle',
   },
   {
     name: 'Martial Arts',
     link: '/explore?category=martial-arts',
     photo: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-red-700/60',
+    icon: '🥋',
+    animClass: 'animate-pulse-subtle',
   },
   {
     name: 'Cycling',
     link: '/explore?category=cycling',
     photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-emerald-700/60',
+    icon: '🚴',
+    animClass: 'animate-float-subtle',
   },
   {
     name: 'Yoga & Fitness',
     link: '/explore?category=yoga',
     photo: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=60',
     overlay: 'bg-rose-700/60',
+    icon: '🧘',
+    animClass: 'animate-float-subtle',
   },
 ];
 
@@ -101,6 +124,14 @@ export function Categories() {
               />
               {/* Color-tinted overlay */}
               <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
+
+              {/* Floating micro-animated icon badge */}
+              <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-base shadow-sm ${category.animClass}`}>
+                  {category.icon}
+                </span>
+              </div>
+
               {/* Category name — bottom-pinned bold white text */}
               <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
                 <span className="font-bold text-sm sm:text-base text-white drop-shadow-md leading-tight block text-center">
@@ -111,8 +142,8 @@ export function Categories() {
           ))}
         </div>
 
-        {/* Divider */}
-        <div className="my-16 border-t border-slate-100" />
+        {/* Wavy Section Divider */}
+        <WavyDivider className="my-10 text-purple-200/50" />
 
         {/* Browse by Type */}
         <div className="mb-8 sm:mb-12">
