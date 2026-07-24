@@ -263,7 +263,7 @@ export function Hero() {
               </div>
               <div className="p-2.5">
                 <h4 className="font-bold text-xs text-slate-900 leading-tight">Swim Lessons</h4>
-                <p className="text-[10px] text-purple-600 font-semibold mt-0.5">Few seats left!</p>
+                <p className="text-[10px] text-purple-600 font-semibold mt-0.5">Weekly Program</p>
               </div>
             </div>
 
