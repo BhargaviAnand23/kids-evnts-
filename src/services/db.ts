@@ -738,7 +738,7 @@ export const dbService = {
   async createOrganizationAdminProfile(profile: Omit<OrganizationAdmin, 'id' | 'created_at'>): Promise<OrganizationAdmin> {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
-      const { data, error } = await supabase.from('organization_admins').insert([profile]).select().single()
+      const { data, error } = await supabase.from('organization_admins').upsert([profile], { onConflict: 'auth_user_id' }).select().single()
       if (error) throw error
       return data
     }

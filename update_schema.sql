@@ -84,11 +84,13 @@ CREATE POLICY "Parents can view own notifications" ON public.notifications FOR S
 );
 
 -- Age bracket migration for 3-18 range: early_years (3-5), kids (6-12), teens (13-18)
-UPDATE public.events SET age_bracket = 'early_years' WHERE age_bracket = 'early_kids';
-UPDATE public.events SET age_bracket = 'teens' WHERE age_bracket = 'young_adults';
+-- STEP 1: Add 'early_years' to Postgres enum age_bracket_type if column is ENUM
+-- MUST BE EXECUTED AS A SEPARATE QUERY IN SUPABASE SQL EDITOR FIRST:
+-- ALTER TYPE age_bracket_type ADD VALUE IF NOT EXISTS 'early_years';
 
-ALTER TABLE public.events DROP CONSTRAINT IF EXISTS events_age_bracket_check;
-ALTER TABLE public.events ADD CONSTRAINT events_age_bracket_check CHECK (age_bracket IN ('early_years', 'kids', 'teens'));
+-- STEP 2: Migrate existing records
+UPDATE public.events SET age_bracket = 'early_years' WHERE age_bracket::text = 'early_kids';
+UPDATE public.events SET age_bracket = 'teens' WHERE age_bracket::text = 'young_adults';
 
 -- 12. EVENT SEATING TIERS
 CREATE TABLE IF NOT EXISTS public.event_seating_tiers (

@@ -118,9 +118,11 @@ CREATE POLICY "Allow organization admin CRUD on schools" ON public.schools
         )
     );
 
--- Organizations: Public read; Admins write
+-- Organizations: Public read; Authenticated user insert; Admin CRUD
 CREATE POLICY "Allow public read access to organizations" ON public.organizations
     FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can create organizations" ON public.organizations
+    FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 CREATE POLICY "Allow organization admin CRUD on organizations" ON public.organizations
     FOR ALL USING (
         EXISTS (

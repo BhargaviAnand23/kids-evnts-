@@ -50,21 +50,15 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      let organizationId: string | undefined;
-
-      if (role === 'admin') {
-        // Step 1: Create the organization first, then link the admin to it
-        const newOrg = await dbService.createOrganization({
-          name: orgName.trim(),
-          type: orgType,
-          contact_email: email,
-          logo_url: null,
-          address: null,
-        });
-        organizationId = newOrg.id;
-      }
-
-      const user = await authService.signUp(email, password, name, role, organizationId);
+      const user = await authService.signUp(
+        email,
+        password,
+        name,
+        role,
+        undefined,
+        undefined,
+        role === 'admin' ? { name: orgName.trim(), type: orgType } : undefined
+      );
       if (!user) {
         // null = Supabase email confirmation required — session not yet granted
         setAwaitingConfirmation(true);

@@ -69,6 +69,13 @@ CREATE TABLE IF NOT EXISTS public.children (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+DO $$ 
+BEGIN 
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'age_bracket_type') THEN
+        CREATE TYPE age_bracket_type AS ENUM ('early_years', 'kids', 'teens');
+    END IF;
+END $$;
+
 -- 6. EVENTS
 CREATE TABLE IF NOT EXISTS public.events (
     id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -209,6 +216,17 @@ CREATE POLICY "Allow public read access to schools" ON public.schools FOR SELECT
 -- Organizations
 DROP POLICY IF EXISTS "Allow public read access to organizations" ON public.organizations;
 CREATE POLICY "Allow public read access to organizations" ON public.organizations FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Authenticated users can create organizations" ON public.organizations;
+CREATE POLICY "Authenticated users can create organizations" ON public.organizations FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+
+DROP POLICY IF EXISTS "Allow organization admin CRUD on organizations" ON public.organizations;
+CREATE POLICY "Allow organization admin CRUD on organizations" ON public.organizations FOR ALL USING (
+    EXISTS (
+        SELECT 1 FROM public.organization_admins oa
+        WHERE oa.auth_user_id = auth.uid() AND oa.organization_id = public.organizations.id
+    )
+);
 
 -- Events
 DROP POLICY IF EXISTS "Allow public read access to approved events" ON public.events;

@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/client'
 import { dbService } from './db'
+import type { OrganizationType } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -89,8 +90,9 @@ export const authService = {
     password: string,
     name: string,
     role: 'parent' | 'admin',
-    organizationId?: string, // Required if role is admin
-    schoolId?: string // legacy for child
+    organizationId?: string, // Required if role is admin and linking to existing org
+    schoolId?: string, // legacy for child
+    orgDetails?: { name: string; type: OrganizationType }
   ): Promise<SessionUser | null> {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
@@ -109,13 +111,28 @@ export const authService = {
       if (!data.user) throw new Error('Sign up failed')
 
       const userId = data.user.id
+      let finalOrgId = organizationId
 
       try {
         if (role === 'admin') {
-          if (!organizationId) throw new Error('Organization is required for admins')
+          if (!finalOrgId && orgDetails) {
+            // Step 1: Create organization first as an authenticated user
+            const newOrg = await dbService.createOrganization({
+              name: orgDetails.name,
+              type: orgDetails.type,
+              contact_email: email,
+              logo_url: null,
+              address: null,
+            })
+            finalOrgId = newOrg.id
+          }
+
+          if (!finalOrgId) throw new Error('Organization is required for admins')
+
+          // Step 2: Link user to organization in organization_admins
           await dbService.createOrganizationAdminProfile({
             auth_user_id: userId,
-            organization_id: organizationId,
+            organization_id: finalOrgId,
             name,
             role: 'admin'
           })
@@ -128,7 +145,7 @@ export const authService = {
           })
         }
       } catch (e) {
-        console.warn('Profile creation failed (DB trigger may have handled it):', e)
+        console.warn('Profile creation failed:', e)
       }
 
       if (!data.session) return null // Email confirmation pending
@@ -138,7 +155,7 @@ export const authService = {
         email,
         role,
         name,
-        organization_id: organizationId
+        organization_id: finalOrgId
       }
     }
 
@@ -151,8 +168,20 @@ export const authService = {
         throw new Error('User already exists')
       }
 
+      let finalOrgId = organizationId
+      if (role === 'admin' && !finalOrgId && orgDetails) {
+        const newOrg = await dbService.createOrganization({
+          name: orgDetails.name,
+          type: orgDetails.type,
+          contact_email: email,
+          logo_url: null,
+          address: null,
+        })
+        finalOrgId = newOrg.id
+      }
+
       const mockUserId = crypto.randomUUID()
-      const newUser = { id: mockUserId, email, password, name, role, organizationId, schoolId }
+      const newUser = { id: mockUserId, email, password, name, role, organizationId: finalOrgId, schoolId }
       users.push(newUser)
       localStorage.setItem(usersKey, JSON.stringify(users))
 
@@ -161,15 +190,16 @@ export const authService = {
         email,
         role,
         name,
-        organization_id: organizationId,
+        organization_id: finalOrgId,
         school_id: schoolId
       }
 
       // Automatically create the profiles in local storage tables
       if (role === 'admin') {
+        if (!finalOrgId) throw new Error('Organization is required for admins')
         await dbService.createOrganizationAdminProfile({
           auth_user_id: mockUserId,
-          organization_id: organizationId!,
+          organization_id: finalOrgId,
           name,
           role: 'admin'
         })
