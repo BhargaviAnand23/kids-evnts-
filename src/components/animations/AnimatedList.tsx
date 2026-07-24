@@ -19,7 +19,7 @@ export function AnimatedList({
         if (!React.isValidElement(child)) return child;
         return (
           <div
-            className="animate-fade-in-up transition-all duration-300"
+            className="animate-fade-in-up transition-all duration-300 h-full flex flex-col"
             style={{
               animationDelay: `${index * staggerDelay}ms`,
               animationFillMode: 'both'

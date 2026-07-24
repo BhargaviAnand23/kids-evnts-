@@ -347,7 +347,9 @@ export const dbService = {
       try {
         const { data, error } = await query.order('event_date', { ascending: true })
         if (!error && data && data.length > 0) {
-          events = data
+          const eventMap = new Map(SEED_EVENTS.map(s => [s.id, s]))
+          data.forEach((d: Event) => eventMap.set(d.id, d))
+          events = Array.from(eventMap.values())
         } else {
           events = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
         }
@@ -360,11 +362,20 @@ export const dbService = {
 
     if (!events || events.length === 0) {
       events = SEED_EVENTS
+    } else {
+      // Ensure all seed events are present even if local storage stored a partial set
+      const eventMap = new Map(SEED_EVENTS.map(s => [s.id, s]))
+      events.forEach(e => eventMap.set(e.id, e))
+      events = Array.from(eventMap.values())
     }
 
-    // Apply memory filtering for fallback/local data
+    // Apply memory filtering for local/fallback data and double-checks
     if (filters?.category && filters.category !== 'All') {
-      events = events.filter(e => e.category.toLowerCase() === filters.category!.toLowerCase() || e.category.toLowerCase().replace(/[^a-z0-9]/g, '') === filters.category!.toLowerCase().replace(/[^a-z0-9]/g, ''))
+      const catTarget = filters.category.toLowerCase().replace(/[^a-z0-9]/g, '')
+      events = events.filter(e => {
+        const c = e.category.toLowerCase().replace(/[^a-z0-9]/g, '')
+        return c === catTarget || c.includes(catTarget) || catTarget.includes(c)
+      })
     }
     if (filters?.organizerId && filters.organizerId !== 'All') {
       events = events.filter(e => e.organizer_id === filters.organizerId)
@@ -373,14 +384,23 @@ export const dbService = {
       events = events.filter(e => e.event_date === filters.date)
     }
     if (filters?.ageBracket && filters.ageBracket !== 'All') {
-      events = events.filter(e => e.age_bracket === filters.ageBracket)
+      events = events.filter(e => {
+        const ab = e.age_bracket as string
+        if (ab === filters.ageBracket) return true
+        if (filters.ageBracket === 'early_years' && ab === 'early_kids') return true
+        if (filters.ageBracket === 'early_kids' && ab === 'early_years') return true
+        if (filters.ageBracket === 'teens' && ab === 'young_adults') return true
+        if (filters.ageBracket === 'young_adults' && ab === 'teens') return true
+        return false
+      })
     }
     if (filters?.status !== 'all') {
       const targetStatus = filters?.status || 'approved'
-      events = events.filter(e => e.status === targetStatus)
+      events = events.filter(e => !e.status || e.status === targetStatus)
     }
     if (filters?.listingType && filters.listingType !== 'All') {
-      events = events.filter(e => (e.listing_type || 'event') === filters.listingType!.toLowerCase())
+      const targetType = filters.listingType.toLowerCase()
+      events = events.filter(e => (e.listing_type || 'event').toLowerCase() === targetType)
     }
     if (filters?.keyword) {
       const kw = filters.keyword.toLowerCase()
@@ -393,7 +413,7 @@ export const dbService = {
     }
 
     if (!events || events.length === 0) {
-      events = SEED_EVENTS.filter(e => e.status === 'approved')
+      events = SEED_EVENTS.filter(e => !e.status || e.status === 'approved')
     }
 
     // Helper to sanitize broken legacy image URLs (e.g. photo-1519315901367-f34f815b6719 which returns 404)
