@@ -48,12 +48,12 @@ export function TrendingEvents() {
 
         let filtered = fetched;
         if (activeTab === 'Sports') {
-          const sportsCats = ['football', 'basketball', 'swimming', 'cricket', 'skating', 'martial arts', 'cycling'];
-          filtered = fetched.filter(e => sportsCats.includes(e.category.toLowerCase()));
+          const sportsCats = ['football', 'sports', 'basketball', 'swimming', 'cricket', 'skating', 'martial arts', 'cycling'];
+          filtered = fetched.filter(e => sportsCats.some(cat => e.category.toLowerCase().includes(cat)));
         } else if (activeTab === 'Arts & Crafts') {
-          filtered = fetched.filter(e => ['arts', 'dance', 'crafts'].includes(e.category.toLowerCase()));
+          filtered = fetched.filter(e => ['arts', 'dance', 'crafts', 'drawing', 'painting'].some(cat => e.category.toLowerCase().includes(cat)));
         } else if (activeTab === 'Music') {
-          filtered = fetched.filter(e => ['music', 'dance'].includes(e.category.toLowerCase()));
+          filtered = fetched.filter(e => ['music', 'dance', 'singing'].some(cat => e.category.toLowerCase().includes(cat)));
         } else if (activeTab === 'This Weekend') {
           const now = new Date();
           const weekendEnd = new Date(now);
@@ -62,10 +62,20 @@ export function TrendingEvents() {
             const d = new Date(e.event_date);
             return d >= now && d <= weekendEnd;
           });
-          if (filtered.length === 0) filtered = fetched; // fallback
         }
 
-        setEvents((filtered.length > 0 ? filtered : fetched).slice(0, 4));
+        // Guarantee 4 items to fill the 4-column grid without empty gaps
+        const displayEvents = [...filtered];
+        if (displayEvents.length < 4) {
+          for (const item of fetched) {
+            if (!displayEvents.some(d => d.id === item.id)) {
+              displayEvents.push(item);
+            }
+            if (displayEvents.length >= 4) break;
+          }
+        }
+
+        setEvents(displayEvents.slice(0, 4));
       } catch (err) {
         console.error('Error loading trending events:', err);
         setEvents(SEED_EVENTS.slice(0, 4));
