@@ -19,11 +19,11 @@ export function getEventBadge(event: Event): BadgeType {
   return 'trending';
 }
 
-const BADGE_CONFIG: Record<BadgeType, { label: string; bg: string; Icon: React.ElementType }> = {
-  hot:      { label: 'Hot',      bg: 'bg-red-500',    Icon: Flame      },
-  popular:  { label: 'Popular',  bg: 'bg-orange-500', Icon: Star       },
-  new:      { label: 'New',      bg: 'bg-green-500',  Icon: Leaf       },
-  trending: { label: 'Trending', bg: 'bg-purple-600', Icon: TrendingUp },
+const BADGE_CONFIG: Record<BadgeType, { label: string; bg: string; text: string; Icon: React.ElementType }> = {
+  hot:      { label: 'Hot',      bg: 'bg-fuchsia-600', text: 'text-white',     Icon: Flame      },
+  popular:  { label: 'Popular',  bg: 'bg-amber-400',   text: 'text-amber-950', Icon: Star       },
+  new:      { label: 'New',      bg: 'bg-emerald-600', text: 'text-white',     Icon: Leaf       },
+  trending: { label: 'Trending', bg: 'bg-indigo-600',  text: 'text-white',     Icon: TrendingUp },
 };
 
 import { useRouter } from 'next/navigation';
@@ -182,7 +182,7 @@ export function SeatsGameMeter({
 // ── The shared event card ──
 export function EventCard({ event }: { event: Event }) {
   const badge = getEventBadge(event);
-  const { label, bg, Icon } = BADGE_CONFIG[badge];
+  const { label, bg, text, Icon } = BADGE_CONFIG[badge];
 
   // 3D Tilt state
   const [tilt, setTilt] = useState({ x: 0, y: 0, active: false });
@@ -238,7 +238,7 @@ export function EventCard({ event }: { event: Event }) {
 
           {/* Status badge — top left */}
           <div className="absolute top-3 left-3">
-            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shadow-md ${bg} text-white`}>
+            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold shadow-md ${bg} ${text}`}>
               <Icon className="w-3 h-3" />
               {label}
             </span>
