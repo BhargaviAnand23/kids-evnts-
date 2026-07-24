@@ -11,6 +11,9 @@ import { dbService } from '@/services/db';
 import { Confetti } from '@/components/ui/Confetti';
 import type { Booking } from '@/types';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import { MagneticButton } from '@/components/ui/MagneticButton';
+
 export default function BookingConfirmationPage() {
   const searchParams = useSearchParams();
   const bookingId = searchParams.get('booking');
@@ -19,6 +22,7 @@ export default function BookingConfirmationPage() {
 
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCelebration, setShowCelebration] = useState(true);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,8 +103,56 @@ export default function BookingConfirmationPage() {
     : '—';
 
   return (
-    <div className="bg-slate-50 min-h-screen flex items-center justify-center py-10 sm:py-16 px-6 md:px-16 lg:px-24">
+    <div className="bg-slate-50 min-h-screen flex items-center justify-center py-10 sm:py-16 px-6 md:px-16 lg:px-24 relative overflow-hidden">
       <Confetti />
+
+      {/* ── Full-Screen Celebratory Over-the-Top Takeover ── */}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-50 bg-purple-950/90 backdrop-blur-xl flex items-center justify-center p-6 text-center"
+          >
+            <motion.div
+              initial={{ scale: 0.2, opacity: 0, rotate: -10 }}
+              animate={{ scale: 1, opacity: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 140, damping: 14, mass: 0.8 }}
+              className="max-w-md w-full bg-gradient-to-b from-purple-600 via-purple-700 to-indigo-900 rounded-[32px] p-8 text-white shadow-2xl border-4 border-amber-300/40 relative overflow-hidden"
+            >
+              <div className="w-20 h-20 bg-amber-400 text-purple-950 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce-subtle">
+                <CheckCircle className="w-10 h-10" />
+              </div>
+
+              <span className="inline-block px-3 py-1 bg-amber-300/20 text-amber-300 rounded-full text-xs font-black tracking-widest uppercase mb-2">
+                🎉 Spot Reserved!
+              </span>
+
+              <h2 className="text-3xl font-black mb-2 tracking-tight">You're Going!</h2>
+              <p className="text-purple-200 text-sm mb-6 leading-relaxed">
+                <strong className="text-white">{childName || 'Your child'}</strong> is confirmed for <strong className="text-amber-300">{eventTitle}</strong>.
+              </p>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 mb-6 text-left font-mono text-xs text-purple-100 flex justify-between items-center">
+                <span>PASS #{bookingRef}</span>
+                <span className="px-2 py-0.5 bg-green-400 text-green-950 font-bold rounded text-[10px]">PAID</span>
+              </div>
+
+              <MagneticButton className="w-full">
+                <Button
+                  size="lg"
+                  onClick={() => setShowCelebration(false)}
+                  className="w-full bg-amber-400 hover:bg-amber-300 text-purple-950 font-extrabold h-14 rounded-full text-base shadow-lg shadow-amber-400/30"
+                >
+                  View Digital Pass <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </MagneticButton>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="max-w-2xl w-full">
         {/* Success Header */}
         <div className="text-center mb-8">

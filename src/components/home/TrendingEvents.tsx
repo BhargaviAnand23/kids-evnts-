@@ -7,7 +7,28 @@ import { dbService as db, SEED_EVENTS } from '@/services/db';
 import { Event } from '@/types';
 
 
+import { motion } from 'framer-motion';
 import { ZigzagDivider } from '@/components/ui/SectionDividers';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.45, ease: 'easeOut' as const }
+  },
+};
 
 // ── Main TrendingEvents section ──
 export function TrendingEvents() {
@@ -87,11 +108,20 @@ export function TrendingEvents() {
         </div>
 
         {/* Event Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <motion.div
+          key={activeTab}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+        >
           {events.map(event => (
-            <EventCard key={event.id} event={event} />
+            <motion.div key={event.id} variants={cardVariants}>
+              <EventCard event={event} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <ZigzagDivider className="text-purple-200/40" />

@@ -12,6 +12,8 @@ export const metadata: Metadata = {
   description: "Make Every Weekend Special with engaging sports, arts, and hobby activities for youth.",
 };
 
+import { PageTransition } from "@/components/layout/PageTransition";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -44,7 +46,9 @@ export default function RootLayout({
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
           </main>
           <Footer />
         </div>

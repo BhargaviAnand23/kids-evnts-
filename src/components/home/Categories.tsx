@@ -1,6 +1,8 @@
+"use client";
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { WavyDivider } from '@/components/ui/SectionDividers';
 
 const categories = [
@@ -94,6 +96,26 @@ const categories = [
   },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.4, ease: 'easeOut' as const }
+  },
+};
+
 export function Categories() {
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-white">
@@ -109,38 +131,45 @@ export function Categories() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-50px' }}
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6"
+        >
           {categories.map((category) => (
-            <Link
-              key={category.name}
-              href={category.link}
-              className="group relative h-36 sm:h-40 rounded-[24px] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-            >
-              {/* Background photo */}
-              <img
-                src={category.photo}
-                alt={category.name}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              {/* Color-tinted overlay */}
-              <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
+            <motion.div key={category.name} variants={itemVariants}>
+              <Link
+                href={category.link}
+                className="group relative block h-36 sm:h-40 rounded-[24px] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+              >
+                {/* Background photo */}
+                <img
+                  src={category.photo}
+                  alt={category.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                {/* Color-tinted overlay */}
+                <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
 
-              {/* Floating micro-animated icon badge */}
-              <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-                <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-base shadow-sm ${category.animClass}`}>
-                  {category.icon}
-                </span>
-              </div>
+                {/* Floating micro-animated icon badge */}
+                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-base shadow-sm ${category.animClass}`}>
+                    {category.icon}
+                  </span>
+                </div>
 
-              {/* Category name — bottom-pinned bold white text */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-md leading-tight block text-center">
-                  {category.name}
-                </span>
-              </div>
-            </Link>
+                {/* Category name — bottom-pinned bold white text */}
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+                  <span className="font-bold text-sm sm:text-base text-white drop-shadow-md leading-tight block text-center">
+                    {category.name}
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Wavy Section Divider */}
         <WavyDivider className="my-10 text-purple-200/50" />

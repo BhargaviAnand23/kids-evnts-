@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Search, MapPin, Calendar, Star, Map } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { CountUp } from '@/components/animations/CountUp';
+import { MagneticButton } from '@/components/ui/MagneticButton';
 import { useRouter } from 'next/navigation';
 
 // Decorative SVG doodles — inline, no external images needed
@@ -31,7 +33,24 @@ function DotDoodle({ className }: { className?: string }) {
 export function Hero() {
   const [searchValue, setSearchValue] = useState('');
   const [locationValue, setLocationValue] = useState('Chennai');
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
+
+  // Parallax Scroll Y Offsets
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start']
+  });
+
+  const yFast = useTransform(scrollYProgress, [0, 1], [0, -140]);
+  const ySlow = useTransform(scrollYProgress, [0, 1], [0, 70]);
+  const yMid = useTransform(scrollYProgress, [0, 1], [0, -70]);
+
+  const handleMouseMoveSection = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -39,21 +58,47 @@ export function Hero() {
     router.push(`/explore?${params.toString()}`);
   };
 
-  return (
-    <section className="relative overflow-hidden py-12 md:py-16 lg:py-20"
-      style={{ background: 'linear-gradient(135deg, #ede9fe 0%, #fce7f3 40%, #fff7ed 100%)' }}>
+  const headingWords = [
+    { text: "Make", isGradient: false },
+    { text: "Every", isGradient: false },
+    { text: "Weekend", isGradient: true },
+    { text: "Special!", isGradient: false },
+  ];
 
-      {/* ── Scattered decorative doodles ── */}
-      <StarDoodle   className="absolute top-8  left-8   w-5 h-5  text-purple-400  opacity-50 rotate-12" />
-      <SparkDoodle  className="absolute top-16 left-24  w-4 h-4  text-amber-400   opacity-60 -rotate-6" />
-      <DotDoodle    className="absolute top-6  left-48  w-3 h-3  text-pink-400    opacity-40" />
-      <StarDoodle   className="absolute top-24 right-32 w-6 h-6  text-amber-500   opacity-50 rotate-45" />
-      <SparkDoodle  className="absolute top-8  right-16 w-5 h-5  text-purple-500  opacity-40 rotate-12" />
-      <DotDoodle    className="absolute top-40 right-8  w-4 h-4  text-pink-500    opacity-35" />
-      <StarDoodle   className="absolute bottom-24 left-12 w-4 h-4 text-purple-400 opacity-40 -rotate-12" />
-      <SparkDoodle  className="absolute bottom-16 left-40 w-3 h-3 text-amber-400  opacity-50" />
-      <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-45" />
-      <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 rotate-20" />
+  return (
+    <section
+      ref={sectionRef}
+      onMouseMove={handleMouseMoveSection}
+      className="relative overflow-hidden py-12 md:py-16 lg:py-20"
+      style={{ background: 'linear-gradient(135deg, #ede9fe 0%, #fce7f3 40%, #fff7ed 100%)' }}
+    >
+      {/* ── Interactive Spotlight Glow (Desktop only) ── */}
+      <div
+        className="pointer-events-none absolute inset-0 transition-opacity duration-300 hidden md:block"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(168, 85, 247, 0.15), transparent 80%)`,
+        }}
+      />
+
+      {/* ── Parallax Scattered decorative doodles ── */}
+      <motion.div style={{ y: yFast }} className="pointer-events-none absolute inset-0">
+        <StarDoodle   className="absolute top-8  left-8   w-5 h-5  text-purple-400  opacity-50 rotate-12" />
+        <SparkDoodle  className="absolute top-24 right-32 w-6 h-6  text-amber-500   opacity-50 rotate-45" />
+        <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-45" />
+      </motion.div>
+
+      <motion.div style={{ y: ySlow }} className="pointer-events-none absolute inset-0">
+        <SparkDoodle  className="absolute top-16 left-24  w-4 h-4  text-amber-400   opacity-60 -rotate-6" />
+        <SparkDoodle  className="absolute top-8  right-16 w-5 h-5  text-purple-500  opacity-40 rotate-12" />
+        <StarDoodle   className="absolute bottom-24 left-12 w-4 h-4 text-purple-400 opacity-40 -rotate-12" />
+      </motion.div>
+
+      <motion.div style={{ y: yMid }} className="pointer-events-none absolute inset-0">
+        <DotDoodle    className="absolute top-6  left-48  w-3 h-3  text-pink-400    opacity-40" />
+        <DotDoodle    className="absolute top-40 right-8  w-4 h-4  text-pink-500    opacity-35" />
+        <SparkDoodle  className="absolute bottom-16 left-40 w-3 h-3 text-amber-400  opacity-50" />
+        <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 rotate-20" />
+      </motion.div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
@@ -67,20 +112,26 @@ export function Hero() {
               <span>The #1 Youth Activity Platform</span>
             </div>
 
-            {/* Heading */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-[1.15] tracking-tight mb-6">
-              Make Every{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500">
-                Weekend
-              </span>{' '}
-              Special!
+            {/* Word-by-Word Reveal Heading */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-[1.15] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
+              {headingWords.map((word, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: i * 0.12, ease: 'easeOut' }}
+                  className={word.isGradient ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500" : ""}
+                >
+                  {word.text}
+                </motion.span>
+              ))}
             </h1>
 
             <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
               Discover, book, and track top-rated sports, arts, music, and learning programs designed for children of all ages — all in one seamless place.
             </p>
 
-            {/* Search Bar — unchanged */}
+            {/* Search Bar */}
             <div className="bg-white p-2 md:p-3 rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-center gap-2 mb-10 max-w-xl mx-auto lg:mx-0">
               <div className="flex items-center px-4 w-full md:w-auto flex-1 py-2 border-b md:border-b-0 md:border-r border-slate-100">
                 <Search className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
@@ -103,13 +154,15 @@ export function Hero() {
                   className="w-full bg-transparent text-sm md:text-base focus:outline-none text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <Button
-                size="lg"
-                onClick={handleSearch}
-                className="w-full md:w-auto md:ml-2 rounded-full h-12 md:h-14 px-8 text-sm md:text-base shrink-0 mt-2 md:mt-0 shadow-md shadow-purple-500/25"
-              >
-                Search
-              </Button>
+              <MagneticButton className="w-full md:w-auto shrink-0 mt-2 md:mt-0">
+                <Button
+                  size="lg"
+                  onClick={handleSearch}
+                  className="w-full md:w-auto md:ml-2 rounded-full h-12 md:h-14 px-8 text-sm md:text-base shadow-md shadow-purple-500/25"
+                >
+                  Search
+                </Button>
+              </MagneticButton>
             </div>
 
             {/* Stats Row — unchanged */}
