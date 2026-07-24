@@ -257,15 +257,6 @@ export function EventCard({ event }: { event: Event }) {
               </span>
             </div>
           )}
-
-          {/* Seats Game Meter Progress Bar — bottom right overlay */}
-          <div className="absolute bottom-3 right-3 z-10">
-            <SeatsGameMeter
-              compact
-              seatsTotal={event.seats_total || 20}
-              seatsAvailable={event.seats_available}
-            />
-          </div>
         </div>
 
         {/* Body */}
