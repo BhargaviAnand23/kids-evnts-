@@ -8,7 +8,7 @@ import { authService } from '@/services/auth';
 
 export default function EmailVerifiedPage() {
   const [checking, setChecking] = useState(true);
-  const [role, setRole] = useState<'parent' | 'admin' | null>(null);
+  const [role, setRole] = useState<'parent' | 'admin' | 'super_admin' | null>(null);
 
   useEffect(() => {
     const check = async () => {

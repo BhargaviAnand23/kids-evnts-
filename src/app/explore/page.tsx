@@ -10,6 +10,7 @@ import { AdBanner } from '@/components/ui/AdBanner';
 import { dbService } from '@/services/db';
 import { EventCard, ageBracketNames, ageBracketDisplayNames } from '@/components/shared/EventCard';
 import { AnimatedList } from '@/components/animations/AnimatedList';
+import { LocationSelector, useSelectedLocation } from '@/components/shared/LocationSelector';
 import type { Event } from '@/types';
 
 const CATEGORIES = ['Football', 'Basketball', 'Dance', 'Swimming', 'Chess', 'Arts & Crafts', 'STEM & Tech', 'Martial Arts', 'Music'];
@@ -17,24 +18,29 @@ const CATEGORIES = ['Football', 'Basketball', 'Dance', 'Swimming', 'Chess', 'Art
 function ExploreContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { selectedCity } = useSelectedLocation();
 
   // Read params from URL
   const qParam = searchParams.get('q') || '';
   const categoryParam = searchParams.get('category') || '';
   const ageBracketParam = searchParams.get('ageBracket') || '';
   const typeParam = searchParams.get('type') || '';
+  const locationParam = searchParams.get('location') || '';
 
   // Local controlled input — stays in sync with URL param
   const [keywordInput, setKeywordInput] = useState(qParam);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Active city used for filtering
+  const activeCity = locationParam || selectedCity;
+
   // Decode category from slug form
   const categoryFilter = categoryParam
     ? categoryParam.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')
     : '';
 
-  const loadEvents = useCallback(async (keyword: string, category: string, ageBracket: string, listingType: string) => {
+  const loadEvents = useCallback(async (keyword: string, category: string, ageBracket: string, listingType: string, city: string) => {
     setLoading(true);
     try {
       const result = await dbService.getEvents({
@@ -42,6 +48,7 @@ function ExploreContent() {
         category: category || undefined,
         ageBracket: ageBracket || undefined,
         listingType: listingType || undefined,
+        location: city && city !== 'All' ? city : undefined,
       });
       setEvents(result);
     } catch (e) {
@@ -53,8 +60,8 @@ function ExploreContent() {
 
   useEffect(() => {
     setKeywordInput(qParam);
-    loadEvents(qParam, categoryFilter, ageBracketParam, typeParam);
-  }, [qParam, categoryParam, ageBracketParam, typeParam, loadEvents, categoryFilter]);
+    loadEvents(qParam, categoryFilter, ageBracketParam, typeParam, activeCity);
+  }, [qParam, categoryParam, ageBracketParam, typeParam, activeCity, loadEvents, categoryFilter]);
 
   const applySearch = () => {
     const params = new URLSearchParams();
@@ -154,18 +161,10 @@ function ExploreContent() {
                     )}
                   </div>
 
-                  {/* Location */}
+                  {/* Location Selector */}
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-2 block">Location</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input
-                        type="text"
-                        placeholder="City or area"
-                        defaultValue="Chennai"
-                        className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                    </div>
+                    <label className="text-sm font-semibold text-slate-700 mb-2 block">City Location</label>
+                    <LocationSelector className="w-full" />
                   </div>
 
                   {/* Activity Type */}
@@ -368,14 +367,14 @@ function ExploreContent() {
                 ))}
               </div>
             ) : events.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Search className="w-8 h-8 text-purple-400" />
+              <div className="text-center py-20 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600">
+                  <MapPin className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">No results found</h3>
-                <p className="text-slate-500 mb-6">
-                  {qParam ? `No events match "${qParam}"` : 'No events match the selected filters.'}
-                  <br />Try adjusting your search or <button onClick={clearAll} className="text-purple-600 font-semibold hover:underline">clear all filters</button>.
+                <h3 className="text-xl font-bold text-slate-900 mb-2">No activities found in {activeCity}</h3>
+                <p className="text-slate-500 text-sm mb-6 max-w-md mx-auto">
+                  {qParam ? `No events match "${qParam}" in ${activeCity}.` : `There are currently no local in-person events listed in ${activeCity}.`}
+                  <br />Try switching to <button onClick={clearAll} className="text-purple-600 font-bold hover:underline">All Cities</button> or explore nationwide online workshops.
                 </p>
               </div>
             ) : (

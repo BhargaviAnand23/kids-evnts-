@@ -88,11 +88,13 @@ export function WishlistHeart({ eventId, className = '' }: { eventId: string; cl
     <button
       aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
       onClick={handleClick}
-      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
-        liked ? 'bg-red-500 text-white scale-110' : 'bg-white/90 text-slate-400 hover:text-red-500 hover:bg-white'
+      className={`w-8.5 h-8.5 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
+        liked
+          ? 'bg-heart-active text-white shadow-heart-glow scale-110'
+          : 'bg-white/90 text-slate-400 hover:text-heart-active hover:bg-white hover:scale-105'
       } ${className}`}
     >
-      <Heart className={`w-4 h-4 ${liked ? 'fill-current' : ''}`} />
+      <Heart className={`w-4 h-4 transition-transform duration-200 ${liked ? 'fill-current' : ''}`} />
     </button>
   );
 }

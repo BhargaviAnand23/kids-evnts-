@@ -6,6 +6,11 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+
+    /* Favorite / Heart Accent Color Tokens (Warm Coral-Rose #F43F5E) */
+    --favorite-heart-active: #f43f5e;
+    --favorite-heart-hover: #e11d48;
+    --favorite-heart-shadow: rgba(244, 63, 94, 0.35);
   }
 
   html {
@@ -33,6 +38,21 @@
   }
   .fade-content-reveal {
     animation: fadeContentUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .bg-heart-active {
+    background-color: var(--favorite-heart-active);
+  }
+  .hover\:bg-heart-hover:hover {
+    background-color: var(--favorite-heart-hover);
+  }
+  .text-heart-active {
+    color: var(--favorite-heart-active);
+  }
+  .hover\:text-heart-active:hover {
+    color: var(--favorite-heart-active);
+  }
+  .shadow-heart-glow {
+    box-shadow: 0 4px 14px var(--favorite-heart-shadow);
   }
 }
 

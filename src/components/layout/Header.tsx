@@ -9,6 +9,7 @@ import { Button } from '../ui/Button';
 import { createClient } from '@/utils/supabase/client';
 import { authService } from '@/services/auth';
 import { dbService } from '@/services/db';
+import { LocationSelector } from '@/components/shared/LocationSelector';
 import type { SessionUser } from '@/services/auth';
 
 // ── Avatar initials helper ────────────────────────────────────────────────────
@@ -176,11 +177,8 @@ export function Header() {
 
         {/* Right side actions */}
         <div className="hidden lg:flex items-center space-x-3 xl:space-x-5 shrink-0">
-          {/* Location pill */}
-          <div className="flex items-center text-slate-600 hover:text-purple-600 cursor-pointer transition-colors bg-slate-50 px-3 py-1.5 rounded-full border border-slate-100 shrink-0">
-            <MapPin className="w-4 h-4 mr-1.5 text-purple-500" />
-            <span className="text-sm font-medium whitespace-nowrap">Chennai</span>
-          </div>
+          {/* Location Selector Component */}
+          <LocationSelector />
 
           {/* Icons Group — Search, Wishlist Heart, Notification Bell aligned on exact horizontal flex baseline */}
           <div className="flex items-center space-x-1 sm:space-x-1.5 text-slate-500 shrink-0">
@@ -193,7 +191,7 @@ export function Header() {
             </Link>
             <Link
               href="/dashboard/parent/saved"
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-slate-100 hover:text-purple-600 transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-rose-50 hover:text-heart-active transition-colors"
               title="Wishlist"
             >
               <Heart className="w-5 h-5" />

@@ -8,13 +8,25 @@ const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 }
 
+export type UserRole = 'parent' | 'admin' | 'super_admin';
+
+export const ADMIN_ALLOWLIST = [
+  'admin@kidspire.com',
+  'superadmin@kidspire.com',
+  'founder@kidspire.com',
+  'staff@kidspire.com',
+  'admin@school-evnts.com',
+  'demo.admin@kidspire.com'
+];
+
 export interface SessionUser {
   id: string
   email: string
-  role: 'parent' | 'admin'
+  role: UserRole
   name: string
-  school_id?: string // legacy child/parent dashboard school
-  organization_id?: string // for admins
+  school_id?: string
+  organization_id?: string
+  is_super_admin?: boolean
 }
 
 export const authService = {
@@ -23,7 +35,21 @@ export const authService = {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        // Check if admin
+        const userEmail = (user.email || '').toLowerCase().trim();
+        const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail);
+
+        // Check if super admin
+        if (isAllowlistedAdmin) {
+          return {
+            id: user.id,
+            email: user.email || '',
+            role: 'super_admin',
+            name: user.user_metadata?.name || 'Platform Administrator',
+            is_super_admin: true
+          }
+        }
+
+        // Check if org admin
         const adminProfile = await dbService.getOrganizationAdminProfile(user.id)
         if (adminProfile) {
           return {
@@ -53,7 +79,16 @@ export const authService = {
       const stored = localStorage.getItem('kids_event_current_user')
       if (stored) {
         try {
-          return JSON.parse(stored)
+          const parsed = JSON.parse(stored);
+          const email = (parsed.email || '').toLowerCase().trim();
+          if (ADMIN_ALLOWLIST.includes(email) || parsed.is_super_admin || parsed.role === 'super_admin') {
+            return {
+              ...parsed,
+              role: 'super_admin',
+              is_super_admin: true
+            };
+          }
+          return parsed;
         } catch {
           return null
         }

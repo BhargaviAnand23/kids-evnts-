@@ -49,9 +49,9 @@ export function HappyKidsGallery() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
           <div>
-            <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-pink-600 bg-pink-50 px-3 py-1 rounded-full mb-2">
-              <Heart className="w-3.5 h-3.5 fill-pink-500 text-pink-500" /> Real Moments
-            </span>
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-purple-100 shadow-sm text-xs font-semibold text-purple-700">
+              <Heart className="w-3.5 h-3.5 fill-heart-active text-heart-active" /> Real Moments
+            </div>
             <h3 className="text-xl sm:text-2xl font-bold text-slate-900">
               Happy Kids in Action
             </h3>

@@ -31,7 +31,10 @@ const cardVariants = {
 };
 
 // ── Main TrendingEvents section ──
+import { useSelectedLocation } from '@/components/shared/LocationSelector';
+
 export function TrendingEvents() {
+  const { selectedCity } = useSelectedLocation();
   const [activeTab, setActiveTab] = useState('All');
   const tabs = ['All', 'This Weekend', 'Sports', 'Arts & Crafts', 'Music'];
   const [events, setEvents] = useState<Event[]>(() =>
@@ -41,7 +44,7 @@ export function TrendingEvents() {
   React.useEffect(() => {
     async function loadEvents() {
       try {
-        let fetched = await db.getEvents({ status: 'approved' });
+        let fetched = await db.getEvents({ status: 'approved', location: selectedCity });
         if (!fetched || fetched.length === 0) {
           fetched = SEED_EVENTS.filter(e => e.status === 'approved');
         }
@@ -82,7 +85,7 @@ export function TrendingEvents() {
       }
     }
     loadEvents();
-  }, [activeTab]);
+  }, [activeTab, selectedCity]);
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">

@@ -313,6 +313,7 @@ export const dbService = {
     status?: 'pending_review' | 'approved' | 'rejected' | 'all'
     keyword?: string
     listingType?: string
+    location?: string
   }): Promise<Event[]> {
     const organizations = await this.getOrganizations()
     let events: Event[] = []
@@ -401,6 +402,17 @@ export const dbService = {
     if (filters?.listingType && filters.listingType !== 'All') {
       const targetType = filters.listingType.toLowerCase()
       events = events.filter(e => (e.listing_type || 'event').toLowerCase() === targetType)
+    }
+    if (filters?.location && filters.location !== 'All') {
+      const locTarget = filters.location.toLowerCase().trim()
+      events = events.filter(e => {
+        if (locTarget === 'online') {
+          return e.is_online || (e.location || '').toLowerCase().includes('online')
+        }
+        if (e.is_online) return true; // Online activities are available everywhere!
+        const loc = (e.location || '').toLowerCase()
+        return loc.includes(locTarget) || locTarget.includes(loc.split(',')[0].trim())
+      })
     }
     if (filters?.keyword) {
       const kw = filters.keyword.toLowerCase()
@@ -813,6 +825,16 @@ export const dbService = {
     children.push(newChild)
     setLocalStorageData('kids_event_children', children)
     return newChild
+  },
+
+  async deleteChild(childId: string): Promise<void> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      await supabase.from('children').delete().eq('id', childId)
+    }
+    const children = getLocalStorageData<Child[]>('kids_event_children', [])
+    const updated = children.filter(c => c.id !== childId)
+    setLocalStorageData('kids_event_children', updated)
   },
 
   // --- BOOKINGS ---
@@ -1310,7 +1332,6 @@ export const dbService = {
   async createReview(reviewData: { event_id: string; parent_id: string; rating: number; comment: string }): Promise<Review> {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
-      // Check for existing review (one per parent per event)
       const { data: existing } = await supabase.from('reviews')
         .select('id').eq('event_id', reviewData.event_id).eq('parent_id', reviewData.parent_id).maybeSingle()
       if (existing) throw new Error('You have already submitted a review for this event.')
@@ -1330,5 +1351,83 @@ export const dbService = {
     setLocalStorageData('kids_event_reviews', reviews)
     return newReview
   },
+
+  // ── SUPER ADMIN MANAGEMENT FUNCTIONS ─────────────────────────────────────
+  async getAllUsersAdmin(): Promise<{ id: string; name: string; email: string; role: 'parent' | 'admin' | 'super_admin'; joined_at: string; status: 'active' | 'suspended'; bookings_count: number; events_count: number }[]> {
+    const DEFAULT_ADMIN_USERS = [
+      { id: 'usr-1', name: 'Bhargavi Anand', email: 'bhargavi@example.com', role: 'parent' as const, joined_at: '2024-08-15', status: 'active' as const, bookings_count: 5, events_count: 0 },
+      { id: 'usr-2', name: 'Chennai Youth Soccer Club', email: 'contact@youthsoccer.org', role: 'admin' as const, joined_at: '2024-06-10', status: 'active' as const, bookings_count: 0, events_count: 4 },
+      { id: 'usr-3', name: 'Rhythm Dance Academy', email: 'info@rhythmdance.com', role: 'admin' as const, joined_at: '2024-07-01', status: 'active' as const, bookings_count: 0, events_count: 2 },
+      { id: 'usr-4', name: 'Priya Sundaram', email: 'priya.s@example.com', role: 'parent' as const, joined_at: '2024-09-20', status: 'active' as const, bookings_count: 2, events_count: 0 },
+      { id: 'usr-5', name: 'Platform Admin Staff', email: 'admin@kidspire.com', role: 'super_admin' as const, joined_at: '2024-01-01', status: 'active' as const, bookings_count: 0, events_count: 0 }
+    ];
+    return getLocalStorageData('kids_event_admin_users', DEFAULT_ADMIN_USERS);
+  },
+
+  async updateUserRoleAdmin(userId: string, newRole: 'parent' | 'admin' | 'super_admin'): Promise<void> {
+    const users = await this.getAllUsersAdmin();
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      users[idx].role = newRole;
+      setLocalStorageData('kids_event_admin_users', users);
+    }
+  },
+
+  async toggleUserStatusAdmin(userId: string, newStatus: 'active' | 'suspended'): Promise<void> {
+    const users = await this.getAllUsersAdmin();
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      users[idx].status = newStatus;
+      setLocalStorageData('kids_event_admin_users', users);
+    }
+  },
+
+  async deleteUserAdmin(userId: string): Promise<void> {
+    const users = await this.getAllUsersAdmin();
+    const updated = users.filter(u => u.id !== userId);
+    setLocalStorageData('kids_event_admin_users', updated);
+  },
+
+  async updateEventBadgesAdmin(eventId: string, badges: { is_sponsored?: boolean; is_hot?: boolean; is_popular?: boolean; is_new?: boolean; sponsor_tier?: 'featured' | 'premium' | 'standard' }): Promise<void> {
+    const localEvents = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS);
+    const idx = localEvents.findIndex(e => e.id === eventId);
+    if (idx !== -1) {
+      localEvents[idx] = { ...localEvents[idx], ...badges };
+      setLocalStorageData('kids_event_events', localEvents);
+    }
+  },
+
+  async deleteEventAdmin(eventId: string): Promise<void> {
+    const localEvents = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS);
+    const updated = localEvents.filter(e => e.id !== eventId);
+    setLocalStorageData('kids_event_events', updated);
+  },
+
+  async getCategoriesAdmin(): Promise<{ name: string; icon: string; count: number; description: string }[]> {
+    const DEFAULT_CATEGORIES = [
+      { name: 'Football', icon: '⚽', count: 12, description: 'Soccer training, leagues, and casual kickabouts' },
+      { name: 'Basketball', icon: '🏀', count: 8, description: 'Court skills, shooting drills, and team matches' },
+      { name: 'Dance', icon: '💃', count: 15, description: 'Hip hop, classical, ballet, and contemporary classes' },
+      { name: 'Swimming', icon: '🏊', count: 10, description: 'Water safety, stroke techniques, and swim clubs' },
+      { name: 'Chess', icon: '♟️', count: 6, description: 'Strategy, tactical puzzles, and tournaments' },
+      { name: 'Arts & Crafts', icon: '🎨', count: 18, description: 'Painting, pottery, sketching, and DIY creative arts' },
+      { name: 'STEM & Tech', icon: '🤖', count: 14, description: 'Robotics, coding, science experiments, and AI workshops' },
+      { name: 'Martial Arts', icon: '🥋', count: 9, description: 'Karate, Taekwondo, self-defense, and discipline' },
+      { name: 'Music', icon: '🎵', count: 11, description: 'Vocal training, keyboard, guitar, and rhythm sessions' }
+    ];
+    return getLocalStorageData('kids_event_categories', DEFAULT_CATEGORIES);
+  },
+
+  async addCategoryAdmin(newCat: { name: string; icon: string; description: string }): Promise<void> {
+    const cats = await this.getCategoriesAdmin();
+    cats.push({ ...newCat, count: 0 });
+    setLocalStorageData('kids_event_categories', cats);
+  },
+
+  async deleteCategoryAdmin(categoryName: string): Promise<void> {
+    const cats = await this.getCategoriesAdmin();
+    const updated = cats.filter(c => c.name.toLowerCase() !== categoryName.toLowerCase());
+    setLocalStorageData('kids_event_categories', updated);
+  }
 }
 
