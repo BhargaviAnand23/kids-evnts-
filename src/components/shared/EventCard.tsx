@@ -115,52 +115,65 @@ export function SeatsGameMeter({
   const isFull = available === 0;
   const isAlmostFull = available > 0 && available <= 5;
 
-  let gradient = 'from-purple-500 via-amber-400 to-emerald-500';
+  let gradient = 'from-purple-600 via-amber-400 to-emerald-500';
+  let badgeIcon = '⚡';
   let badgeText = `${available} seats left`;
 
   if (isFull) {
     gradient = 'from-rose-500 to-red-600';
+    badgeIcon = '⛔';
     badgeText = 'Sold Out';
   } else if (isAlmostFull) {
-    gradient = 'from-amber-500 to-rose-500';
+    gradient = 'from-amber-500 via-rose-500 to-red-500';
+    badgeIcon = '🔥';
     badgeText = `Only ${available} left!`;
   }
 
   if (compact) {
     return (
-      <div className="flex items-center gap-2 bg-white/90 backdrop-blur-md px-2.5 py-1 rounded-full shadow-md border border-slate-100/80 text-[10px]">
-        <div className="w-12 sm:w-14 h-2 bg-slate-200 rounded-full overflow-hidden relative shrink-0">
+      <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-md shadow-slate-900/10 rounded-2xl px-3 py-2 flex flex-col gap-1.5 min-w-[125px]">
+        {/* Top row: Status text */}
+        <div className="flex items-center justify-between text-[11px] font-black leading-none">
+          <span className={`flex items-center gap-1.5 ${isFull ? 'text-rose-600 font-black' : isAlmostFull ? 'text-amber-700 font-black' : 'text-slate-800 font-extrabold'}`}>
+            <span>{badgeIcon}</span>
+            <span>{badgeText}</span>
+          </span>
+        </div>
+        {/* Bottom row: Thicker game meter bar */}
+        <div className="w-full h-2.5 bg-slate-200/90 rounded-full overflow-hidden relative shadow-inner">
           <div
             className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500 relative overflow-hidden`}
             style={{ width: `${percentFilled}%` }}
           >
-            <div className="absolute inset-0 bg-white/35 animate-meter-shine" />
+            <div className="absolute inset-0 bg-white/40 animate-meter-shine" />
           </div>
         </div>
-        <span className={`font-bold whitespace-nowrap ${isFull ? 'text-red-600' : isAlmostFull ? 'text-amber-700' : 'text-slate-700'}`}>
-          {badgeText}
-        </span>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5">
-      <div className="flex items-center justify-between text-xs mb-1.5 font-bold">
-        <span className="text-slate-700 flex items-center gap-1">
-          <span>⚡ Seats Filled</span>
+    <div className="w-full bg-slate-50/90 border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+      <div className="flex items-center justify-between text-xs mb-2.5 font-black">
+        <span className="text-slate-800 flex items-center gap-1.5">
+          <span className="text-purple-600">⚡ Seats Filled</span>
         </span>
-        <span className={isFull ? 'text-red-600 font-extrabold' : isAlmostFull ? 'text-amber-600 font-extrabold' : 'text-slate-600'}>
-          {isFull ? 'Sold Out' : `${filled}/${total} (${percentFilled}%)`}
+        <span className={isFull ? 'text-rose-600 font-black' : isAlmostFull ? 'text-amber-700 font-black' : 'text-slate-700 font-bold'}>
+          {isFull ? 'Sold Out' : `${filled} of ${total} (${percentFilled}%)`}
         </span>
       </div>
-      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden relative shadow-inner">
+      <div className="w-full h-3 bg-slate-200/90 rounded-full overflow-hidden relative shadow-inner">
         <div
           className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500 relative overflow-hidden`}
           style={{ width: `${percentFilled}%` }}
         >
-          <div className="absolute inset-0 bg-white/35 animate-meter-shine" />
+          <div className="absolute inset-0 bg-white/40 animate-meter-shine" />
         </div>
+      </div>
+      <div className="flex justify-between items-center text-[11px] text-slate-500 font-semibold mt-2">
+        <span>0 filled</span>
+        <span className="font-bold text-purple-700">{available} seats available</span>
+        <span>{total} capacity</span>
       </div>
     </div>
   );
