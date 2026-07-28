@@ -30,10 +30,19 @@ import { useRouter } from 'next/navigation';
 import { authService } from '@/services/auth';
 import { dbService } from '@/services/db';
 
-export function WishlistHeart({ eventId, className = '' }: { eventId: string; className?: string }) {
+export function WishlistHeart({
+  eventId,
+  className = '',
+  size = 'md'
+}: {
+  eventId: string;
+  className?: string;
+  size?: 'sm' | 'md' | 'lg';
+}) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
   const [parentId, setParentId] = useState<string | null>(null);
+  const [isAnimate, setIsAnimate] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -70,6 +79,9 @@ export function WishlistHeart({ eventId, className = '' }: { eventId: string; cl
       setParentId(profile.id);
     }
 
+    setIsAnimate(true);
+    setTimeout(() => setIsAnimate(false), 300);
+
     const nextState = !liked;
     setLiked(nextState);
     try {
@@ -84,17 +96,34 @@ export function WishlistHeart({ eventId, className = '' }: { eventId: string; cl
     }
   };
 
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-9.5 h-9.5 sm:w-10 sm:h-10',
+    lg: 'w-11 h-11'
+  }[size];
+
+  const iconSizes = {
+    sm: 'w-4 h-4',
+    md: 'w-4.5 h-4.5 sm:w-5 sm:h-5',
+    lg: 'w-5.5 h-5.5'
+  }[size];
+
   return (
     <button
+      type="button"
       aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
       onClick={handleClick}
-      className={`w-8.5 h-8.5 rounded-full flex items-center justify-center shadow-md transition-all duration-200 ${
+      className={`relative group rounded-full flex items-center justify-center transition-all duration-300 ease-out transform active:scale-90 ${sizeClasses} ${
         liked
-          ? 'bg-heart-active text-white shadow-heart-glow scale-110'
-          : 'bg-white/90 text-slate-400 hover:text-heart-active hover:bg-white hover:scale-105'
-      } ${className}`}
+          ? 'bg-purple-600 text-white shadow-[0_4px_14px_rgba(124,58,237,0.35)] border border-purple-500 hover:bg-purple-700 hover:scale-110'
+          : 'bg-white/95 text-slate-400 border border-slate-200/80 shadow-md backdrop-blur-sm hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50/90 hover:scale-110 hover:shadow-lg'
+      } ${isAnimate ? 'animate-heart-pop' : ''} ${className}`}
     >
-      <Heart className={`w-4 h-4 transition-transform duration-200 ${liked ? 'fill-current' : ''}`} />
+      <Heart
+        className={`${iconSizes} transition-all duration-300 ${
+          liked ? 'fill-white stroke-white' : 'stroke-[2.2] group-hover:stroke-purple-600'
+        }`}
+      />
     </button>
   );
 }

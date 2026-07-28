@@ -64,8 +64,11 @@ export default async function EventDetailPage({ params }: { params: { id: string
           
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
-            <div className="w-full h-[360px] md:h-[480px] rounded-[32px] overflow-hidden mb-8 shadow-sm">
+            <div className="w-full h-[360px] md:h-[480px] rounded-[32px] overflow-hidden mb-8 shadow-sm relative">
               <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+              <div className="absolute top-5 right-5 z-10">
+                <WishlistHeart eventId={event.id} size="lg" />
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mb-4 flex-wrap">

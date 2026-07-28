@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { authService } from '@/services/auth';
 import { dbService } from '@/services/db';
+import { WishlistHeart } from '@/components/shared/EventCard';
 
 const NAV_LINKS = [
   { href: '/dashboard/parent', label: 'My Bookings', icon: Ticket },
@@ -74,7 +75,9 @@ export default function SavedEventsPage() {
             ) : savedItems.length === 0 ? (
               <Card>
                 <CardContent className="py-16 text-center">
-                  <Heart className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                  <div className="w-16 h-16 rounded-full bg-purple-50 border border-purple-100 flex items-center justify-center mx-auto mb-4 text-purple-600">
+                    <Heart className="w-8 h-8 fill-purple-100 text-purple-600" />
+                  </div>
                   <p className="font-semibold text-slate-700 mb-2">No saved events yet</p>
                   <p className="text-slate-500 text-sm mb-6">Tap the heart icon on any event to save it for later.</p>
                   <Button asChild><Link href="/explore">Browse Activities</Link></Button>
@@ -87,12 +90,15 @@ export default function SavedEventsPage() {
                   if (!evt) return null;
                   return (
                     <Card key={item.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                      <div className="h-40 bg-slate-200">
+                      <div className="h-44 bg-slate-200 relative">
                         <img
                           src={evt.image_url || 'https://images.unsplash.com/photo-1560272564-c83b66b1ad12?auto=format&fit=crop&q=80&w=400'}
                           alt={evt.title}
                           className="w-full h-full object-cover"
                         />
+                        <div className="absolute top-3 right-3 z-10">
+                          <WishlistHeart eventId={evt.id} />
+                        </div>
                       </div>
                       <CardContent className="p-5">
                         <Badge variant="pill" className="bg-purple-100 text-purple-800 mb-2">{evt.category}</Badge>
@@ -103,10 +109,10 @@ export default function SavedEventsPage() {
                         </div>
                         <div className="flex gap-2">
                           <Button size="sm" asChild className="flex-1">
-                            <Link href={`/events/${evt.id}`}><ExternalLink className="w-4 h-4 mr-2" /> View</Link>
+                            <Link href={`/events/${evt.id}`}><ExternalLink className="w-4 h-4 mr-2" /> View Event</Link>
                           </Button>
-                          <Button size="sm" variant="outline" className="text-red-500 border-red-200 hover:bg-red-50" onClick={() => handleUnsave(evt.id)}>
-                            <Trash2 className="w-4 h-4" />
+                          <Button size="sm" variant="outline" className="text-slate-600 border-slate-200 hover:bg-slate-50" onClick={() => handleUnsave(evt.id)}>
+                            <Trash2 className="w-4 h-4 mr-1 text-slate-400" /> Remove
                           </Button>
                         </div>
                       </CardContent>

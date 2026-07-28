@@ -195,7 +195,7 @@ export function Header() {
             </Link>
             <Link
               href="/dashboard/parent/saved"
-              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-rose-50 hover:text-heart-active transition-colors"
+              className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-purple-50 hover:text-purple-600 transition-colors"
               title="Wishlist"
             >
               <Heart className="w-5 h-5" />

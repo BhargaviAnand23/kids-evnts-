@@ -566,13 +566,13 @@ export default function ProfileKidsPage() {
                     </div>
                   </div>
 
-                  <div className="bg-rose-50/80 border border-rose-100 rounded-2xl p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-heart-active text-white flex items-center justify-center shrink-0">
-                      <Heart className="w-5 h-5 fill-current" />
+                  <div className="bg-purple-50/80 border border-purple-100 rounded-2xl p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <Heart className="w-5 h-5 fill-white text-white" />
                     </div>
                     <div>
-                      <div className="text-2xl font-black text-rose-900">{savedCount}</div>
-                      <div className="text-xs font-semibold text-rose-700">Saved Events</div>
+                      <div className="text-2xl font-black text-purple-950">{savedCount}</div>
+                      <div className="text-xs font-semibold text-purple-700">Saved Events</div>
                     </div>
                   </div>
 
