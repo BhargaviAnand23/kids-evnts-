@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, Review, SeatingTier } from '@/types'
+import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -754,6 +754,17 @@ export const dbService = {
     const allSaved = getLocalStorageData<any[]>('kids_event_saved_events', [])
     const updated = allSaved.filter(s => !(s.parent_id === parentId && s.event_id === eventId))
     setLocalStorageData('kids_event_saved_events', updated)
+  },
+
+  // --- SUPER ADMINS ---
+  async getSuperAdminProfile(authUserId: string): Promise<SuperAdmin | null> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase.from('super_admins').select('*').eq('auth_user_id', authUserId).maybeSingle()
+      if (!error && data) return data
+    }
+    const admins = getLocalStorageData<SuperAdmin[]>('kids_event_super_admins', [])
+    return admins.find(a => a.auth_user_id === authUserId) || null
   },
 
   // --- ORGANIZATION ADMINS ---

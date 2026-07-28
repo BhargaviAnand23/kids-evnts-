@@ -281,6 +281,19 @@ CREATE POLICY "Super admins can manage all seating tiers" ON public.event_seatin
         )
     );
 
+-- Super Admins
+DROP POLICY IF EXISTS "Super admins can read own profile" ON public.super_admins;
+CREATE POLICY "Super admins can read own profile" ON public.super_admins
+    FOR SELECT USING (auth_user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Super admins can insert own profile" ON public.super_admins;
+CREATE POLICY "Super admins can insert own profile" ON public.super_admins
+    FOR INSERT WITH CHECK (auth_user_id = auth.uid());
+
+DROP POLICY IF EXISTS "Super admins can update own profile" ON public.super_admins;
+CREATE POLICY "Super admins can update own profile" ON public.super_admins
+    FOR UPDATE USING (auth_user_id = auth.uid());
+
 -- Parents & Children
 DROP POLICY IF EXISTS "Parents can view own profile" ON public.parents;
 CREATE POLICY "Parents can view own profile" ON public.parents FOR SELECT USING (auth_user_id = auth.uid());

@@ -34,7 +34,8 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const dashboardHref = user.role === 'admin' ? '/dashboard/admin' : '/dashboard/parent';
+  const isSuperAdmin = user.role === 'super_admin' || user.is_super_admin;
+  const dashboardHref = isSuperAdmin ? '/dashboard/super-admin' : user.role === 'admin' ? '/dashboard/admin' : '/dashboard/parent';
 
   return (
     <div ref={ref} className="relative shrink-0">
@@ -60,18 +61,21 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
           <div className="px-4 py-3 border-b border-slate-100 mb-1">
             <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
             <p className="text-xs text-slate-500 truncate">{user.email}</p>
-            <span className="inline-block mt-1.5 text-[10px] font-semibold uppercase tracking-wide bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
-              {user.role === 'admin' ? 'Organizer' : 'Parent'}
+            <span className={`inline-block mt-1.5 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+              isSuperAdmin ? 'bg-purple-100 text-purple-700 border border-purple-200' :
+              user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
+            }`}>
+              {isSuperAdmin ? '⚡ Super Admin' : user.role === 'admin' ? 'Organizer' : 'Parent'}
             </span>
           </div>
 
           <Link
             href={dashboardHref}
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-colors"
+            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-colors font-medium"
           >
-            <LayoutDashboard className="w-4 h-4" />
-            My Dashboard
+            <LayoutDashboard className="w-4 h-4 text-purple-600" />
+            {isSuperAdmin ? 'Super Admin Dashboard' : 'My Dashboard'}
           </Link>
 
           <button

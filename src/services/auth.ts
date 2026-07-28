@@ -38,13 +38,14 @@ export const authService = {
         const userEmail = (user.email || '').toLowerCase().trim();
         const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail);
 
-        // Check if super admin
-        if (isAllowlistedAdmin) {
+        // Check if super admin (DB table or allowlist)
+        const superAdminProfile = await dbService.getSuperAdminProfile(user.id)
+        if (isAllowlistedAdmin || superAdminProfile) {
           return {
             id: user.id,
             email: user.email || '',
             role: 'super_admin',
-            name: user.user_metadata?.name || 'Platform Administrator',
+            name: superAdminProfile?.name || user.user_metadata?.name || 'Platform Administrator',
             is_super_admin: true
           }
         }
@@ -98,6 +99,16 @@ export const authService = {
   },
 
   async recoverProfile(userId: string): Promise<SessionUser | null> {
+    const superAdminProfile = await dbService.getSuperAdminProfile(userId)
+    if (superAdminProfile) {
+      return {
+        id: userId,
+        email: '',
+        role: 'super_admin',
+        name: superAdminProfile.name,
+        is_super_admin: true
+      }
+    }
     const adminProfile = await dbService.getOrganizationAdminProfile(userId)
     if (adminProfile) {
       return {
@@ -272,6 +283,19 @@ export const authService = {
       const userName: string =
         (data.user.user_metadata?.name as string | undefined) ||
         userEmail.split('@')[0]
+
+      // Check super admin profile first
+      const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim());
+      const superAdminProfile = await dbService.getSuperAdminProfile(userId)
+      if (isAllowlistedAdmin || superAdminProfile) {
+        return {
+          id: userId,
+          email: userEmail,
+          role: 'super_admin',
+          name: superAdminProfile?.name || userName || 'Platform Administrator',
+          is_super_admin: true
+        }
+      }
 
       // Check admin profile first
       const adminProfile = await dbService.getOrganizationAdminProfile(userId)

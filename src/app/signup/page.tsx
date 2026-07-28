@@ -90,7 +90,9 @@ export default function SignupPage() {
         setAwaitingConfirmation(true);
         return;
       }
-      if (user.role === 'admin') {
+      if (user.role === 'super_admin' || user.is_super_admin) {
+        router.push('/dashboard/super-admin');
+      } else if (user.role === 'admin') {
         router.push('/dashboard/admin');
       } else {
         router.push('/dashboard/parent');

@@ -29,7 +29,9 @@ export default function LoginPage() {
     try {
       const user = await authService.login(email, password);
       // Redirect based on role
-      if (user.role === 'admin') {
+      if (user.role === 'super_admin' || user.is_super_admin) {
+        router.push('/dashboard/super-admin');
+      } else if (user.role === 'admin') {
         router.push('/dashboard/admin');
       } else {
         router.push('/dashboard/parent');

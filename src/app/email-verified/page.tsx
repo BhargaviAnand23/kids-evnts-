@@ -24,8 +24,8 @@ export default function EmailVerifiedPage() {
     check();
   }, []);
 
-  const dashboardHref = role === 'admin' ? '/dashboard/admin' : role === 'parent' ? '/dashboard/parent' : '/login';
-  const dashboardLabel = role === 'admin' ? 'Go to Partner Dashboard' : role === 'parent' ? 'Go to My Dashboard' : 'Log In';
+  const dashboardHref = role === 'super_admin' ? '/dashboard/super-admin' : role === 'admin' ? '/dashboard/admin' : role === 'parent' ? '/dashboard/parent' : '/login';
+  const dashboardLabel = role === 'super_admin' ? 'Go to Super Admin Dashboard' : role === 'admin' ? 'Go to Partner Dashboard' : role === 'parent' ? 'Go to My Dashboard' : 'Log In';
 
   return (
     <div className="bg-slate-50 min-h-screen flex items-center justify-center px-6 py-16">
