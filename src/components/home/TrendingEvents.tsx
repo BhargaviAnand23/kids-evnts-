@@ -38,7 +38,7 @@ export function TrendingEvents() {
   const [activeTab, setActiveTab] = useState('All');
   const tabs = ['All', 'This Weekend', 'Sports', 'Arts & Crafts', 'Music'];
   const [events, setEvents] = useState<Event[]>(() =>
-    SEED_EVENTS.filter(e => e.status === 'approved').slice(0, 4)
+    SEED_EVENTS.filter(e => e && e.status === 'approved').slice(0, 4)
   );
 
   React.useEffect(() => {
@@ -46,11 +46,12 @@ export function TrendingEvents() {
       try {
         // Always fetch full pool of approved events for fallback
         const allApproved = await db.getEvents({ status: 'approved' });
-        
-        let fetched = allApproved;
+        const validApproved = (allApproved || []).filter(e => e && e.id);
+
+        let fetched = validApproved;
         if (selectedCity && selectedCity !== 'All') {
           const locTarget = selectedCity.toLowerCase().trim();
-          const cityMatches = allApproved.filter(e => {
+          const cityMatches = validApproved.filter(e => {
             if (locTarget === 'online') {
               return e.is_online || (e.location || '').toLowerCase().includes('online');
             }
@@ -81,25 +82,46 @@ export function TrendingEvents() {
           });
         }
 
-        // Guarantee 4 items to fill the 4-column grid without empty gaps
-        const displayEvents = [...filtered];
-        if (displayEvents.length < 4) {
-          for (const item of allApproved) {
-            if (!displayEvents.some(d => d.id === item.id)) {
-              displayEvents.push(item);
-            }
-            if (displayEvents.length >= 4) break;
+        // Deduplicate & sanitize valid events
+        const validEvents: Event[] = [];
+        const seenIds = new Set<string>();
+        for (const item of filtered) {
+          if (item && item.id && !seenIds.has(item.id)) {
+            seenIds.add(item.id);
+            validEvents.push(item);
           }
         }
 
-        setEvents(displayEvents.slice(0, 4));
+        // For 'All' tab, if we have fewer than 4 events, fill up to 4 from validApproved
+        if (activeTab === 'All' && validEvents.length < 4) {
+          for (const item of validApproved) {
+            if (item && item.id && !seenIds.has(item.id)) {
+              seenIds.add(item.id);
+              validEvents.push(item);
+            }
+            if (validEvents.length >= 4) break;
+          }
+        }
+
+        setEvents(validEvents.slice(0, 4));
       } catch (err) {
         console.error('Error loading trending events:', err);
-        setEvents(SEED_EVENTS.slice(0, 4));
+        setEvents(SEED_EVENTS.filter(e => e && e.id).slice(0, 4));
       }
     }
     loadEvents();
   }, [activeTab, selectedCity]);
+
+  // Dynamic grid column class based on actual valid cards count
+  const count = events.length;
+  const gridColsClass =
+    count === 1
+      ? 'grid-cols-1 max-w-md mx-auto'
+      : count === 2
+      ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+      : count === 3
+      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto'
+      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">
@@ -135,20 +157,27 @@ export function TrendingEvents() {
         </div>
 
         {/* Event Cards Grid */}
-        <motion.div
-          key={activeTab}
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
-        >
-          {events.map(event => (
-            <motion.div key={event.id} variants={cardVariants}>
-              <EventCard event={event} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {events.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm max-w-md mx-auto">
+            <p className="text-slate-600 font-semibold text-sm">No activities found for "{activeTab}".</p>
+            <p className="text-slate-400 text-xs mt-1">Try selecting 'All' to view all available activities.</p>
+          </div>
+        ) : (
+          <motion.div
+            key={activeTab}
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            className={`grid gap-6 md:gap-8 ${gridColsClass}`}
+          >
+            {events.filter(e => e && e.id).map(event => (
+              <motion.div key={event.id} variants={cardVariants}>
+                <EventCard event={event} />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
       </div>
 
       <ZigzagDivider className="text-purple-200/40" />
