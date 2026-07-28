@@ -7,7 +7,7 @@ import { FadeContent } from '../animations/FadeContent';
 export function Footer() {
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 md:pt-20 pb-10 mt-16 md:mt-20">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         {/* Footer CTA Banner */}
         <FadeContent>
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-[32px] p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between mb-20 md:mb-24 relative overflow-hidden">

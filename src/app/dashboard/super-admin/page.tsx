@@ -253,7 +253,7 @@ function SuperAdminContent() {
       </aside>
 
       {/* ── Main Content Area ────────────────────────────────────────────── */}
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto overflow-y-auto">
+      <main className="flex-1 p-6 md:p-10 max-w-screen-2xl mx-auto overflow-y-auto">
 
         {/* Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">

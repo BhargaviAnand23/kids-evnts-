@@ -26,15 +26,15 @@ const categories = [
 export default function CategoriesPage() {
   return (
     <div className="bg-slate-50 min-h-screen py-10 sm:py-14 md:py-16">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
           <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Activity Directory
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">Categories</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-3 tracking-tight">Categories</h1>
+          <p className="text-slate-600 text-sm sm:text-base lg:text-lg">
             Browse through our curated directory of youth activities. Select any category to view all matching events and classes.
           </p>
         </div>

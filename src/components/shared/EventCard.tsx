@@ -223,19 +223,13 @@ export function EventCard({ event }: { event: Event }) {
     setTilt({ x: 0, y: 0, active: false });
   };
 
-  const isEarlyYears = event.age_bracket === 'early_years';
-  const isTeens = event.age_bracket === 'teens';
-
   // Standardized Card Border & Shadow across all event cards
   const cardBorderClass = event.is_sponsored
     ? 'rounded-2xl border border-purple-200 shadow-sm hover:border-purple-400 hover:shadow-xl'
     : 'rounded-2xl border border-slate-200/80 shadow-sm hover:border-purple-300 hover:shadow-xl';
 
-  const ageBadgeStyle = isEarlyYears
-    ? 'bg-amber-100 text-amber-900 font-bold border border-amber-300/60 rounded-full px-2.5 py-0.5'
-    : isTeens
-    ? 'bg-indigo-50 text-indigo-700 font-semibold border border-indigo-200/60 rounded-md px-2 py-0.5'
-    : 'bg-slate-100 text-slate-700 font-medium rounded-full px-2 py-0.5';
+  // Standardized Age Badge style across all event cards
+  const ageBadgeStyle = 'bg-slate-100 text-slate-700 font-medium rounded-full px-2.5 py-0.5 border border-slate-200/60';
 
   return (
     <Link href={`/events/${event.id}`} className="group block h-full">
@@ -252,7 +246,7 @@ export function EventCard({ event }: { event: Event }) {
       >
 
         {/* Image */}
-        <div className="relative h-48 overflow-hidden shrink-0">
+        <div className="relative h-48 sm:h-52 lg:h-56 xl:h-60 overflow-hidden shrink-0">
           <img
             src={event.image_url || 'https://images.unsplash.com/photo-1574629810360-7efbb192569a?w=600&auto=format&fit=crop&q=60'}
             alt={event.title}
@@ -275,21 +269,21 @@ export function EventCard({ event }: { event: Event }) {
           {/* Sponsored tag */}
           {event.is_sponsored && (
             <div className="absolute bottom-3 left-3">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-600 text-white shadow">
-                <Sparkles className="w-2.5 h-2.5" /> Sponsored
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold bg-purple-600 text-white shadow">
+                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Sponsored
               </span>
             </div>
           )}
         </div>
 
         {/* Body */}
-        <div className="p-5 flex flex-col flex-1">
+        <div className="p-4 sm:p-5 lg:p-6 flex flex-col flex-1">
           {/* Type Badge + Category pill + age */}
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${getTypeBadgeStyle(event.listing_type)}`}>
+            <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded border ${getTypeBadgeStyle(event.listing_type)}`}>
               {getListingTypeDisplayName(event.listing_type)}
             </span>
-            <span className="text-[11px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] sm:text-xs font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
               {event.category}
             </span>
             <span className={`flex items-center text-xs ml-auto ${ageBadgeStyle}`}>
@@ -299,22 +293,22 @@ export function EventCard({ event }: { event: Event }) {
           </div>
 
           {/* Title */}
-          <h3 className="font-bold text-lg text-slate-900 mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors leading-snug">
+          <h3 className="font-bold text-base sm:text-lg lg:text-xl text-slate-900 mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors leading-snug">
             {event.title}
           </h3>
 
           {/* Organizer */}
-          <p className="text-sm text-slate-500 mb-3 font-medium line-clamp-1">{event.organizer?.name}</p>
+          <p className="text-xs sm:text-sm text-slate-500 mb-3 font-medium line-clamp-1">{event.organizer?.name}</p>
 
           {/* Date */}
-          <div className="flex items-center text-sm text-slate-600 mb-1.5">
+          <div className="flex items-center text-xs sm:text-sm text-slate-600 mb-1.5">
             <Calendar className="w-4 h-4 mr-2 text-slate-400 shrink-0" />
             {new Date(event.event_date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
             {event.event_time ? ` · ${event.event_time.slice(0, 5)}` : ''}
           </div>
 
           {/* Location */}
-          <div className="flex items-center text-sm text-slate-600 mb-3">
+          <div className="flex items-center text-xs sm:text-sm text-slate-600 mb-3">
             <MapPin className="w-4 h-4 mr-2 text-slate-400 shrink-0" />
             <span className="truncate">
               {event.is_online ? 'Online Webinar' : (event.location || 'Online')}
@@ -343,12 +337,12 @@ export function EventCard({ event }: { event: Event }) {
           {/* Price + Book Now */}
           <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
             <div>
-              <span className="font-bold text-xl text-slate-900">₹{event.price}</span>
+              <span className="font-bold text-lg sm:text-xl lg:text-2xl text-slate-900">₹{event.price}</span>
               <span className="text-xs text-slate-400 ml-1">/ child</span>
             </div>
             <button
               onClick={e => e.stopPropagation()}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-sm font-semibold rounded-full transition-all duration-150 shadow-sm shadow-purple-500/30 shrink-0"
+              className="px-3.5 sm:px-4 lg:px-5 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-xs sm:text-sm lg:text-base font-semibold rounded-full transition-all duration-150 shadow-sm shadow-purple-500/30 shrink-0"
             >
               {event.listing_type === 'webinar' ? 'Join Online' : 'Book Now'}
             </button>

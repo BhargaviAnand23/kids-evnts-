@@ -29,10 +29,10 @@ const testimonials = [
 export function Testimonials() {
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-slate-50">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 sm:mb-6 tracking-tight">Loved by Parents & Partners</h2>
-          <p className="text-slate-600 text-base">Don't just take our word for it. Here's what our community has to say about Kidspire.</p>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">Loved by Parents & Partners</h2>
+          <p className="text-slate-600 text-sm sm:text-base lg:text-lg">Don't just take our word for it. Here's what our community has to say about Kidspire.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

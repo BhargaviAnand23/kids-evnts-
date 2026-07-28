@@ -12,7 +12,7 @@ export default function Home() {
   return (
     <div>
       <Hero />
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 py-4">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-4">
         <AdBanner slot="homepage-below-hero" format="horizontal" />
       </div>
       <Categories />

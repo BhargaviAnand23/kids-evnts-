@@ -102,7 +102,7 @@ export function Hero() {
         <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 rotate-20" />
       </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 relative z-10">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
           {/* ── Left Column ── */}
@@ -115,7 +115,7 @@ export function Hero() {
             </div>
 
             {/* Word-by-Word Reveal Heading */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 leading-[1.15] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-[1.12] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
               {headingWords.map((word, i) => (
                 <motion.span
                   key={i}
@@ -129,12 +129,12 @@ export function Hero() {
               ))}
             </h1>
 
-            <p className="text-slate-600 text-base md:text-lg mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-slate-600 text-base md:text-lg lg:text-xl xl:text-2xl mb-8 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed">
               Discover, book, and track top-rated sports, arts, music, and learning programs designed for children of all ages — all in one seamless place.
             </p>
 
             {/* Search Bar */}
-            <div className="bg-white p-2 md:p-3 rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-center gap-2 mb-10 max-w-xl mx-auto lg:mx-0">
+            <div className="bg-white p-2 md:p-3 rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-center gap-2 mb-10 max-w-xl lg:max-w-2xl mx-auto lg:mx-0">
               <div className="flex items-center px-4 w-full md:w-auto flex-1 py-2 border-b md:border-b-0 md:border-r border-slate-100">
                 <Search className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
                 <input
@@ -143,7 +143,7 @@ export function Hero() {
                   value={searchValue}
                   onChange={e => setSearchValue(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="w-full bg-transparent text-sm md:text-base focus:outline-none text-slate-800 placeholder-slate-400"
+                  className="w-full bg-transparent text-sm md:text-base lg:text-lg focus:outline-none text-slate-800 placeholder-slate-400"
                 />
               </div>
               <div className="flex items-center px-4 w-full md:w-auto shrink-0 py-2">
@@ -153,53 +153,53 @@ export function Hero() {
                 <Button
                   size="lg"
                   onClick={handleSearch}
-                  className="w-full md:w-auto md:ml-2 rounded-full h-12 md:h-14 px-8 text-sm md:text-base shadow-md shadow-purple-500/25"
+                  className="w-full md:w-auto md:ml-2 rounded-full h-12 md:h-14 px-8 text-sm md:text-base lg:text-lg shadow-md shadow-purple-500/25"
                 >
                   Search
                 </Button>
               </MagneticButton>
             </div>
 
-            {/* Stats Row — unchanged */}
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-8 md:gap-12 text-slate-700">
+            {/* Micro Stats */}
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/60 pt-6 max-w-lg mx-auto lg:mx-0">
               <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-orange-100 text-orange-600 mr-3">
-                  <Calendar className="w-5 h-5" />
+                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-orange-100 text-orange-600 mr-3 shrink-0">
+                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl leading-none mb-1">
+                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
                     <CountUp end={500} suffix="+" duration={1500} />
                   </div>
-                  <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Events</div>
+                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Events</div>
                 </div>
               </div>
               <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 text-purple-600 mr-3">
-                  <Map className="w-5 h-5" />
+                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-100 text-purple-600 mr-3 shrink-0">
+                  <Map className="w-5 h-5 lg:w-6 lg:h-6" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl leading-none mb-1">
+                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
                     <CountUp end={120} suffix="+" duration={1500} />
                   </div>
-                  <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Venues</div>
+                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Venues</div>
                 </div>
               </div>
               <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 mr-3">
-                  <Star className="w-5 h-5" />
+                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-blue-100 text-blue-600 mr-3 shrink-0">
+                  <Star className="w-5 h-5 lg:w-6 lg:h-6" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl leading-none mb-1">
+                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
                     <CountUp end={4.9} decimals={1} suffix="/5" duration={1500} />
                   </div>
-                  <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Rating</div>
+                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Rating</div>
                 </div>
               </div>
             </div>
           </div>
 
           {/* ── Right Column — Photo collage ── */}
-          <div className="w-full lg:w-1/2 relative h-[380px] sm:h-[460px] md:h-[520px] lg:h-[560px] mt-6 lg:mt-0 pr-2 sm:pr-4">
+          <div className="w-full lg:w-1/2 relative h-[380px] sm:h-[460px] md:h-[520px] lg:h-[580px] xl:h-[640px] 2xl:h-[700px] mt-6 lg:mt-0 pr-2 sm:pr-4">
 
             {/* Main large photo */}
             <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-4/5 h-[85%] rounded-[40px] overflow-visible z-10 rotate-2 hover:rotate-0 transition-transform duration-500">

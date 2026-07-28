@@ -4,7 +4,7 @@ import { Trophy, MapPin, Calendar, ArrowRight } from 'lucide-react';
 export function MegaEventBanner() {
   return (
     <section className="py-8 md:py-10 lg:py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="relative w-full rounded-[32px] overflow-hidden min-h-[280px] sm:min-h-[320px] md:min-h-[360px] flex items-end shadow-2xl shadow-purple-900/20">
 
           {/* ── Background photo ── */}
@@ -31,7 +31,7 @@ export function MegaEventBanner() {
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 leading-tight tracking-tight drop-shadow-md">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 leading-tight tracking-tight drop-shadow-md">
                 Kids Sports Festival 2025
               </h2>
 

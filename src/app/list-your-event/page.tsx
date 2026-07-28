@@ -69,7 +69,7 @@ export default function ListYourEventPage() {
 
   return (
     <div className="bg-slate-50 min-h-screen py-10 sm:py-14 md:py-16">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">

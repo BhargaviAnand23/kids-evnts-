@@ -141,7 +141,7 @@ export default function ParentSettingsPage() {
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 sm:mb-8">My Dashboard</h1>
         <div className="flex flex-col md:flex-row gap-8">
 

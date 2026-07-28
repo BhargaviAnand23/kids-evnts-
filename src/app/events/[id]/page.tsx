@@ -46,7 +46,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
     <div className="bg-slate-50 min-h-screen pb-24">
       {/* Top Nav/Breadcrumb */}
       <div className="bg-white border-b border-slate-100 py-4">
-        <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 flex items-center justify-between">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex items-center justify-between">
           <Link href="/explore" className="text-slate-500 hover:text-purple-600 flex items-center text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Explore
           </Link>
@@ -59,12 +59,12 @@ export default async function EventDetailPage({ params }: { params: { id: string
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24 mt-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 mt-8">
         <div className="flex flex-col lg:flex-row gap-10">
           
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
-            <div className="w-full h-[360px] md:h-[480px] rounded-[32px] overflow-hidden mb-8 shadow-sm relative">
+            <div className="w-full h-[320px] sm:h-[400px] md:h-[480px] lg:h-[540px] xl:h-[600px] rounded-[32px] overflow-hidden mb-8 shadow-sm relative">
               <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
               <div className="absolute top-5 right-5 z-10">
                 <WishlistHeart eventId={event.id} size="lg" />
@@ -88,7 +88,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
               </Badge>
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
             
             <div className="flex items-center text-slate-600 mb-8 border-b border-slate-200 pb-8">
               <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl mr-4">

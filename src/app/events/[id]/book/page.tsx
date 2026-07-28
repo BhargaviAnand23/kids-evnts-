@@ -184,7 +184,7 @@ export default function BookEventPage() {
 
   return (
     <div className="bg-slate-50 min-h-screen py-10">
-      <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-24">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <Link href={`/events/${event.id}`} className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-purple-600 mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4 mr-2" /> Back to Event Details
         </Link>
