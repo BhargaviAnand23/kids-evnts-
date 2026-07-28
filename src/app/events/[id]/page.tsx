@@ -83,7 +83,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
               <Badge variant="pill" className="bg-purple-100 text-purple-800">
                 {event.category}
               </Badge>
-              <Badge variant="pill" className="bg-orange-50 text-orange-700">
+              <Badge variant="pill" className="bg-slate-100 text-slate-700 border border-slate-200/60 font-medium">
                 <Users className="w-3.5 h-3.5 mr-1" /> {ageBracketNames[event.age_bracket] || 'All Ages'}
               </Badge>
             </div>
