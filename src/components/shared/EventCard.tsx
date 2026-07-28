@@ -96,16 +96,10 @@ export function WishlistHeart({
     }
   };
 
-  const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-9.5 h-9.5 sm:w-10 sm:h-10',
-    lg: 'w-11 h-11'
-  }[size];
-
   const iconSizes = {
-    sm: 'w-4 h-4',
-    md: 'w-4.5 h-4.5 sm:w-5 sm:h-5',
-    lg: 'w-5.5 h-5.5'
+    sm: 'w-4.5 h-4.5',   // ~18px
+    md: 'w-5.5 h-5.5',   // ~22px
+    lg: 'w-6.5 h-6.5'    // ~26px
   }[size];
 
   return (
@@ -113,15 +107,15 @@ export function WishlistHeart({
       type="button"
       aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
       onClick={handleClick}
-      className={`relative group rounded-full flex items-center justify-center transition-all duration-300 ease-out transform active:scale-90 ${sizeClasses} ${
-        liked
-          ? 'bg-purple-600 text-white shadow-[0_4px_14px_rgba(124,58,237,0.35)] border border-purple-500 hover:bg-purple-700 hover:scale-110'
-          : 'bg-white/95 text-slate-400 border border-slate-200/80 shadow-md backdrop-blur-sm hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50/90 hover:scale-110 hover:shadow-lg'
-      } ${isAnimate ? 'animate-heart-pop' : ''} ${className}`}
+      className={`relative inline-flex items-center justify-center p-1 bg-transparent border-0 outline-none cursor-pointer transition-all duration-300 ease-out transform active:scale-90 hover:scale-125 focus:outline-none ${
+        isAnimate ? 'animate-heart-pop' : ''
+      } ${className}`}
     >
       <Heart
         className={`${iconSizes} transition-all duration-300 ${
-          liked ? 'fill-white stroke-white' : 'stroke-[2.2] group-hover:stroke-purple-600'
+          liked
+            ? 'fill-purple-600 text-purple-600 stroke-purple-600 drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]'
+            : 'fill-transparent text-white stroke-white stroke-[2.3] drop-shadow-[0_2px_5px_rgba(0,0,0,0.65)] hover:stroke-purple-200'
         }`}
       />
     </button>
