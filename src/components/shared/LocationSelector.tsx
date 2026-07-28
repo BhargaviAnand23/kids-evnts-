@@ -18,7 +18,12 @@ export const EVENT_KEY = 'kidspire_location_change';
 
 // ── Custom Hook for reactive location state ──────────────────────────────
 export function useSelectedLocation() {
-  const [city, setCity] = useState<string>('Chennai');
+  const [city, setCity] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(STORAGE_KEY) || 'All';
+    }
+    return 'All';
+  });
 
   useEffect(() => {
     // 1. Initial load from LocalStorage or default

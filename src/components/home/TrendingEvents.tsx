@@ -44,9 +44,23 @@ export function TrendingEvents() {
   React.useEffect(() => {
     async function loadEvents() {
       try {
-        let fetched = await db.getEvents({ status: 'approved', location: selectedCity });
-        if (!fetched || fetched.length === 0) {
-          fetched = SEED_EVENTS.filter(e => e.status === 'approved');
+        // Always fetch full pool of approved events for fallback
+        const allApproved = await db.getEvents({ status: 'approved' });
+        
+        let fetched = allApproved;
+        if (selectedCity && selectedCity !== 'All') {
+          const locTarget = selectedCity.toLowerCase().trim();
+          const cityMatches = allApproved.filter(e => {
+            if (locTarget === 'online') {
+              return e.is_online || (e.location || '').toLowerCase().includes('online');
+            }
+            if (e.is_online) return true;
+            const loc = (e.location || '').toLowerCase();
+            return loc.includes(locTarget) || locTarget.includes(loc.split(',')[0].trim());
+          });
+          if (cityMatches.length > 0) {
+            fetched = cityMatches;
+          }
         }
 
         let filtered = fetched;
@@ -70,7 +84,7 @@ export function TrendingEvents() {
         // Guarantee 4 items to fill the 4-column grid without empty gaps
         const displayEvents = [...filtered];
         if (displayEvents.length < 4) {
-          for (const item of fetched) {
+          for (const item of allApproved) {
             if (!displayEvents.some(d => d.id === item.id)) {
               displayEvents.push(item);
             }
