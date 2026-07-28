@@ -223,15 +223,13 @@ export function EventCard({ event }: { event: Event }) {
     setTilt({ x: 0, y: 0, active: false });
   };
 
-  // Age-bracket contextual styling (Requirement 7: Early Years playful/rounded vs Teens clean)
   const isEarlyYears = event.age_bracket === 'early_years';
   const isTeens = event.age_bracket === 'teens';
 
-  const cardRadiusClass = isEarlyYears
-    ? 'rounded-[28px] border-2 border-amber-200/50 shadow-amber-900/5'
-    : isTeens
-    ? 'rounded-2xl border border-slate-200/80 shadow-slate-900/5'
-    : 'rounded-[24px] border border-slate-100 shadow-purple-900/5';
+  // Standardized Card Border & Shadow across all event cards
+  const cardBorderClass = event.is_sponsored
+    ? 'rounded-2xl border border-purple-200 shadow-sm hover:border-purple-400 hover:shadow-xl'
+    : 'rounded-2xl border border-slate-200/80 shadow-sm hover:border-purple-300 hover:shadow-xl';
 
   const ageBadgeStyle = isEarlyYears
     ? 'bg-amber-100 text-amber-900 font-bold border border-amber-300/60 rounded-full px-2.5 py-0.5'
@@ -250,7 +248,7 @@ export function EventCard({ event }: { event: Event }) {
             : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
           transition: tilt.active ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
         }}
-        className={`bg-white overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 h-full flex flex-col electric-border-hover ${cardRadiusClass}`}
+        className={`bg-white overflow-hidden transition-all duration-300 h-full flex flex-col ${cardBorderClass}`}
       >
 
         {/* Image */}
