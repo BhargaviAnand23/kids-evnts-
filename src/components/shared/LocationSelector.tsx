@@ -58,7 +58,13 @@ export function useSelectedLocation() {
 }
 
 // ── Location Selector Component ──────────────────────────────────────────
-export function LocationSelector({ className = '' }: { className?: string }) {
+export function LocationSelector({
+  className = '',
+  variant = 'default'
+}: {
+  className?: string;
+  variant?: 'default' | 'searchBar';
+}) {
   const { selectedCity, setSelectedCity } = useSelectedLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -132,23 +138,45 @@ export function LocationSelector({ className = '' }: { className?: string }) {
          c.state.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const isFullWidth = className.includes('w-full');
+
   return (
-    <div className={`relative inline-block ${className}`}>
+    <div className={`relative ${isFullWidth ? 'w-full' : 'inline-block'} ${className}`}>
       
       {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(v => !v)}
-        className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-purple-700 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 shrink-0 font-medium text-xs sm:text-sm cursor-pointer shadow-sm"
-        title="Select city or location"
-        aria-label="Select location"
-      >
-        <MapPin className="w-4 h-4 text-purple-600 shrink-0" />
-        <span className="font-semibold text-slate-800 truncate max-w-[120px] sm:max-w-[160px]">
-          {selectedCity === 'All' ? 'All Cities' : selectedCity}
-        </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-      </button>
+      {variant === 'searchBar' ? (
+        <button
+          type="button"
+          onClick={() => setIsOpen(v => !v)}
+          className="w-full flex items-center justify-between text-left bg-transparent p-0 border-none transition-all duration-200 cursor-pointer focus:outline-none group"
+          title="Select city or location"
+          aria-label="Select location"
+        >
+          <div className="flex items-center min-w-0 flex-1">
+            <MapPin className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
+            <span className="font-semibold text-slate-800 text-sm md:text-base lg:text-lg truncate group-hover:text-purple-600 transition-colors">
+              {selectedCity === 'All' ? 'All Cities' : selectedCity}
+            </span>
+          </div>
+          <ChevronDown className={`w-4 h-4 text-slate-400 shrink-0 ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsOpen(v => !v)}
+          className={`flex items-center justify-between gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-purple-700 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 shrink-0 font-medium text-xs sm:text-sm cursor-pointer shadow-sm ${isFullWidth ? 'w-full' : ''}`}
+          title="Select city or location"
+          aria-label="Select location"
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            <MapPin className="w-4 h-4 text-purple-600 shrink-0" />
+            <span className="font-semibold text-slate-800 truncate max-w-[120px] sm:max-w-[160px]">
+              {selectedCity === 'All' ? 'All Cities' : selectedCity}
+            </span>
+          </div>
+          <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </button>
+      )}
 
       {/* Modal / Dropdown Container */}
       {isOpen && (

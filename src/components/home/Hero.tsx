@@ -134,8 +134,8 @@ export function Hero() {
             </p>
 
             {/* Search Bar */}
-            <div className="bg-white p-2 md:p-3 rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-center gap-2 mb-10 max-w-xl lg:max-w-2xl mx-auto lg:mx-0">
-              <div className="flex items-center px-4 w-full md:w-auto flex-1 py-2 border-b md:border-b-0 md:border-r border-slate-100">
+            <div className="bg-white p-3 md:p-3 rounded-2xl md:rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-stretch md:items-center gap-0 md:gap-2 mb-10 max-w-xl lg:max-w-2xl mx-auto lg:mx-0">
+              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto flex-1 border-b md:border-b-0 md:border-r border-slate-100">
                 <Search className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
                 <input
                   type="text"
@@ -146,18 +146,20 @@ export function Hero() {
                   className="w-full bg-transparent text-sm md:text-base lg:text-lg focus:outline-none text-slate-800 placeholder-slate-400"
                 />
               </div>
-              <div className="flex items-center px-4 w-full md:w-auto shrink-0 py-2">
-                <LocationSelector />
+              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto shrink-0 border-b md:border-b-0 border-slate-100">
+                <LocationSelector variant="searchBar" className="w-full md:w-auto" />
               </div>
-              <MagneticButton className="w-full md:w-auto shrink-0 mt-2 md:mt-0">
-                <Button
-                  size="lg"
-                  onClick={handleSearch}
-                  className="w-full md:w-auto md:ml-2 rounded-full h-12 md:h-14 px-8 text-sm md:text-base lg:text-lg shadow-md shadow-purple-500/25"
-                >
-                  Search
-                </Button>
-              </MagneticButton>
+              <div className="pt-2 md:pt-0 w-full md:w-auto shrink-0">
+                <MagneticButton className="w-full md:w-auto shrink-0">
+                  <Button
+                    size="lg"
+                    onClick={handleSearch}
+                    className="w-full md:w-auto md:ml-2 rounded-xl md:rounded-full h-12 md:h-14 px-8 text-sm md:text-base lg:text-lg shadow-md shadow-purple-500/25"
+                  >
+                    Search
+                  </Button>
+                </MagneticButton>
+              </div>
             </div>
 
             {/* Micro Stats */}
