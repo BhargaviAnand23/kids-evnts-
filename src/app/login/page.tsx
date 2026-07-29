@@ -37,7 +37,8 @@ export default function LoginPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials and try again.');
+      const msg = typeof err === 'string' ? err : err?.message || err?.error_description || 'Login failed. Please check your credentials and try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

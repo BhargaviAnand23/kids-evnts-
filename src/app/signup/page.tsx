@@ -13,28 +13,36 @@ import type { OrganizationType } from '@/types';
 
 type Role = 'parent' | 'admin';
 
-interface SignupError {
-  text: string;
-  isDuplicateEmail?: boolean;
+function getErrorMessage(err: any): string {
+  if (!err) return 'An unexpected error occurred.';
+  if (typeof err === 'string') return err;
+  if (err.message && typeof err.message === 'string' && err.message.trim()) {
+    return err.message;
+  }
+  if (err.error_description && typeof err.error_description === 'string' && err.error_description.trim()) {
+    return err.error_description;
+  }
+  if (err.details && typeof err.details === 'string' && err.details.trim()) {
+    return err.details;
+  }
+  return 'Sign up failed. Please try again.';
 }
 
 function isDuplicateEmailError(err: any): boolean {
   if (!err) return false;
-  const message = typeof err === 'string'
-    ? err
-    : (err.message || err.error_description || err.code || JSON.stringify(err));
-  const lowerMsg = message.toLowerCase();
+  const code = typeof err.code === 'string' ? err.code.toLowerCase() : '';
+  const msg = getErrorMessage(err).toLowerCase();
 
-  const isDuplicateCode = ['user_already_exists', 'email_exists', 'email_already_in_use', 'email_taken', 'already_registered'].includes(err.code?.toLowerCase());
+  const isDuplicateCode = ['user_already_exists', 'email_exists', 'email_already_in_use', 'email_taken', 'already_registered'].includes(code);
 
   const isDuplicateText =
-    lowerMsg.includes('already registered') ||
-    lowerMsg.includes('already exists') ||
-    lowerMsg.includes('already in use') ||
-    lowerMsg.includes('user already') ||
-    lowerMsg.includes('email_exists') ||
-    lowerMsg.includes('user_already_exists') ||
-    (lowerMsg.includes('email') && (lowerMsg.includes('exist') || lowerMsg.includes('taken') || lowerMsg.includes('registered')));
+    msg.includes('already registered') ||
+    msg.includes('already exists') ||
+    msg.includes('already in use') ||
+    msg.includes('user already') ||
+    msg.includes('email_exists') ||
+    msg.includes('user_already_exists') ||
+    (msg.includes('email') && (msg.includes('exist') || msg.includes('taken') || msg.includes('registered')));
 
   return Boolean(isDuplicateCode || isDuplicateText);
 }
@@ -49,28 +57,30 @@ export default function SignupPage() {
   const [orgName, setOrgName] = useState('');
   const [orgType, setOrgType] = useState<OrganizationType>('club');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<SignupError | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isDuplicate, setIsDuplicate] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsDuplicate(false);
 
     if (!name || !email || !password) {
-      setError({ text: 'Please fill in all fields.' });
+      setError('Please fill in all fields.');
       return;
     }
     if (password.length < 6) {
-      setError({ text: 'Password must be at least 6 characters.' });
+      setError('Password must be at least 6 characters.');
       return;
     }
     if (role === 'admin' && !orgName.trim()) {
-      setError({ text: 'Please enter your organization or academy name.' });
+      setError('Please enter your organization or academy name.');
       return;
     }
     if (!termsAccepted) {
-      setError({ text: 'You must agree to the Terms of Service and Privacy Policy to continue.' });
+      setError('You must agree to the Terms of Service and Privacy Policy to continue.');
       return;
     }
 
@@ -98,16 +108,12 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      if (isDuplicateEmailError(err)) {
-        setError({
-          text: 'This email is already registered. Please log in instead, or use a different email address.',
-          isDuplicateEmail: true
-        });
+      const isDup = isDuplicateEmailError(err);
+      setIsDuplicate(isDup);
+      if (isDup) {
+        setError('This email is already registered. Please log in instead, or use a different email address.');
       } else {
-        setError({
-          text: err.message || 'Sign up failed. Please try again.',
-          isDuplicateEmail: false
-        });
+        setError(getErrorMessage(err));
       }
     } finally {
       setLoading(false);
@@ -152,7 +158,7 @@ export default function SignupPage() {
             <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
               <button
                 type="button"
-                onClick={() => { setRole('parent'); setError(null); }}
+                onClick={() => { setRole('parent'); setError(null); setIsDuplicate(false); }}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
                   role === 'parent'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -163,7 +169,7 @@ export default function SignupPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setRole('admin'); setError(null); }}
+                onClick={() => { setRole('admin'); setError(null); setIsDuplicate(false); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   role === 'admin'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -175,11 +181,11 @@ export default function SignupPage() {
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              {Boolean(error && (error.text || error.isDuplicateEmail)) && (
+              {error && (
                 <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-2">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                   <div className="flex-1 leading-relaxed">
-                    {error!.isDuplicateEmail ? (
+                    {isDuplicate ? (
                       <span>
                         This email is already registered. Please{' '}
                         <Link href="/login" className="font-bold underline text-red-800 hover:text-red-950 transition-colors">
@@ -188,7 +194,7 @@ export default function SignupPage() {
                         instead, or use a different email address.
                       </span>
                     ) : (
-                      <span>{error!.text}</span>
+                      <span>{error}</span>
                     )}
                   </div>
                 </div>
