@@ -53,13 +53,22 @@ export function BookOrWaitlistButton({ eventId, seatsAvailable, listingType, joi
       router.push('/login');
       return;
     }
-    const profile = await dbService.getParentProfile(user.id);
+    let profile = await dbService.getParentProfile(user.id);
     if (!profile) {
-      router.push('/login');
-      return;
+      try {
+        profile = await dbService.createParentProfile({
+          auth_user_id: user.id,
+          name: user.name || 'Parent',
+          email: user.email || '',
+          phone: '',
+        });
+      } catch (e) {
+        console.warn('Could not auto-create parent profile for waitlist:', e);
+      }
     }
-    setParentId(profile.id);
-    const kids = await dbService.getChildren(profile.id);
+    const pid = profile?.id || user.id;
+    setParentId(pid);
+    const kids = await dbService.getChildren(pid);
     setChildren(kids);
     if (kids.length > 0) setSelectedChildId(kids[0].id);
     setLoading(false);

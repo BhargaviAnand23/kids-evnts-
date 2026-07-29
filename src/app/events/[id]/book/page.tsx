@@ -10,6 +10,8 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import type { AuthChangeEvent } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/client';
 import { dbService } from '@/services/db';
 import { authService } from '@/services/auth';
 import type { Event, Child, Parent } from '@/types';
@@ -47,31 +49,109 @@ export default function BookEventPage() {
   }, [event, hasTiers, searchParams, selectedTierId]);
 
   useEffect(() => {
-    const load = async () => {
-      const [eventData, currentUser] = await Promise.all([
-        dbService.getEventById(eventId),
-        authService.getCurrentUser(),
-      ]);
+    let isMounted = true;
 
-      if (!eventData) { router.push('/explore'); return; }
-      setEvent(eventData);
+    const loadData = async () => {
+      try {
+        const [eventData, currentUser] = await Promise.all([
+          dbService.getEventById(eventId),
+          authService.getCurrentUser(),
+        ]);
 
-      if (!currentUser || currentUser.role !== 'parent') {
-        setNotLoggedIn(true);
-        setLoading(false);
-        return;
+        if (!isMounted) return;
+
+        if (!eventData) {
+          router.push('/explore');
+          return;
+        }
+        setEvent(eventData);
+
+        if (!currentUser) {
+          setNotLoggedIn(true);
+          setLoading(false);
+          return;
+        }
+
+        // User is logged in
+        setNotLoggedIn(false);
+
+        // Fetch or self-heal parent profile
+        let profile = await dbService.getParentProfile(currentUser.id);
+        if (!profile) {
+          try {
+            profile = await dbService.createParentProfile({
+              auth_user_id: currentUser.id,
+              name: currentUser.name || 'Parent',
+              email: currentUser.email || '',
+              phone: '',
+            });
+          } catch (e) {
+            console.warn('Could not auto-create parent profile:', e);
+          }
+        }
+
+        if (!isMounted) return;
+
+        if (profile) {
+          setParent(profile);
+          const kids = await dbService.getChildren(profile.id);
+          if (isMounted) {
+            setChildren(kids);
+            if (kids.length > 0) {
+              setSelectedChildIds([kids[0].id]);
+            }
+          }
+        } else {
+          // Fallback parent profile object for session user
+          const fallbackParent: Parent = {
+            id: currentUser.id,
+            auth_user_id: currentUser.id,
+            name: currentUser.name || 'Parent User',
+            email: currentUser.email || '',
+            phone: '',
+            created_at: new Date().toISOString(),
+          };
+          setParent(fallbackParent);
+          const kids = await dbService.getChildren(fallbackParent.id);
+          if (isMounted) {
+            setChildren(kids);
+            if (kids.length > 0) {
+              setSelectedChildIds([kids[0].id]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error loading booking data:', err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
-
-      const profile = await dbService.getParentProfile(currentUser.id);
-      if (profile) {
-        setParent(profile);
-        const kids = await dbService.getChildren(profile.id);
-        setChildren(kids);
-        if (kids.length > 0) setSelectedChildIds([kids[0].id]);
-      }
-      setLoading(false);
     };
-    load();
+
+    loadData();
+
+    // Subscribe to Supabase auth state changes for immediate hydration reactivity (matching Header)
+    const supabase = createClient();
+    let subscription: any = null;
+
+    if (supabase) {
+      const res = supabase.auth.onAuthStateChange(async (evt: AuthChangeEvent) => {
+        if (evt === 'SIGNED_IN' || evt === 'TOKEN_REFRESHED' || evt === 'INITIAL_SESSION') {
+          loadData();
+        } else if (evt === 'SIGNED_OUT') {
+          if (isMounted) {
+            setNotLoggedIn(true);
+            setParent(null);
+            setChildren([]);
+          }
+        }
+      });
+      subscription = res.data?.subscription;
+    }
+
+    return () => {
+      isMounted = false;
+      if (subscription) subscription.unsubscribe();
+    };
   }, [eventId, router]);
 
   const toggleChildSelection = (id: string) => {
