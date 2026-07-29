@@ -175,11 +175,11 @@ export default function SignupPage() {
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              {error && (
-                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+              {Boolean(error && (error.text || error.isDuplicateEmail)) && (
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-2">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                   <div className="flex-1 leading-relaxed">
-                    {error.isDuplicateEmail ? (
+                    {error!.isDuplicateEmail ? (
                       <span>
                         This email is already registered. Please{' '}
                         <Link href="/login" className="font-bold underline text-red-800 hover:text-red-950 transition-colors">
@@ -188,7 +188,7 @@ export default function SignupPage() {
                         instead, or use a different email address.
                       </span>
                     ) : (
-                      <span>{error.text}</span>
+                      <span>{error!.text}</span>
                     )}
                   </div>
                 </div>
