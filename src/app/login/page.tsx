@@ -20,14 +20,14 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
 
-    if (!email || !password) {
+    if (!email.trim() || !password) {
       setError('Please enter your email and password.');
       return;
     }
 
     setLoading(true);
     try {
-      const user = await authService.login(email, password);
+      const user = await authService.login(email.trim(), password);
       // Redirect based on role
       if (user.role === 'super_admin' || user.is_super_admin) {
         router.push('/dashboard/super-admin');
@@ -37,8 +37,8 @@ export default function LoginPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      const msg = typeof err === 'string' ? err : err?.message || err?.error_description || 'Login failed. Please check your credentials and try again.';
-      setError(msg);
+      const message = err?.message || err?.error_description || 'Something went wrong. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -61,7 +61,7 @@ export default function LoginPage() {
         <Card className="border-none shadow-2xl shadow-purple-900/10 mb-6">
           <CardContent className="p-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {Boolean(error && error.trim()) && (
+              {error && (
                 <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                   <span>{error}</span>

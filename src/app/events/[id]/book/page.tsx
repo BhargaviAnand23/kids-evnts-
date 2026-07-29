@@ -217,7 +217,7 @@ export default function BookEventPage() {
 
       router.push(`/events/${event.id}/book/confirmation?booking=${createdBookingIds[0]}`);
     } catch (err: any) {
-      const msg = err.message || '';
+      const msg = err?.message || err?.error_description || '';
       if (msg.toLowerCase().includes('seats') || msg.toLowerCase().includes('available') || msg.toLowerCase().includes('sold out')) {
         setError('Sorry — this event just sold out while you were booking. Please join the waitlist.');
       } else {

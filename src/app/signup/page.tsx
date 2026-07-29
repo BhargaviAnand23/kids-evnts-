@@ -8,44 +8,9 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
 import { authService } from '@/services/auth';
-import { dbService } from '@/services/db';
 import type { OrganizationType } from '@/types';
 
 type Role = 'parent' | 'admin';
-
-function getErrorMessage(err: any): string {
-  if (!err) return 'An unexpected error occurred.';
-  if (typeof err === 'string') return err;
-  if (err.message && typeof err.message === 'string' && err.message.trim()) {
-    return err.message;
-  }
-  if (err.error_description && typeof err.error_description === 'string' && err.error_description.trim()) {
-    return err.error_description;
-  }
-  if (err.details && typeof err.details === 'string' && err.details.trim()) {
-    return err.details;
-  }
-  return 'Sign up failed. Please try again.';
-}
-
-function isDuplicateEmailError(err: any): boolean {
-  if (!err) return false;
-  const code = typeof err.code === 'string' ? err.code.toLowerCase() : '';
-  const msg = getErrorMessage(err).toLowerCase();
-
-  const isDuplicateCode = ['user_already_exists', 'email_exists', 'email_already_in_use', 'email_taken', 'already_registered'].includes(code);
-
-  const isDuplicateText =
-    msg.includes('already registered') ||
-    msg.includes('already exists') ||
-    msg.includes('already in use') ||
-    msg.includes('user already') ||
-    msg.includes('email_exists') ||
-    msg.includes('user_already_exists') ||
-    (msg.includes('email') && (msg.includes('exist') || msg.includes('taken') || msg.includes('registered')));
-
-  return Boolean(isDuplicateCode || isDuplicateText);
-}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -58,16 +23,14 @@ export default function SignupPage() {
   const [orgType, setOrgType] = useState<OrganizationType>('club');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isDuplicate, setIsDuplicate] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setIsDuplicate(false);
 
-    if (!name || !email || !password) {
+    if (!name.trim() || !email.trim() || !password) {
       setError('Please fill in all fields.');
       return;
     }
@@ -87,9 +50,9 @@ export default function SignupPage() {
     setLoading(true);
     try {
       const user = await authService.signUp(
-        email,
+        email.trim(),
         password,
-        name,
+        name.trim(),
         role,
         undefined,
         undefined,
@@ -108,13 +71,8 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      const isDup = isDuplicateEmailError(err);
-      setIsDuplicate(isDup);
-      if (isDup) {
-        setError('This email is already registered. Please log in instead, or use a different email address.');
-      } else {
-        setError(getErrorMessage(err));
-      }
+      const message = err?.message || err?.error_description || 'Something went wrong. Please try again.';
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -158,7 +116,7 @@ export default function SignupPage() {
             <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
               <button
                 type="button"
-                onClick={() => { setRole('parent'); setError(null); setIsDuplicate(false); }}
+                onClick={() => { setRole('parent'); setError(null); }}
                 className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
                   role === 'parent'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -169,7 +127,7 @@ export default function SignupPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setRole('admin'); setError(null); setIsDuplicate(false); }}
+                onClick={() => { setRole('admin'); setError(null); }}
                 className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
                   role === 'admin'
                     ? 'bg-white shadow-sm text-slate-900'
@@ -185,17 +143,7 @@ export default function SignupPage() {
                 <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-2">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                   <div className="flex-1 leading-relaxed">
-                    {isDuplicate ? (
-                      <span>
-                        This email is already registered. Please{' '}
-                        <Link href="/login" className="font-bold underline text-red-800 hover:text-red-950 transition-colors">
-                          Log In
-                        </Link>{' '}
-                        instead, or use a different email address.
-                      </span>
-                    ) : (
-                      <span>{error}</span>
-                    )}
+                    <span>{error}</span>
                   </div>
                 </div>
               )}
