@@ -156,11 +156,13 @@ export default function BookingConfirmationPage() {
       <div className="max-w-2xl w-full">
         {/* Success Header */}
         <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10" />
+          <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md shadow-green-500/10 animate-check-scale">
+            <svg className="w-10 h-10 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" className="animate-check-draw" />
+            </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Booking Confirmed!</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">Booking Confirmed!</h1>
+          <p className="text-slate-600 text-body">
             You're all set! A confirmation email with your ticket has been sent to your registered email address.
           </p>
         </div>

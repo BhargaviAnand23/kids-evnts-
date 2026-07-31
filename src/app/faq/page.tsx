@@ -1,6 +1,8 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { HelpCircle, ArrowRight } from 'lucide-react';
+import { HelpCircle, ChevronDown, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 export default function FaqPage() {
@@ -39,6 +41,14 @@ export default function FaqPage() {
     }
   ];
 
+  const [openIndexes, setOpenIndexes] = useState<number[]>([0, 1]);
+
+  const toggleFaq = (idx: number) => {
+    setOpenIndexes(prev =>
+      prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
+    );
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-10 sm:py-14 md:py-16 px-6 md:px-16 lg:px-24">
       <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100">
@@ -55,18 +65,44 @@ export default function FaqPage() {
         </div>
 
         {/* FAQ Accordion List */}
-        <div className="space-y-6 mb-12">
-          {faqs.map((faq, idx) => (
-            <div key={idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-colors">
-              <h3 className="text-card-title font-bold text-slate-900 mb-2 flex items-start">
-                <HelpCircle className="w-5 h-5 text-purple-600 mr-3 mt-0.5 shrink-0" />
-                {faq.q}
-              </h3>
-              <p className="text-slate-600 text-body leading-relaxed pl-8">
-                {faq.a}
-              </p>
-            </div>
-          ))}
+        <div className="space-y-4 mb-12">
+          {faqs.map((faq, idx) => {
+            const isOpen = openIndexes.includes(idx);
+            return (
+              <div
+                key={idx}
+                className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
+                  isOpen ? 'bg-purple-50/40 border-purple-200 shadow-sm' : 'bg-slate-50 border-slate-100 hover:border-purple-200'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleFaq(idx)}
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer focus:outline-none"
+                >
+                  <h3 className="text-card-title font-bold text-slate-900 flex items-center gap-3">
+                    <HelpCircle className={`w-5 h-5 shrink-0 transition-colors ${isOpen ? 'text-purple-600' : 'text-slate-400'}`} />
+                    <span>{faq.q}</span>
+                  </h3>
+                  <div className={`p-1.5 rounded-full bg-white border border-slate-200/80 transition-transform duration-300 shrink-0 ${isOpen ? 'rotate-180 bg-purple-100 border-purple-200' : ''}`}>
+                    <ChevronDown className={`w-4 h-4 ${isOpen ? 'text-purple-700' : 'text-slate-500'}`} />
+                  </div>
+                </button>
+                
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isOpen ? 'grid-rows-[1fr] opacity-100 pb-5 sm:pb-6 px-5 sm:px-6' : 'grid-rows-[0fr] opacity-0 px-5 sm:px-6'
+                  }`}
+                >
+                  <div className="overflow-hidden">
+                    <p className="text-slate-600 text-body leading-relaxed pl-8 pt-1 border-t border-slate-200/60">
+                      {faq.a}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Still Have Questions */}
