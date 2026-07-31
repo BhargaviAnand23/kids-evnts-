@@ -61,7 +61,7 @@ export default function LoginPage() {
         <Card className="border-none shadow-2xl shadow-purple-900/10 mb-6">
           <CardContent className="p-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {error && (
+              {typeof error === 'string' && error && (
                 <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
                   <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
                   <span>{error}</span>
