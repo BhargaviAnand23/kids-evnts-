@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, User, ArrowRight, AlertCircle, Loader2, CheckCircle2, Building2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, CheckCircle2, Building2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { FormError } from '@/components/ui/FormError';
 import { authService } from '@/services/auth';
 import type { OrganizationType } from '@/types';
 
@@ -70,9 +71,14 @@ export default function SignupPage() {
       } else {
         router.push('/dashboard/parent');
       }
-    } catch (err: any) {
-      const message = err?.message || err?.error_description || 'Something went wrong. Please try again.';
-      setError(message);
+    } catch (err: unknown) {
+      const e = err as { message?: string; error_description?: string };
+      const msg = typeof e?.message === 'string' && e.message.trim()
+        ? e.message.trim()
+        : typeof e?.error_description === 'string' && e.error_description.trim()
+          ? e.error_description.trim()
+          : 'Something went wrong. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -139,14 +145,7 @@ export default function SignupPage() {
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
-              {typeof error === 'string' && error && (
-                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm mb-2">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
-                  <div className="flex-1 leading-relaxed">
-                    <span>{error}</span>
-                  </div>
-                </div>
-              )}
+              <FormError message={error} />
 
               <div>
                 <label htmlFor="signup-name" className="text-sm font-semibold text-slate-700 mb-2 block">Full Name</label>

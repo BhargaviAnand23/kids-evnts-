@@ -3,10 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { FormError } from '@/components/ui/FormError';
 import { authService } from '@/services/auth';
 
 export default function LoginPage() {
@@ -36,9 +37,14 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard/parent');
       }
-    } catch (err: any) {
-      const message = err?.message || err?.error_description || 'Something went wrong. Please try again.';
-      setError(message);
+    } catch (err: unknown) {
+      const e = err as { message?: string; error_description?: string };
+      const msg = typeof e?.message === 'string' && e.message.trim()
+        ? e.message.trim()
+        : typeof e?.error_description === 'string' && e.error_description.trim()
+          ? e.error_description.trim()
+          : 'Something went wrong. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -48,7 +54,7 @@ export default function LoginPage() {
     <div className="bg-slate-50 min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16 px-6 md:px-16 lg:px-24 relative overflow-hidden">
       {/* Decorative bg */}
       <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-purple-100 to-transparent -z-10"></div>
-      
+
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold text-purple-600 tracking-tight mb-2 block">
@@ -61,12 +67,7 @@ export default function LoginPage() {
         <Card className="border-none shadow-2xl shadow-purple-900/10 mb-6">
           <CardContent className="p-8">
             <form className="space-y-6" onSubmit={handleSubmit}>
-              {typeof error === 'string' && error && (
-                <div className="flex items-start gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                  <AlertCircle className="w-4 h-4 mt-0.5 shrink-0 text-red-500" />
-                  <span>{error}</span>
-                </div>
-              )}
+              <FormError message={error} />
               <div>
                 <label htmlFor="login-email" className="text-sm font-semibold text-slate-700 mb-2 block">Email address</label>
                 <Input

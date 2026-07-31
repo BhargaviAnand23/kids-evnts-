@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, ArrowLeft, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { FormError } from '@/components/ui/FormError';
 import { createClient } from '@/utils/supabase/client';
 
 export default function ForgotPasswordPage() {
@@ -17,17 +18,24 @@ export default function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!email) { setError('Please enter your email address.'); return; }
+    if (!email.trim()) {
+      setError('Please enter your email address.');
+      return;
+    }
     setLoading(true);
     try {
       const supabase = createClient();
-      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error: supabaseError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (supabaseError) throw supabaseError;
       setSent(true);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send reset email. Please try again.');
+    } catch (err: unknown) {
+      const e = err as { message?: string };
+      const msg = typeof e?.message === 'string' && e.message.trim()
+        ? e.message.trim()
+        : 'Failed to send reset email. Please try again.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -71,11 +79,7 @@ export default function ForgotPasswordPage() {
           <Card className="border-none shadow-xl shadow-slate-200/50">
             <CardContent className="p-8">
               <form className="space-y-6" onSubmit={handleSubmit}>
-                {error && (
-                  <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                    <AlertCircle className="w-4 h-4 shrink-0" /> {error}
-                  </div>
-                )}
+                <FormError message={error} />
                 <div>
                   <label className="text-sm font-semibold text-slate-700 mb-2 block">Email address</label>
                   <Input

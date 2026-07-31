@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { FormError } from '@/components/ui/FormError';
 import type { AuthChangeEvent } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { dbService } from '@/services/db';
@@ -321,11 +322,7 @@ export default function BookEventPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {error && (
-                    <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
-                      <AlertCircle className="w-4 h-4 shrink-0" /> {error}
-                    </div>
-                  )}
+                  <FormError message={error} />
 
                   <div>
                     {children.length === 0 ? (
