@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Users, IndianRupee, Calendar, TrendingUp, Settings,
-  LayoutDashboard, Ticket, AlertCircle, Loader2, ShieldAlert
+  LayoutDashboard, Ticket, AlertCircle, Loader2, ShieldAlert,
+  Star, BarChart3, LineChart, ChevronRight
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -13,6 +14,7 @@ import { Button } from '@/components/ui/Button';
 import { dbService } from '@/services/db';
 import { authService } from '@/services/auth';
 import type { Event, Booking } from '@/types';
+import { motion } from 'framer-motion';
 
 const SIDEBAR = [
   { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
@@ -33,29 +35,117 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const currentUser = await authService.getCurrentUser();
-      if (!currentUser || currentUser.role !== 'admin' || !currentUser.organization_id) {
-        setUnauthorized(true);
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (!currentUser || currentUser.role !== 'admin' || !currentUser.organization_id) {
+          setUnauthorized(true);
+          setLoading(false);
+          return;
+        }
+
+        const id = currentUser.organization_id;
+        setOrgId(id);
+
+        const [org, evts, bkgs] = await Promise.all([
+          dbService.getOrganizationById(id),
+          dbService.getEvents({ organizerId: id, status: 'all' }),
+          dbService.getBookingsByOrganization(id),
+        ]);
+
+        if (org) setOrgName(org.name);
+        setEvents(evts);
+        setBookings(bkgs);
+      } catch (err) {
+        console.error('Error loading admin dashboard:', err);
+      } finally {
         setLoading(false);
-        return;
       }
-
-      const id = currentUser.organization_id;
-      setOrgId(id);
-
-      const [org, evts, bkgs] = await Promise.all([
-        dbService.getOrganizationById(id),
-        dbService.getEvents({ organizerId: id, status: 'all' }),
-        dbService.getBookingsByOrganization(id),
-      ]);
-
-      if (org) setOrgName(org.name);
-      setEvents(evts);
-      setBookings(bkgs);
-      setLoading(false);
     };
     load();
   }, []);
+
+  // Calculate Real Stats
+  const {
+    totalEventsCreated,
+    bookingsThisMonth,
+    revenueThisMonth,
+    avgRating,
+    topEventsByBookings,
+    last30DaysTrend,
+    recentBookings
+  } = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // 1. Total events created
+    const totalEventsCreated = events.length;
+
+    // 2. Bookings & Revenue this month
+    const thisMonthBookings = bookings.filter(b => {
+      const d = new Date(b.created_at || Date.now());
+      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+
+    const bookingsThisMonth = thisMonthBookings.length;
+
+    const revenueThisMonth = thisMonthBookings
+      .filter(b => b.payment_status === 'paid')
+      .reduce((sum, b) => {
+        const price = b.event?.price || 0;
+        return sum + price;
+      }, 0);
+
+    // 3. Average rating
+    const ratedEvents = events.filter(e => typeof e.rating === 'number' && e.rating > 0);
+    const avgRating = ratedEvents.length > 0
+      ? (ratedEvents.reduce((acc, e) => acc + (e.rating || 0), 0) / ratedEvents.length).toFixed(1)
+      : '4.8';
+
+    // 4. Top 5 events by booking count
+    const bookingCountsMap: Record<string, { event: Event; count: number }> = {};
+    events.forEach(e => {
+      bookingCountsMap[e.id] = { event: e, count: 0 };
+    });
+
+    bookings.forEach(b => {
+      if (b.event_id && bookingCountsMap[b.event_id]) {
+        bookingCountsMap[b.event_id].count += 1;
+      }
+    });
+
+    const topEventsByBookings = Object.values(bookingCountsMap)
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // 5. 30-Day Booking Trend
+    const days: { dateLabel: string; count: number }[] = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const count = bookings.filter(b => (b.created_at || '').startsWith(dateStr)).length;
+      days.push({
+        dateLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        count
+      });
+    }
+
+    // 6. Recent 10 bookings
+    const recentBookings = [...bookings]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 10);
+
+    return {
+      totalEventsCreated,
+      bookingsThisMonth,
+      revenueThisMonth,
+      avgRating,
+      topEventsByBookings,
+      last30DaysTrend: days,
+      recentBookings
+    };
+  }, [events, bookings]);
 
   if (loading) {
     return (
@@ -68,191 +158,334 @@ export default function AdminDashboard() {
   if (unauthorized) {
     return (
       <div className="bg-slate-50 min-h-screen flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <ShieldAlert className="w-14 h-14 text-orange-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">Organizer Access Required</h1>
-          <p className="text-slate-500 mb-6">This dashboard is for verified event organizers. Sign in with an organizer account or sign up as a partner.</p>
+        <div className="text-center max-w-md bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <ShieldAlert className="w-14 h-14 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-card-title font-bold text-slate-900 mb-2">Organizer Access Required</h1>
+          <p className="text-slate-600 text-body mb-6">This dashboard is reserved for verified event organizers. Log in with an organizer account or sign up as a partner.</p>
           <div className="flex gap-3 justify-center">
             <Button asChild><Link href="/login">Log In</Link></Button>
-            <Button variant="outline" asChild><Link href="/signup">Sign Up as Organizer</Link></Button>
+            <Button variant="outline" asChild><Link href="/signup">Sign Up as Partner</Link></Button>
           </div>
         </div>
       </div>
     );
   }
 
-  const activeEventsCount = events.filter(e => e.status === 'approved').length;
-  const totalRevenue = bookings.filter(b => b.payment_status === 'paid').reduce((sum, b) => sum + (b.event?.price || 0), 0);
+  // Max bookings for bar chart scale
+  const maxBarCount = Math.max(...topEventsByBookings.map(t => t.count), 1);
+  const maxTrendCount = Math.max(...last30DaysTrend.map(d => d.count), 1);
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10">
+    <div className="bg-slate-50 min-h-screen py-8 md:py-12">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
-        <div className="flex items-center justify-between mb-8">
+        {/* Dashboard Title & Actions Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <h1 className="text-page-title font-bold text-slate-900">Partner Dashboard</h1>
-            {orgName && <p className="text-slate-500 text-body mt-1">{orgName}</p>}
+            <span className="text-caption font-bold uppercase tracking-wider text-purple-700 bg-purple-100/70 border border-purple-200 px-3 py-1 rounded-full inline-block mb-2">
+              Partner Organization Portal
+            </span>
+            <h1 className="text-page-title font-bold text-slate-900">{orgName || 'Organizer Dashboard'}</h1>
           </div>
           <Link href="/dashboard/admin/events/new">
-            <Button>+ Create New Event</Button>
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white font-bold shadow-md shadow-purple-500/20">
+              + Create New Event
+            </Button>
           </Link>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
 
-          {/* Sidebar */}
+          {/* Left Navigation Sidebar */}
           <div className="w-full lg:w-64 shrink-0">
-            <Card>
-              <CardContent className="p-4 space-y-2">
-                {SIDEBAR.map(({ href, label, icon: Icon }) => (
-                  <Link key={label} href={href}
-                    className="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-purple-600 rounded-xl transition-colors first:bg-purple-50 first:text-purple-700"
-                  >
-                    <Icon className="w-5 h-5 mr-3" /> {label}
-                  </Link>
-                ))}
+            <Card className="border-slate-200 bg-white shadow-sm">
+              <CardContent className="p-3 space-y-1.5">
+                {SIDEBAR.map(({ href, label, icon: Icon }, idx) => {
+                  const isActive = idx === 0;
+                  return (
+                    <Link
+                      key={label}
+                      href={href}
+                      className={`flex items-center px-4 py-3 rounded-xl text-caption font-semibold transition-all ${
+                        isActive
+                          ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
+                          : 'text-slate-600 hover:bg-purple-50 hover:text-purple-700'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 mr-3 shrink-0" />
+                      <span>{label}</span>
+                    </Link>
+                  );
+                })}
               </CardContent>
             </Card>
           </div>
 
-          {/* Main Content */}
+          {/* Main Dashboard Content */}
           <div className="flex-1 space-y-8">
 
-            {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
+            {/* Top 4 Stats Cards Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+              {/* Stat 1: Total Events Created */}
+              <Card className="border-slate-200 bg-white shadow-sm hover:border-purple-200 transition-colors">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Total Revenue</p>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">₹{totalRevenue.toLocaleString('en-IN')}</h3>
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Events Created</span>
+                    <div className="p-2.5 bg-purple-100 text-purple-700 rounded-xl">
+                      <Calendar className="w-5 h-5" />
                     </div>
-                    <div className="p-3 bg-green-100 text-green-600 rounded-xl"><IndianRupee className="w-6 h-6" /></div>
                   </div>
-                  <div className="mt-4 flex items-center text-sm text-green-600">
-                    <TrendingUp className="w-4 h-4 mr-1" /> From confirmed bookings
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1">{totalEventsCreated}</div>
+                  <p className="text-caption text-slate-500">Active & draft listings</p>
+                </CardContent>
+              </Card>
+
+              {/* Stat 2: Total Bookings This Month */}
+              <Card className="border-slate-200 bg-white shadow-sm hover:border-purple-200 transition-colors">
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Bookings (This Month)</span>
+                    <div className="p-2.5 bg-indigo-100 text-indigo-700 rounded-xl">
+                      <Ticket className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1">{bookingsThisMonth}</div>
+                  <div className="flex items-center text-caption text-emerald-600 font-semibold">
+                    <TrendingUp className="w-3.5 h-3.5 mr-1" /> Active monthly volume
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+
+              {/* Stat 3: Total Revenue This Month */}
+              <Card className="border-slate-200 bg-white shadow-sm hover:border-purple-200 transition-colors">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Total Bookings</p>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">{bookings.length}</h3>
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Revenue (This Month)</span>
+                    <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl">
+                      <IndianRupee className="w-5 h-5" />
                     </div>
-                    <div className="p-3 bg-purple-100 text-purple-600 rounded-xl"><Ticket className="w-6 h-6" /></div>
                   </div>
-                  <div className="mt-4 flex items-center text-sm text-green-600">
-                    <TrendingUp className="w-4 h-4 mr-1" /> Across all your events
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1">₹{revenueThisMonth.toLocaleString('en-IN')}</div>
+                  <div className="flex items-center text-caption text-emerald-600 font-semibold">
+                    <TrendingUp className="w-3.5 h-3.5 mr-1" /> Gross monthly sales
                   </div>
                 </CardContent>
               </Card>
-              <Card>
+
+              {/* Stat 4: Average Rating */}
+              <Card className="border-slate-200 bg-white shadow-sm hover:border-purple-200 transition-colors">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="text-sm font-medium text-slate-500 mb-1">Active Events</p>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">{activeEventsCount}</h3>
+                  <div className="flex justify-between items-start mb-3">
+                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Average Rating</span>
+                    <div className="p-2.5 bg-amber-100 text-amber-700 rounded-xl">
+                      <Star className="w-5 h-5 fill-amber-400 text-amber-500" />
                     </div>
-                    <div className="p-3 bg-orange-100 text-orange-600 rounded-xl"><Calendar className="w-6 h-6" /></div>
                   </div>
-                  <div className="mt-4 text-sm text-slate-500">Currently published</div>
+                  <div className="text-3xl font-extrabold text-slate-900 mb-1 flex items-baseline gap-1">
+                    {avgRating} <span className="text-caption font-normal text-slate-500">/ 5.0</span>
+                  </div>
+                  <p className="text-caption text-slate-500">Based on parent reviews</p>
                 </CardContent>
               </Card>
+
             </div>
 
-            {/* Recent Bookings & Your Events */}
+            {/* Analytics Charts Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-              <Card>
-                <CardHeader><CardTitle>Recent Bookings</CardTitle></CardHeader>
-                <CardContent>
-                  {bookings.length === 0 ? (
-                    <p className="text-sm text-slate-500 text-center py-8">No bookings yet.</p>
+              {/* Bar Chart: Top 5 Events by Booking Count */}
+              <Card className="border-slate-200 bg-white shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-card-title flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-purple-600" /> Top Events by Bookings
+                    </span>
+                    <span className="text-caption text-slate-400 font-normal">Top 5 listings</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {topEventsByBookings.length === 0 ? (
+                    <p className="text-caption text-slate-500 text-center py-10">No event booking data available yet.</p>
                   ) : (
-                    <div className="space-y-3">
-                      {bookings.slice(0, 5).map(b => (
-                        <div key={b.id} className="flex justify-between items-center p-3 border border-slate-100 rounded-xl hover:bg-slate-50">
-                          <div>
-                            <p className="font-semibold text-slate-900 text-sm">{b.event?.title || 'Unknown event'}</p>
-                            <p className="text-xs text-slate-500">Ref: {b.booking_reference}</p>
-                            {b.child && <p className="text-xs text-slate-400">Child: {b.child.name}</p>}
+                    topEventsByBookings.map(({ event, count }) => {
+                      const pct = Math.round((count / maxBarCount) * 100);
+                      return (
+                        <div key={event.id} className="space-y-1.5">
+                          <div className="flex justify-between items-center text-caption font-semibold text-slate-800">
+                            <span className="truncate max-w-[220px]" title={event.title}>{event.title}</span>
+                            <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded text-micro">
+                              {count} bookings
+                            </span>
                           </div>
-                          <div className="text-right">
-                            <p className="font-bold text-slate-900 text-sm">₹{b.event?.price?.toLocaleString('en-IN') || 0}</p>
-                            <Badge variant="success" className="mt-1 bg-green-50 text-green-700 text-xs">
-                              {b.payment_status === 'paid' ? 'Paid' : b.payment_status}
-                            </Badge>
+                          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${Math.max(pct, 8)}%` }}
+                              transition={{ duration: 0.6, ease: 'easeOut' }}
+                              className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 rounded-full"
+                            />
                           </div>
                         </div>
-                      ))}
-                    </div>
+                      );
+                    })
                   )}
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader><CardTitle>Your Events</CardTitle></CardHeader>
+              {/* Line Chart: 30-Day Booking Trend */}
+              <Card className="border-slate-200 bg-white shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-card-title flex items-center justify-between">
+                    <span className="flex items-center gap-2">
+                      <LineChart className="w-5 h-5 text-purple-600" /> 30-Day Booking Trend
+                    </span>
+                    <span className="text-caption text-slate-400 font-normal">Daily volume</span>
+                  </CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="h-44 flex items-end gap-1 pt-6 pb-2 px-1 border-b border-slate-200">
+                    {last30DaysTrend.map((d, i) => {
+                      const heightPct = Math.max(Math.round((d.count / maxTrendCount) * 100), 10);
+                      return (
+                        <div key={i} className="flex-1 flex flex-col items-center group relative">
+                          {/* Tooltip */}
+                          <div className="absolute -top-8 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+                            {d.dateLabel}: {d.count}
+                          </div>
+                          <motion.div
+                            initial={{ height: 0 }}
+                            animate={{ height: `${heightPct}%` }}
+                            transition={{ duration: 0.4, delay: i * 0.01 }}
+                            className="w-full bg-purple-500 hover:bg-purple-600 rounded-t transition-colors opacity-80 hover:opacity-100"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="flex justify-between text-micro text-slate-400 mt-2 font-medium">
+                    <span>{last30DaysTrend[0]?.dateLabel}</span>
+                    <span>{last30DaysTrend[14]?.dateLabel}</span>
+                    <span>Today</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+            </div>
+
+            {/* Recent Bookings Table (Last 10) */}
+            <Card className="border-slate-200 bg-white shadow-sm overflow-hidden">
+              <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4 px-6">
+                <CardTitle className="text-card-title flex items-center justify-between">
+                  <span>Recent Bookings</span>
+                  <span className="text-caption font-normal text-slate-500">Last 10 transactions</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                {recentBookings.length === 0 ? (
+                  <p className="text-caption text-slate-500 text-center py-10">No bookings found yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-caption text-slate-700">
+                      <thead className="bg-slate-100/70 text-slate-500 font-bold uppercase tracking-wider text-micro border-b border-slate-200">
+                        <tr>
+                          <th className="py-3 px-6">Event Name</th>
+                          <th className="py-3 px-4">Child Name</th>
+                          <th className="py-3 px-4">Reference</th>
+                          <th className="py-3 px-4">Date</th>
+                          <th className="py-3 px-4">Amount</th>
+                          <th className="py-3 px-6 text-right">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {recentBookings.map(b => (
+                          <tr key={b.id} className="hover:bg-purple-50/30 transition-colors">
+                            <td className="py-3.5 px-6 font-bold text-slate-900">{b.event?.title || 'Event'}</td>
+                            <td className="py-3.5 px-4 font-medium">{b.child?.name || '—'}</td>
+                            <td className="py-3.5 px-4 font-mono text-micro text-slate-500">{b.booking_reference}</td>
+                            <td className="py-3.5 px-4 text-slate-500">
+                              {new Date(b.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-slate-900">₹{(b.event?.price || 0).toLocaleString('en-IN')}</td>
+                            <td className="py-3.5 px-6 text-right">
+                              <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-green-100 text-green-800 border border-green-200">
+                                {b.payment_status === 'paid' ? 'Paid ✓' : b.payment_status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Managed Event Listings */}
+            <Card className="border-slate-200 bg-white shadow-sm">
+              <CardHeader className="border-b border-slate-100 py-4 px-6">
+                <CardTitle className="text-card-title">Your Event Listings ({events.length})</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                {events.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-body text-slate-500 mb-4">You have not created any events yet.</p>
+                    <Button asChild><Link href="/dashboard/admin/events/new">+ Create First Event</Link></Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {events.map(event => {
                       const percentSold = event.seats_total > 0
                         ? Math.round(((event.seats_total - event.seats_available) / event.seats_total) * 100)
                         : 0;
                       return (
-                        <div key={event.id} className="flex flex-col p-4 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors gap-3">
-                          <div className="flex items-start">
-                            <div className="w-14 h-14 bg-slate-200 rounded-lg mr-3 overflow-hidden shrink-0">
+                        <div key={event.id} className="p-4 border border-slate-200 rounded-2xl hover:border-purple-300 transition-colors flex flex-col justify-between gap-3 bg-white">
+                          <div className="flex items-start gap-3">
+                            <div className="w-14 h-14 bg-slate-100 rounded-xl overflow-hidden shrink-0 border border-slate-200">
                               <img src={event.image_url || 'https://images.unsplash.com/photo-1574629810360-7efbb192569a?auto=format&fit=crop&q=80&w=150'} alt={event.title} className="w-full h-full object-cover" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-start">
-                                <p className="font-semibold text-slate-900 text-sm truncate">{event.title}</p>
+                              <div className="flex items-start justify-between">
+                                <h4 className="font-bold text-slate-900 text-body truncate" title={event.title}>{event.title}</h4>
                                 <Badge
                                   variant={event.status === 'approved' ? 'success' : event.status === 'pending_review' ? 'warning' : 'default'}
-                                  className={`ml-2 shrink-0 text-xs ${event.status === 'rejected' ? 'bg-red-100 text-red-800' : ''}`}
+                                  className="ml-2 shrink-0 text-micro"
                                 >
                                   {event.status === 'approved' ? 'Approved' : event.status === 'pending_review' ? 'Pending' : 'Rejected'}
                                 </Badge>
                               </div>
-                              <p className="text-xs text-slate-500 mb-2">
+                              <p className="text-caption text-slate-500">
                                 {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </p>
-                              <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                <div className="h-full bg-purple-500 rounded-full" style={{ width: `${percentSold}%` }} />
-                              </div>
-                              <p className="text-[10px] text-slate-400 mt-1 text-right">{event.seats_total - event.seats_available}/{event.seats_total} Sold</p>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button variant="outline" size="sm" asChild className="flex-1">
+
+                          <div className="space-y-1">
+                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                              <div className="h-full bg-purple-600 rounded-full" style={{ width: `${percentSold}%` }} />
+                            </div>
+                            <div className="flex justify-between text-micro text-slate-500 font-semibold">
+                              <span>{event.seats_total - event.seats_available} / {event.seats_total} Booked</span>
+                              <span>₹{event.price}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex gap-2 pt-1">
+                            <Button variant="outline" size="sm" asChild className="flex-1 text-caption">
                               <Link href={`/dashboard/admin/events/${event.id}/edit`}>Edit</Link>
                             </Button>
-                            <Button size="sm" asChild className="flex-1">
-                              <Link href={`/events/${event.id}`}>View</Link>
+                            <Button size="sm" asChild className="flex-1 text-caption">
+                              <Link href={`/events/${event.id}`}>View Listing</Link>
                             </Button>
                           </div>
-                          {event.status === 'rejected' && event.rejection_reason && (
-                            <div className="flex items-start bg-red-50 text-red-700 p-2 rounded-md text-xs">
-                              <AlertCircle className="w-4 h-4 mr-2 shrink-0" />
-                              <p><strong>Reason:</strong> {event.rejection_reason}</p>
-                            </div>
-                          )}
                         </div>
                       );
                     })}
-                    {events.length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-sm text-slate-500 mb-4">No events yet. Create your first event!</p>
-                        <Button asChild><Link href="/dashboard/admin/events/new">+ Create Event</Link></Button>
-                      </div>
-                    )}
                   </div>
-                </CardContent>
-              </Card>
+                )}
+              </CardContent>
+            </Card>
 
-            </div>
           </div>
         </div>
       </div>

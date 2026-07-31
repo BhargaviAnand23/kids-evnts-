@@ -27,7 +27,8 @@ import {
   Filter,
   LogOut,
   RefreshCw,
-  Eye
+  Eye,
+  LineChart
 } from 'lucide-react';
 import Link from 'next/link';
 import { AdminGuard } from '@/components/admin/AdminGuard';
@@ -35,6 +36,7 @@ import { dbService as db } from '@/services/db';
 import { Event, Booking } from '@/types';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
+import { motion } from 'framer-motion';
 
 type AdminTab = 'overview' | 'events' | 'users' | 'categories' | 'bookings' | 'settings';
 
@@ -182,20 +184,29 @@ function SuperAdminContent() {
     return matchesSearch && matchesRole;
   });
 
+  // Simulated platform growth trend (last 4 weeks)
+  const growthTrend = [
+    { label: 'Week 1', signups: 12, bookings: 18 },
+    { label: 'Week 2', signups: 19, bookings: 27 },
+    { label: 'Week 3', signups: 26, bookings: 39 },
+    { label: 'Week 4', signups: 34, bookings: 52 },
+  ];
+  const maxGrowth = 60;
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col md:flex-row">
 
       {/* ── Sidebar Nav ────────────────────────────────────────────────── */}
-      <aside className="w-full md:w-64 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 shrink-0 p-6 flex flex-col justify-between">
+      <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 shrink-0 p-6 flex flex-col justify-between shadow-sm">
         <div>
           {/* Platform Branding */}
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white font-extrabold shadow-lg shadow-purple-500/20">
+            <div className="w-10 h-10 rounded-2xl bg-purple-600 text-white flex items-center justify-center font-extrabold shadow-md shadow-purple-500/20 text-lg">
               ⚡
             </div>
             <div>
-              <h2 className="font-extrabold text-white text-card-title leading-tight">Kidspire Admin</h2>
-              <span className="text-micro font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+              <h2 className="font-extrabold text-slate-900 text-card-title leading-tight">Kidspire Admin</h2>
+              <span className="text-micro font-bold uppercase tracking-wider text-purple-700 bg-purple-100 border border-purple-200 px-2 py-0.5 rounded-full">
                 Staff Control Panel
               </span>
             </div>
@@ -219,8 +230,8 @@ function SuperAdminContent() {
                   onClick={() => setActiveTab(item.id as AdminTab)}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-caption font-semibold transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
+                      : 'text-slate-600 hover:text-purple-700 hover:bg-purple-50'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -228,7 +239,7 @@ function SuperAdminContent() {
                     <span>{item.label}</span>
                   </div>
                   {item.badge !== null && (
-                    <span className="bg-orange-500 text-white font-bold text-micro px-2 py-0.5 rounded-full animate-pulse">
+                    <span className="bg-amber-500 text-white font-bold text-micro px-2 py-0.5 rounded-full animate-pulse">
                       {item.badge}
                     </span>
                   )}
@@ -239,20 +250,20 @@ function SuperAdminContent() {
         </div>
 
         {/* User Card at Bottom of Sidebar */}
-        <div className="pt-6 border-t border-slate-800 mt-6 flex items-center justify-between">
+        <div className="pt-6 border-t border-slate-200 mt-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold flex items-center justify-center text-caption">
+            <div className="w-8 h-8 rounded-full bg-purple-100 border border-purple-200 text-purple-700 font-bold flex items-center justify-center text-caption">
               SA
             </div>
             <div className="truncate">
-              <p className="text-caption font-bold text-slate-200 truncate">Super Admin</p>
+              <p className="text-caption font-bold text-slate-900 truncate">Super Admin</p>
               <p className="text-micro text-slate-500 font-mono">admin@kidspire.com</p>
             </div>
           </div>
           <Link
             href="/"
             title="Exit to Website"
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <LogOut className="w-4 h-4" />
           </Link>
@@ -263,9 +274,9 @@ function SuperAdminContent() {
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
 
         {/* Top Header Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-200">
           <div>
-            <h1 className="text-page-title font-extrabold text-white capitalize flex items-center gap-3">
+            <h1 className="text-page-title font-bold text-slate-900 capitalize flex items-center gap-3">
               {activeTab === 'overview' && 'Platform Overview'}
               {activeTab === 'events' && 'Events & Listing Approvals'}
               {activeTab === 'users' && 'User Management & Roles'}
@@ -273,24 +284,32 @@ function SuperAdminContent() {
               {activeTab === 'bookings' && 'Bookings & Financial Records'}
               {activeTab === 'settings' && 'Platform Configuration'}
             </h1>
-            <p className="text-slate-400 text-caption mt-1">
+            <p className="text-slate-500 text-caption mt-1">
               Manage platform events, parent accounts, organizers, and financial payout logs.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/dashboard/super-admin/events/new"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-600 text-white font-bold text-caption hover:bg-purple-700 transition-all shadow-md shadow-purple-500/20"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Event</span>
+            </Link>
+
             <button
               onClick={loadAllAdminData}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-caption font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-caption font-semibold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-purple-400' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-purple-600' : ''}`} />
               <span>Refresh Data</span>
             </button>
 
             <Link
               href="/"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-caption font-semibold text-purple-300 hover:bg-purple-600/30 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 border border-purple-200 text-caption font-semibold text-purple-700 hover:bg-purple-100 transition-all"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>View Main Site</span>
@@ -303,83 +322,127 @@ function SuperAdminContent() {
           <div className="space-y-8">
             {/* Stat Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden">
+              <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase text-slate-400">Total Users</span>
-                  <div className="p-3 bg-purple-500/10 text-purple-400 rounded-2xl">
+                  <span className="text-xs font-bold uppercase text-slate-500">Total Users</span>
+                  <div className="p-3 bg-purple-100 text-purple-700 rounded-2xl">
                     <Users className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="text-3xl font-black text-white">{users.length}</div>
-                <p className="text-[11px] text-slate-400 mt-2">Active parents & event organizers</p>
+                <div className="text-3xl font-black text-slate-900">{users.length}</div>
+                <p className="text-[11px] text-slate-500 mt-2">Active parents & event organizers</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden">
+              <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase text-slate-400">Total Events</span>
-                  <div className="p-3 bg-indigo-500/10 text-indigo-400 rounded-2xl">
+                  <span className="text-xs font-bold uppercase text-slate-500">Total Events</span>
+                  <div className="p-3 bg-indigo-100 text-indigo-700 rounded-2xl">
                     <Calendar className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="text-3xl font-black text-white">{events.length}</div>
-                <p className="text-[11px] text-slate-400 mt-2">{approvedEvents.length} approved, {pendingEvents.length} pending</p>
+                <div className="text-3xl font-black text-slate-900">{events.length}</div>
+                <p className="text-[11px] text-slate-500 mt-2">{approvedEvents.length} approved, {pendingEvents.length} pending</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden">
+              <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase text-slate-400">Pending Review</span>
-                  <div className="p-3 bg-orange-500/10 text-orange-400 rounded-2xl">
+                  <span className="text-xs font-bold uppercase text-slate-500">Pending Review</span>
+                  <div className="p-3 bg-amber-100 text-amber-700 rounded-2xl">
                     <AlertCircle className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="text-3xl font-black text-orange-400">{pendingEvents.length}</div>
-                <p className="text-[11px] text-slate-400 mt-2">Awaiting approval action</p>
+                <div className="text-3xl font-black text-amber-600">{pendingEvents.length}</div>
+                <p className="text-[11px] text-slate-500 mt-2">Awaiting approval action</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl relative overflow-hidden">
+              <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-bold uppercase text-slate-400">Est. Platform GMV</span>
-                  <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-2xl">
+                  <span className="text-xs font-bold uppercase text-slate-500">Est. Platform GMV</span>
+                  <div className="p-3 bg-emerald-100 text-emerald-700 rounded-2xl">
                     <DollarSign className="w-5 h-5" />
                   </div>
                 </div>
-                <div className="text-3xl font-black text-emerald-400">₹{totalRevenue.toLocaleString()}</div>
-                <p className="text-[11px] text-slate-400 mt-2">Total gross ticket bookings</p>
+                <div className="text-3xl font-black text-emerald-700">₹{totalRevenue.toLocaleString()}</div>
+                <p className="text-[11px] text-slate-500 mt-2">Total gross ticket bookings</p>
+              </div>
+            </div>
+
+            {/* Platform Growth Chart Card */}
+            <div className="bg-white border border-slate-200 p-6 rounded-3xl shadow-sm space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-purple-600" /> Platform Growth & Monthly Volume
+                  </h3>
+                  <p className="text-caption text-slate-500">Weekly user signups and ticket bookings</p>
+                </div>
+                <div className="flex items-center gap-4 text-xs font-semibold">
+                  <span className="flex items-center gap-1 text-purple-700"><span className="w-3 h-3 bg-purple-600 rounded-full inline-block" /> Bookings</span>
+                  <span className="flex items-center gap-1 text-indigo-700"><span className="w-3 h-3 bg-indigo-400 rounded-full inline-block" /> Signups</span>
+                </div>
+              </div>
+
+              <div className="h-44 flex items-end gap-6 pt-6 pb-2 px-4 border-b border-slate-200">
+                {growthTrend.map((g, idx) => {
+                  const bPct = Math.round((g.bookings / maxGrowth) * 100);
+                  const sPct = Math.round((g.signups / maxGrowth) * 100);
+                  return (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
+                      <div className="w-full flex justify-center items-end gap-2 h-full">
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${sPct}%` }}
+                          transition={{ duration: 0.5, delay: idx * 0.1 }}
+                          className="w-1/2 max-w-[24px] bg-indigo-300 rounded-t"
+                          title={`Signups: ${g.signups}`}
+                        />
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: `${bPct}%` }}
+                          transition={{ duration: 0.5, delay: idx * 0.1 + 0.05 }}
+                          className="w-1/2 max-w-[24px] bg-purple-600 rounded-t"
+                          title={`Bookings: ${g.bookings}`}
+                        />
+                      </div>
+                      <span className="text-micro font-semibold text-slate-500">{g.label}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
             {/* Quick Pending Approvals Callout */}
             {pendingEvents.length > 0 && (
-              <div className="bg-gradient-to-r from-orange-950/40 via-slate-900 to-slate-900 border border-orange-500/30 p-6 rounded-3xl space-y-4">
+              <div className="bg-amber-50/60 border border-amber-200 p-6 rounded-3xl space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-orange-300 text-lg flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-orange-400" />
+                  <h3 className="font-extrabold text-amber-900 text-body-lg flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5 text-amber-600" />
                     New Event Submission Approvals ({pendingEvents.length})
                   </h3>
-                  <button onClick={() => setActiveTab('events')} className="text-xs text-orange-400 font-bold hover:underline">
+                  <button onClick={() => setActiveTab('events')} className="text-caption text-amber-700 font-bold hover:underline">
                     View All Events →
                   </button>
                 </div>
 
                 <div className="space-y-3">
                   {pendingEvents.map(evt => (
-                    <div key={evt.id} className="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div key={evt.id} className="bg-white p-4 rounded-2xl border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
                       <div>
-                        <h4 className="font-bold text-white text-sm">{evt.title}</h4>
-                        <p className="text-xs text-slate-400">{evt.organizer?.name || 'Organizer'} • {evt.category} • {evt.location}</p>
+                        <h4 className="font-bold text-slate-900 text-body">{evt.title}</h4>
+                        <p className="text-caption text-slate-500">{evt.organizer?.name || 'Organizer'} • {evt.category} • {evt.location}</p>
                       </div>
                       <div className="flex gap-2 w-full sm:w-auto">
                         <button
                           onClick={() => handleApproveEvent(evt.id)}
-                          className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-caption flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          <CheckCircle className="w-3.5 h-3.5" /> Approve
+                          <CheckCircle className="w-4 h-4" /> Approve
                         </button>
                         <button
                           onClick={() => handleRejectEvent(evt.id)}
-                          className="flex-1 sm:flex-none px-4 py-2 bg-red-600/30 hover:bg-red-600/50 text-red-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                          className="flex-1 sm:flex-none px-4 py-2 bg-red-100 hover:bg-red-200 text-red-700 font-bold rounded-xl text-caption flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
-                          <XCircle className="w-3.5 h-3.5" /> Reject
+                          <XCircle className="w-4 h-4" /> Reject
                         </button>
                       </div>
                     </div>
@@ -387,24 +450,6 @@ function SuperAdminContent() {
                 </div>
               </div>
             )}
-
-            {/* Recent Activity Log */}
-            <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
-              <h3 className="font-extrabold text-white text-base">Platform Audit & Activity Log</h3>
-              <div className="space-y-3 text-xs">
-                {[
-                  { time: '10 mins ago', text: 'New event submission: "Beginner Hip Hop Dance Course" by Rhythm Studio', type: 'info' },
-                  { time: '1 hour ago', text: 'Parent user "Bhargavi Anand" booked 2 seats for Kids Soccer Camp', type: 'success' },
-                  { time: '3 hours ago', text: 'Category "STEM & Tech" updated with 2 new event listings', type: 'info' },
-                  { time: 'Yesterday', text: 'Organizer "Chennai Youth Soccer Club" status verified', type: 'success' },
-                ].map((log, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-slate-950/60 rounded-xl border border-slate-800/60">
-                    <span className="text-slate-300 font-medium">{log.text}</span>
-                    <span className="text-[10px] text-slate-500 font-mono shrink-0 ml-2">{log.time}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
           </div>
         )}
 
@@ -412,7 +457,7 @@ function SuperAdminContent() {
         {activeTab === 'events' && (
           <div className="space-y-6">
             {/* Search & Filter bar */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -420,7 +465,7 @@ function SuperAdminContent() {
                   placeholder="Search by title, category, or city…"
                   value={eventSearch}
                   onChange={e => setEventSearch(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-caption text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
@@ -429,7 +474,7 @@ function SuperAdminContent() {
                 <select
                   value={eventStatusFilter}
                   onChange={e => setEventStatusFilter(e.target.value)}
-                  className="bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                  className="bg-slate-50 border border-slate-200 text-caption font-semibold text-slate-700 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
                 >
                   <option value="all">All Statuses</option>
                   <option value="pending_review">Pending Review</option>
@@ -440,10 +485,10 @@ function SuperAdminContent() {
             </div>
 
             {/* Events Table */}
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <table className="w-full text-left text-caption text-slate-700">
+                  <thead className="bg-slate-100/70 text-slate-600 font-bold uppercase tracking-wider text-micro border-b border-slate-200">
                     <tr>
                       <th className="p-4">Event Details</th>
                       <th className="p-4">Category</th>
@@ -455,36 +500,39 @@ function SuperAdminContent() {
                       <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredEvents.map(event => (
-                      <tr key={event.id} className="hover:bg-slate-850/50 transition-colors">
-                        <td className="p-4 font-bold text-white max-w-[200px]">
+                      <tr key={event.id} className="hover:bg-purple-50/30 transition-colors">
+                        <td className="p-4 font-bold text-slate-900 max-w-[200px]">
                           <p className="truncate">{event.title}</p>
-                          <p className="text-[10px] text-slate-400 font-normal">{event.organizer?.name || 'Organizer'}</p>
+                          <p className="text-micro text-slate-500 font-normal">{event.organizer?.name || 'Organizer'}</p>
                         </td>
                         <td className="p-4">{event.category}</td>
                         <td className="p-4">{event.location}</td>
-                        <td className="p-4 font-mono text-[11px]">
+                        <td className="p-4 font-mono text-micro">
                           {event.event_date}
                         </td>
-                        <td className="p-4 font-bold text-white">₹{event.price}</td>
+                        <td className="p-4 font-bold text-slate-900">₹{event.price}</td>
                         <td className="p-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-                            event.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                            event.status === 'pending_review' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20' :
-                            'bg-red-500/10 text-red-400 border border-red-500/20'
+                          <span className={`px-2.5 py-1 rounded-full text-micro font-extrabold ${
+                            event.status === 'approved' ? 'bg-green-100 text-green-800 border border-green-200' :
+                            event.status === 'pending_review' ? 'bg-amber-100 text-amber-800 border border-amber-200' :
+                            'bg-red-100 text-red-800 border border-red-200'
                           }`}>
                             {event.status === 'pending_review' ? 'Pending' : event.status}
                           </span>
                         </td>
                         <td className="p-4">
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5 items-center">
+                            <span className="px-2 py-0.5 rounded text-micro font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                              Added by Admin
+                            </span>
                             <button
                               onClick={() => handleToggleBadge(event.id, 'is_sponsored')}
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors ${
+                              className={`px-2 py-0.5 rounded text-micro font-bold border transition-colors cursor-pointer ${
                                 event.is_sponsored
-                                  ? 'bg-purple-600 text-white border-purple-500'
-                                  : 'bg-slate-950 text-slate-500 border-slate-800 hover:text-slate-300'
+                                  ? 'bg-purple-600 text-white border-purple-600'
+                                  : 'bg-slate-100 text-slate-600 border-slate-200 hover:border-purple-300'
                               }`}
                               title="Toggle Sponsored Badge"
                             >
@@ -495,15 +543,15 @@ function SuperAdminContent() {
                         <td className="p-4 text-right space-x-2">
                           {event.status === 'pending_review' && (
                             <>
-                              <button onClick={() => handleApproveEvent(event.id)} className="p-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 rounded-lg transition-colors" title="Approve">
+                              <button onClick={() => handleApproveEvent(event.id)} className="p-1.5 bg-green-100 text-green-700 hover:bg-green-200 rounded-lg transition-colors cursor-pointer" title="Approve">
                                 <CheckCircle className="w-4 h-4" />
                               </button>
-                              <button onClick={() => handleRejectEvent(event.id)} className="p-1.5 bg-red-600/20 text-red-400 hover:bg-red-600/40 rounded-lg transition-colors" title="Reject">
+                              <button onClick={() => handleRejectEvent(event.id)} className="p-1.5 bg-red-100 text-red-700 hover:bg-red-200 rounded-lg transition-colors cursor-pointer" title="Reject">
                                 <XCircle className="w-4 h-4" />
                               </button>
                             </>
                           )}
-                          <button onClick={() => handleDeleteEvent(event.id)} className="p-1.5 bg-slate-800 text-slate-400 hover:text-red-400 rounded-lg transition-colors" title="Delete Event">
+                          <button onClick={() => handleDeleteEvent(event.id)} className="p-1.5 bg-slate-100 text-slate-500 hover:text-red-600 rounded-lg transition-colors cursor-pointer" title="Delete Event">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </td>
@@ -519,7 +567,7 @@ function SuperAdminContent() {
         {/* ── TAB 3: USER MANAGEMENT ─────────────────────────────────────── */}
         {activeTab === 'users' && (
           <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row gap-4 justify-between bg-slate-900 p-4 rounded-2xl border border-slate-800">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
@@ -527,14 +575,14 @@ function SuperAdminContent() {
                   placeholder="Search user by name or email…"
                   value={userSearch}
                   onChange={e => setUserSearch(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-caption text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
               <select
                 value={userRoleFilter}
                 onChange={e => setUserRoleFilter(e.target.value)}
-                className="bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                className="bg-slate-50 border border-slate-200 text-caption font-semibold text-slate-700 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
               >
                 <option value="all">All Roles</option>
                 <option value="parent">Parent</option>
@@ -543,10 +591,10 @@ function SuperAdminContent() {
               </select>
             </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
               <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs text-slate-300">
-                  <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <table className="w-full text-left text-caption text-slate-700">
+                  <thead className="bg-slate-100/70 text-slate-600 font-bold uppercase tracking-wider text-micro border-b border-slate-200">
                     <tr>
                       <th className="p-4">User Name</th>
                       <th className="p-4">Email</th>
@@ -556,24 +604,24 @@ function SuperAdminContent() {
                       <th className="p-4 text-right">Role Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800">
+                  <tbody className="divide-y divide-slate-100">
                     {filteredUsers.map(u => (
-                      <tr key={u.id} className="hover:bg-slate-850/50 transition-colors">
-                        <td className="p-4 font-bold text-white">{u.name}</td>
-                        <td className="p-4 font-mono text-slate-400">{u.email}</td>
+                      <tr key={u.id} className="hover:bg-purple-50/30 transition-colors">
+                        <td className="p-4 font-bold text-slate-900">{u.name}</td>
+                        <td className="p-4 font-mono text-slate-500">{u.email}</td>
                         <td className="p-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                            u.role === 'super_admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
-                            u.role === 'admin' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' :
-                            'bg-slate-800 text-slate-300'
+                          <span className={`px-2.5 py-1 rounded-full text-micro font-bold ${
+                            u.role === 'super_admin' ? 'bg-purple-100 text-purple-800 border border-purple-200' :
+                            u.role === 'admin' ? 'bg-indigo-100 text-indigo-800 border border-indigo-200' :
+                            'bg-slate-100 text-slate-700'
                           }`}>
                             {u.role === 'super_admin' ? '⚡ Super Admin' : u.role === 'admin' ? '🎪 Organizer' : '👪 Parent'}
                           </span>
                         </td>
-                        <td className="p-4 font-mono text-[11px]">{u.joined_at}</td>
+                        <td className="p-4 font-mono text-micro">{u.joined_at}</td>
                         <td className="p-4">
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                            u.status === 'active' ? 'text-emerald-400 bg-emerald-500/10' : 'text-red-400 bg-red-500/10'
+                          <span className={`px-2 py-0.5 rounded text-micro font-bold ${
+                            u.status === 'active' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'
                           }`}>
                             {u.status}
                           </span>
@@ -581,14 +629,14 @@ function SuperAdminContent() {
                         <td className="p-4 text-right space-x-2">
                           <button
                             onClick={() => handlePromoteUser(u.id, u.role === 'parent' ? 'admin' : u.role === 'admin' ? 'super_admin' : 'parent')}
-                            className="px-2.5 py-1 bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 font-bold rounded-lg transition-colors text-[11px]"
+                            className="px-2.5 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold rounded-lg transition-colors text-micro cursor-pointer"
                             title="Promote Role"
                           >
                             Change Role
                           </button>
                           <button
                             onClick={() => handleToggleUserStatus(u.id, u.status)}
-                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-lg transition-colors text-[11px]"
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition-colors text-micro cursor-pointer"
                           >
                             {u.status === 'active' ? 'Suspend' : 'Activate'}
                           </button>
@@ -605,26 +653,26 @@ function SuperAdminContent() {
         {/* ── TAB 4: CATEGORIES ──────────────────────────────────────────── */}
         {activeTab === 'categories' && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center bg-slate-900 p-4 rounded-2xl border border-slate-800">
-              <h3 className="font-bold text-white text-sm">Event Categories ({categories.length})</h3>
+            <div className="flex justify-between items-center bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <h3 className="font-bold text-slate-900 text-body">Event Categories ({categories.length})</h3>
               <button
                 onClick={() => setShowAddCat(v => !v)}
-                className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 cursor-pointer transition-colors"
+                className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-caption flex items-center gap-2 cursor-pointer transition-colors"
               >
                 <Plus className="w-4 h-4" /> Add Category
               </button>
             </div>
 
             {showAddCat && (
-              <form onSubmit={handleAddCategory} className="bg-slate-900 border border-purple-500/40 p-5 rounded-2xl space-y-4">
-                <h4 className="font-bold text-white text-xs uppercase tracking-wider">New Category Details</h4>
+              <form onSubmit={handleAddCategory} className="bg-white border border-purple-200 p-5 rounded-2xl space-y-4 shadow-sm">
+                <h4 className="font-bold text-slate-900 text-caption uppercase tracking-wider">New Category Details</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <input
                     type="text"
                     placeholder="Category Name (e.g. Robotics)"
                     value={newCatName}
                     onChange={e => setNewCatName(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-caption text-slate-900 placeholder-slate-400"
                     required
                   />
                   <input
@@ -632,34 +680,34 @@ function SuperAdminContent() {
                     placeholder="Icon Emoji (e.g. 🤖)"
                     value={newCatIcon}
                     onChange={e => setNewCatIcon(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-caption text-slate-900 placeholder-slate-400"
                   />
                   <input
                     type="text"
                     placeholder="Description"
                     value={newCatDesc}
                     onChange={e => setNewCatDesc(e.target.value)}
-                    className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500"
+                    className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-caption text-slate-900 placeholder-slate-400"
                   />
                 </div>
                 <div className="flex justify-end gap-2">
-                  <button type="button" onClick={() => setShowAddCat(false)} className="px-4 py-2 bg-slate-800 text-slate-300 font-semibold rounded-xl text-xs">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl text-xs">Save Category</button>
+                  <button type="button" onClick={() => setShowAddCat(false)} className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl text-caption">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl text-caption">Save Category</button>
                 </div>
               </form>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {categories.map(cat => (
-                <div key={cat.name} className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex items-center justify-between">
+                <div key={cat.name} className="bg-white border border-slate-200 p-5 rounded-2xl flex items-center justify-between shadow-sm">
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{cat.icon}</span>
                     <div>
-                      <h4 className="font-bold text-white text-sm">{cat.name}</h4>
-                      <p className="text-[11px] text-slate-400">{cat.description}</p>
+                      <h4 className="font-bold text-slate-900 text-body">{cat.name}</h4>
+                      <p className="text-caption text-slate-500">{cat.description}</p>
                     </div>
                   </div>
-                  <button onClick={() => handleDeleteCategory(cat.name)} className="text-slate-500 hover:text-red-400 p-2">
+                  <button onClick={() => handleDeleteCategory(cat.name)} className="text-slate-400 hover:text-red-600 p-2 cursor-pointer">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -671,22 +719,22 @@ function SuperAdminContent() {
         {/* ── TAB 5: BOOKINGS & PAYOUTS ──────────────────────────────────── */}
         {activeTab === 'bookings' && (
           <div className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl space-y-4">
-              <h3 className="font-extrabold text-white text-base">Booking & Revenue Summary</h3>
-              <p className="text-slate-400 text-xs">View all ticket sales, booking references, and platform payout metrics across organizers.</p>
+            <div className="bg-white border border-slate-200 p-6 rounded-3xl space-y-4 shadow-sm">
+              <h3 className="font-extrabold text-slate-900 text-body-lg">Booking & Revenue Summary</h3>
+              <p className="text-slate-500 text-caption">View all ticket sales, booking references, and platform payout metrics across organizers.</p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                  <span className="text-slate-400 text-xs">Total Tickets Sold</span>
-                  <div className="text-2xl font-bold text-white mt-1">42 Seats</div>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <span className="text-slate-500 text-caption">Total Tickets Sold</span>
+                  <div className="text-2xl font-bold text-slate-900 mt-1">42 Seats</div>
                 </div>
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                  <span className="text-slate-400 text-xs">Gross Platform Revenue</span>
-                  <div className="text-2xl font-bold text-emerald-400 mt-1">₹18,450</div>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <span className="text-slate-500 text-caption">Gross Platform Revenue</span>
+                  <div className="text-2xl font-bold text-emerald-700 mt-1">₹18,450</div>
                 </div>
-                <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800">
-                  <span className="text-slate-400 text-xs">Est. Platform Commission (10%)</span>
-                  <div className="text-2xl font-bold text-purple-400 mt-1">₹1,845</div>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                  <span className="text-slate-500 text-caption">Est. Platform Commission (10%)</span>
+                  <div className="text-2xl font-bold text-purple-700 mt-1">₹1,845</div>
                 </div>
               </div>
             </div>
@@ -695,23 +743,23 @@ function SuperAdminContent() {
 
         {/* ── TAB 6: SETTINGS ────────────────────────────────────────────── */}
         {activeTab === 'settings' && (
-          <div className="space-y-6 bg-slate-900 border border-slate-800 p-6 rounded-3xl">
-            <h3 className="font-extrabold text-white text-base">Platform Rules & Settings</h3>
-            <div className="space-y-4 text-xs text-slate-300">
-              <div className="flex items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800">
+          <div className="space-y-6 bg-white border border-slate-200 p-6 rounded-3xl shadow-sm">
+            <h3 className="font-extrabold text-slate-900 text-body-lg">Platform Rules & Settings</h3>
+            <div className="space-y-4 text-caption text-slate-700">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <div>
-                  <p className="font-bold text-white">Require Manual Approval for New Event Listings</p>
-                  <p className="text-slate-400 text-[11px]">When enabled, all newly created events require staff review before public display.</p>
+                  <p className="font-bold text-slate-900">Require Manual Approval for New Event Listings</p>
+                  <p className="text-slate-500 text-caption">When enabled, all newly created events require staff review before public display.</p>
                 </div>
-                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 font-bold rounded-full text-[10px]">ACTIVE</span>
+                <span className="px-3 py-1 bg-green-100 text-green-800 font-bold rounded-full text-micro border border-green-200">ACTIVE</span>
               </div>
 
-              <div className="flex items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
                 <div>
-                  <p className="font-bold text-white">Default Organizer Commission Fee</p>
-                  <p className="text-slate-400 text-[11px]">Percentage retained by platform on ticket bookings.</p>
+                  <p className="font-bold text-slate-900">Default Organizer Commission Fee</p>
+                  <p className="text-slate-500 text-caption">Percentage retained by platform on ticket bookings.</p>
                 </div>
-                <span className="font-bold text-purple-400 text-sm">10.0%</span>
+                <span className="font-bold text-purple-700 text-body">10.0%</span>
               </div>
             </div>
           </div>

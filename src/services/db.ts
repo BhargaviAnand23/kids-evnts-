@@ -503,11 +503,12 @@ export const dbService = {
     return tiers.filter(t => t.event_id === eventId)
   },
 
-  async createEvent(eventData: Omit<Event, 'id' | 'created_at' | 'status' | 'rejection_reason'>): Promise<Event> {
-    const { seating_tiers, ...cleanEventData } = eventData;
+  async createEvent(eventData: Omit<Event, 'id' | 'created_at' | 'status' | 'rejection_reason'> & { status?: 'pending_review' | 'approved' | 'rejected'; created_by_admin?: boolean }): Promise<Event> {
+    const { seating_tiers, created_by_admin, ...cleanEventData } = eventData;
+    const initialStatus = cleanEventData.status || 'pending_review';
     const newEventData = {
       ...cleanEventData,
-      status: 'pending_review' as const,
+      status: initialStatus as any,
       rejection_reason: null
     }
     

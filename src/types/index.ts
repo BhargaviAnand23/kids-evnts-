@@ -87,6 +87,7 @@ export interface Event {
   rejection_reason?: string | null
   is_sponsored?: boolean
   sponsor_tier?: 'featured' | 'premium' | 'standard'
+  rating?: number
   created_at: string
   organizer?: Organization | null
   school?: School | null

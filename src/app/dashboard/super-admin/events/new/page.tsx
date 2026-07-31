@@ -1,0 +1,382 @@
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { dbService } from '@/services/db';
+import { authService } from '@/services/auth';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { ArrowLeft, Loader2, ShieldAlert, CheckCircle } from 'lucide-react';
+import Link from 'next/link';
+import type { AgeBracket, Organization } from '@/types';
+
+export default function SuperAdminNewEventPage() {
+  const router = useRouter();
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [selectedOrgId, setSelectedOrgId] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [unauthorized, setUnauthorized] = useState(false);
+  const [seatingTiers, setSeatingTiers] = useState<{ tier_name: string; tier_price: number; tier_seats_total: number }[]>([]);
+
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    category: 'Football',
+    age_bracket: 'kids',
+    event_date: '',
+    event_time: '',
+    location: '',
+    price: 0,
+    seats_total: 10,
+    image_url: 'https://images.unsplash.com/photo-1574629810360-7efbb192569a?auto=format&fit=crop&q=80&w=600',
+    
+    // Type-specific fields
+    listing_type: 'event',
+    registration_deadline: '',
+    prize_details: '',
+    eligibility_rules: '',
+    session_count: '',
+    session_frequency: 'Weekly',
+    course_duration_weeks: '',
+    curriculum_outline: '',
+    is_online: false,
+    join_link: ''
+  });
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (!currentUser || currentUser.role !== 'super_admin') {
+          setUnauthorized(true);
+          setAuthLoading(false);
+          return;
+        }
+
+        const orgs = await dbService.getOrganizations();
+        setOrganizations(orgs);
+        if (orgs.length > 0) {
+          setSelectedOrgId(orgs[0].id);
+        }
+      } catch (err) {
+        console.error('Error initializing super admin event creation:', err);
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+    init();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const isWebinar = formData.listing_type === 'webinar';
+    const isCompetition = formData.listing_type === 'competition';
+    const isCourse = formData.listing_type === 'course';
+
+    // Fallback to first available organization if not selected
+    const targetOrgId = selectedOrgId || (organizations[0]?.id || 'org-platform');
+
+    const payload = {
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      age_bracket: formData.age_bracket as AgeBracket,
+      event_date: formData.event_date,
+      event_time: formData.event_time,
+      location: isWebinar ? 'Online Webinar' : (formData.location || 'Venue TBD'),
+      price: formData.price,
+      seats_total: isWebinar ? 1000 : Number(formData.seats_total),
+      seats_available: isWebinar ? 1000 : Number(formData.seats_total),
+      image_url: formData.image_url || null,
+      organizer_id: targetOrgId,
+      status: 'approved' as const, // Auto-approved directly by Super Admin
+
+      listing_type: formData.listing_type as any,
+      is_online: isWebinar,
+
+      // Competitions
+      registration_deadline: isCompetition && formData.registration_deadline ? new Date(formData.registration_deadline).toISOString() : null,
+      prize_details: isCompetition ? formData.prize_details : null,
+      eligibility_rules: isCompetition ? formData.eligibility_rules : null,
+
+      // Courses
+      session_count: isCourse && formData.session_count ? Number(formData.session_count) : null,
+      session_frequency: isCourse ? formData.session_frequency : null,
+      course_duration_weeks: isCourse && formData.course_duration_weeks ? Number(formData.course_duration_weeks) : null,
+      curriculum_outline: isCourse ? formData.curriculum_outline : null,
+
+      // Webinars
+      join_link: isWebinar ? formData.join_link : null,
+
+      // Seating Tiers
+      seating_tiers: formData.listing_type === 'event' && seatingTiers.length > 0
+        ? seatingTiers.map(t => ({
+            id: '',
+            event_id: '',
+            tier_name: t.tier_name,
+            tier_price: t.tier_price,
+            tier_seats_total: t.tier_seats_total,
+            tier_seats_available: t.tier_seats_total
+          }))
+        : undefined
+    };
+
+    try {
+      await dbService.createEvent(payload as any);
+      router.push('/dashboard/super-admin?success=created');
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.message || 'Failed to create event directly.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'number' ? Number(value) : value
+    }));
+  };
+
+  if (authLoading) {
+    return <div className="bg-slate-50 min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 text-purple-600 animate-spin" /></div>;
+  }
+
+  if (unauthorized) {
+    return (
+      <div className="bg-slate-50 min-h-screen flex items-center justify-center px-6">
+        <div className="text-center max-w-md bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <ShieldAlert className="w-14 h-14 text-orange-500 mx-auto mb-4" />
+          <h1 className="text-card-title font-bold text-slate-900 mb-2">Super Admin Access Required</h1>
+          <p className="text-slate-600 text-body mb-6">You must be logged in as a Super Admin to create events directly.</p>
+          <Button asChild><Link href="/login">Log In</Link></Button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-slate-50 min-h-screen py-10">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+        <Link href="/dashboard/super-admin" className="inline-flex items-center text-slate-500 hover:text-purple-600 text-caption font-semibold mb-6 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-2" /> Back to Super Admin Dashboard
+        </Link>
+        <Card className="border-slate-200 bg-white shadow-sm">
+          <CardHeader className="border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                Super Admin Privilege
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-micro font-bold bg-green-100 text-green-800 border border-green-200 flex items-center gap-1">
+                <CheckCircle className="w-3 h-3" /> Auto-Approved
+              </span>
+            </div>
+            <CardTitle className="text-page-title font-bold text-slate-900 mt-2">Create New Event (Direct Listing)</CardTitle>
+            <p className="text-caption text-slate-500">Events created by Super Admin skip review and publish live instantly.</p>
+          </CardHeader>
+          <CardContent className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+
+              {/* Organizer Selection Dropdown */}
+              <div className="space-y-2 bg-purple-50/60 p-4 rounded-xl border border-purple-100">
+                <label htmlFor="organizer_id" className="text-caption font-bold text-purple-900 block">
+                  Select Event Organizer / Host
+                </label>
+                <select
+                  id="organizer_id"
+                  value={selectedOrgId}
+                  onChange={e => setSelectedOrgId(e.target.value)}
+                  className="w-full bg-white border border-purple-200 rounded-xl px-3 py-2.5 text-caption font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">Independent / Platform Default Event</option>
+                  {organizations.map(org => (
+                    <option key={org.id} value={org.id}>
+                      {org.name} ({org.type || 'Organization'})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-micro text-purple-700">Choose the host organization for this event, or keep default platform host.</p>
+              </div>
+              
+              {/* Listing Type Picker */}
+              <div className="space-y-3">
+                <label className="text-caption font-semibold text-slate-700 block">What are you listing?</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    { val: 'event', label: 'Event', desc: 'Workshops, camps, day events', icon: '🎉' },
+                    { val: 'competition', label: 'Competition', desc: 'Tournaments, sports meets', icon: '🏆' },
+                    { val: 'course', label: 'Course', desc: 'Weekly classes, masterclasses', icon: '📚' },
+                    { val: 'webinar', label: 'Webinar', desc: 'Online talks, virtual lessons', icon: '💻' },
+                  ].map((type) => {
+                    const isSelected = formData.listing_type === type.val;
+                    return (
+                      <button
+                        key={type.val}
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, listing_type: type.val }))}
+                        className={`flex flex-col items-center justify-between p-3.5 rounded-2xl border-2 text-center transition-all duration-200 cursor-pointer ${
+                          isSelected
+                            ? 'border-purple-600 bg-purple-50/50 shadow-sm'
+                            : 'border-slate-200 bg-white hover:border-purple-300'
+                        }`}
+                      >
+                        <div className="text-2xl mb-1">{type.icon}</div>
+                        <div className={`font-bold text-caption ${isSelected ? 'text-purple-700' : 'text-slate-900'}`}>{type.label}</div>
+                        <div className="text-micro text-slate-400 mt-1 leading-tight">{type.desc}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="title" className="text-caption font-semibold text-slate-700 block">Listing Title</label>
+                <Input id="title" name="title" required value={formData.title} onChange={handleChange} placeholder="e.g. Super Admin Tennis Championship" />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="description" className="text-caption font-semibold text-slate-700 block">Description</label>
+                <textarea id="description" name="description" required value={formData.description} onChange={handleChange} rows={4}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-body focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[90px]"
+                  placeholder="Describe details, schedule, requirements..." />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="category" className="text-caption font-semibold text-slate-700 block">Category</label>
+                  <select id="category" name="category" value={formData.category} onChange={handleChange}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-caption focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="Football">Football</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Dance">Dance</option>
+                    <option value="Swimming">Swimming</option>
+                    <option value="Chess">Chess</option>
+                    <option value="Arts & Crafts">Arts &amp; Crafts</option>
+                    <option value="Music">Music</option>
+                    <option value="Martial Arts">Martial Arts</option>
+                    <option value="STEM & Tech">STEM &amp; Tech</option>
+                    <option value="Cycling">Cycling</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="age_bracket" className="text-caption font-semibold text-slate-700 block">Age Bracket</label>
+                  <select id="age_bracket" name="age_bracket" value={formData.age_bracket} onChange={handleChange}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-caption focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <option value="early_years">Early Years (3–5)</option>
+                    <option value="kids">Kids (6–12)</option>
+                    <option value="teens">Teens (13–18)</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="event_date" className="text-caption font-semibold text-slate-700 block">Date</label>
+                  <Input id="event_date" name="event_date" type="date" required value={formData.event_date} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="event_time" className="text-caption font-semibold text-slate-700 block">Time</label>
+                  <Input id="event_time" name="event_time" type="time" required value={formData.event_time} onChange={handleChange} />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="price" className="text-caption font-semibold text-slate-700 block">Price (₹)</label>
+                  <Input id="price" name="price" type="number" required value={formData.price} onChange={handleChange} min={0} />
+                </div>
+              </div>
+
+              {/* Event Specific: Location, Seats & Seating Tiers */}
+              {formData.listing_type === 'event' && (
+                <div className="space-y-4 border-t border-slate-100 pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label htmlFor="location" className="text-caption font-semibold text-slate-700 block">Location / Venue</label>
+                      <Input id="location" name="location" required value={formData.location} onChange={handleChange} placeholder="e.g. City Sports Complex" />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="seats_total" className="text-caption font-semibold text-slate-700 block">Total Seats</label>
+                      <Input id="seats_total" name="seats_total" type="number" required value={formData.seats_total} onChange={handleChange} min={1} />
+                    </div>
+                  </div>
+
+                  {/* Seating Tiers */}
+                  <div className="bg-purple-50/60 p-4 rounded-xl border border-purple-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-bold text-caption text-purple-900">Seating Tiers (VIP / General)</h4>
+                        <p className="text-micro text-purple-700">Define custom tiers with separate pricing & seats.</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSeatingTiers(prev => [...prev, { tier_name: prev.length === 0 ? 'VIP' : 'General', tier_price: prev.length === 0 ? 500 : 250, tier_seats_total: 10 }])}
+                        className="text-micro font-bold bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-colors cursor-pointer"
+                      >
+                        + Add Tier
+                      </button>
+                    </div>
+
+                    {seatingTiers.map((tier, idx) => (
+                      <div key={idx} className="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-purple-100 shadow-sm">
+                        <input
+                          type="text"
+                          placeholder="Tier Name"
+                          value={tier.tier_name}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_name = e.target.value;
+                            setSeatingTiers(updated);
+                          }}
+                          className="flex-1 text-caption border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Price (₹)"
+                          value={tier.tier_price}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_price = parseFloat(e.target.value) || 0;
+                            setSeatingTiers(updated);
+                          }}
+                          className="w-24 text-caption border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Seats"
+                          value={tier.tier_seats_total}
+                          onChange={(e) => {
+                            const updated = [...seatingTiers];
+                            updated[idx].tier_seats_total = parseInt(e.target.value) || 1;
+                            setSeatingTiers(updated);
+                          }}
+                          className="w-20 text-caption border border-slate-200 rounded px-2.5 py-1.5"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSeatingTiers(prev => prev.filter((_, i) => i !== idx))}
+                          className="text-caption text-red-500 hover:text-red-700 px-2 font-bold cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2 border-t border-slate-100 pt-4">
+                <label htmlFor="image_url" className="text-caption font-semibold text-slate-700 block">Listing Image URL (optional)</label>
+                <Input id="image_url" name="image_url" value={formData.image_url} onChange={handleChange} placeholder="https://..." />
+              </div>
+
+              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold h-12" disabled={loading}>
+                {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating & Auto-Approving…</> : 'Publish Live Event'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
