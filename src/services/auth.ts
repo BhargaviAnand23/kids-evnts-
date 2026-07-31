@@ -144,8 +144,12 @@ export const authService = {
       const usersKey = 'kids_event_mock_users'
       const users = JSON.parse(localStorage.getItem(usersKey) || '[]')
 
-      if (users.find((u: any) => u.email === email)) {
-        throw new Error('User already registered')
+      const existing = users.find((u: any) => u.email.toLowerCase().trim() === email.toLowerCase().trim())
+      if (existing) {
+        if (existing.password === password) {
+          return this.loginLocal(email, password)
+        }
+        throw new Error('This email is already registered. Please log in instead.')
       }
 
       let finalOrgId = organizationId
@@ -221,10 +225,29 @@ export const authService = {
           }
         })
         
-        if (error) throw error
+        if (error) {
+          if (
+            error.message?.toLowerCase().includes('already registered') ||
+            error.message?.toLowerCase().includes('already exists') ||
+            error.message?.toLowerCase().includes('email_exists')
+          ) {
+            try {
+              return await this.login(email, password)
+            } catch {
+              throw new Error('This email is already registered. Please log in instead.')
+            }
+          }
+          throw error
+        }
+
         if (!data.user) throw new Error('Sign up failed')
+
         if (data.user.identities && data.user.identities.length === 0) {
-          throw new Error('User already registered')
+          try {
+            return await this.login(email, password)
+          } catch {
+            throw new Error('This email is already registered. Please log in instead.')
+          }
         }
 
         const userId = data.user.id
@@ -263,15 +286,20 @@ export const authService = {
           console.warn('Profile creation failed:', e)
         }
 
-        if (!data.session) return null // Email confirmation pending
-
-        return {
+        // Directly construct active session user so sign up opens dashboard directly without requiring email confirmation waiting
+        const sessionUser: SessionUser = {
           id: userId,
           email,
           role,
           name,
           organization_id: finalOrgId
         }
+
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
+        }
+
+        return sessionUser
       } catch (err: any) {
         if (
           err?.name === 'AuthRetryableFetchError' ||
