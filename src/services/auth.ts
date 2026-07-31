@@ -31,107 +31,60 @@ export interface SessionUser {
 
 export const authService = {
   async getCurrentUser(): Promise<SessionUser | null> {
-    if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const userEmail = (user.email || '').toLowerCase().trim();
-        const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail);
+    if (!isSupabaseConfigured()) return null
 
-        // Check if super admin (DB table or allowlist)
-        const superAdminProfile = await dbService.getSuperAdminProfile(user.id)
-        if (isAllowlistedAdmin || superAdminProfile) {
-          return {
-            id: user.id,
-            email: user.email || '',
-            role: 'super_admin',
-            name: superAdminProfile?.name || user.user_metadata?.name || 'Platform Administrator',
-            is_super_admin: true
-          }
-        }
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return null
 
-        // Check if org admin
-        const adminProfile = await dbService.getOrganizationAdminProfile(user.id)
-        if (adminProfile) {
-          return {
-            id: user.id,
-            email: user.email || '',
-            role: 'admin',
-            name: adminProfile.name,
-            organization_id: adminProfile.organization_id
-          }
-        }
-        
-        // Otherwise, parent
-        const parentProfile = await dbService.getParentProfile(user.id)
-        if (parentProfile) {
-          return {
-            id: user.id,
-            email: user.email || '',
-            role: 'parent',
-            name: parentProfile.name
-          }
-        }
-      }
-    }
+    const userEmail = (user.email || '').toLowerCase().trim()
+    const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail)
 
-    // Local Storage Mock Session
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('kids_event_current_user')
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored);
-          const email = (parsed.email || '').toLowerCase().trim();
-          if (ADMIN_ALLOWLIST.includes(email) || parsed.is_super_admin || parsed.role === 'super_admin') {
-            return {
-              ...parsed,
-              role: 'super_admin',
-              is_super_admin: true
-            };
-          }
-          return parsed;
-        } catch {
-          return null
-        }
-      }
-    }
-    return null
-  },
-
-  async recoverProfile(userId: string): Promise<SessionUser | null> {
-    const superAdminProfile = await dbService.getSuperAdminProfile(userId)
-    if (superAdminProfile) {
+    // 1. Check if super admin
+    const superAdminProfile = await dbService.getSuperAdminProfile(user.id)
+    if (isAllowlistedAdmin || superAdminProfile) {
       return {
-        id: userId,
-        email: '',
+        id: user.id,
+        email: user.email || '',
         role: 'super_admin',
-        name: superAdminProfile.name,
+        name: superAdminProfile?.name || user.user_metadata?.name || 'Platform Administrator',
         is_super_admin: true
       }
     }
-    const adminProfile = await dbService.getOrganizationAdminProfile(userId)
+
+    // 2. Check if organization admin
+    const adminProfile = await dbService.getOrganizationAdminProfile(user.id)
     if (adminProfile) {
       return {
-        id: userId,
-        email: '', // Best effort
+        id: user.id,
+        email: user.email || '',
         role: 'admin',
         name: adminProfile.name,
         organization_id: adminProfile.organization_id
       }
     }
-    const parentProfile = await dbService.getParentProfile(userId)
+
+    // 3. Check if parent
+    const parentProfile = await dbService.getParentProfile(user.id)
     if (parentProfile) {
       return {
-        id: userId,
-        email: '',
+        id: user.id,
+        email: user.email || '',
         role: 'parent',
         name: parentProfile.name
       }
     }
-    return null
+
+    // 4. Fallback for newly confirmed user before profile trigger query settles
+    return {
+      id: user.id,
+      email: user.email || '',
+      role: (user.user_metadata?.role as UserRole) || 'parent',
+      name: user.user_metadata?.name || (user.email || '').split('@')[0] || 'User'
+    }
   },
 
-  async signUpLocal(
+  async signUp(
     email: string,
     password: string,
     name: string,
@@ -140,290 +93,126 @@ export const authService = {
     schoolId?: string,
     orgDetails?: { name: string; type: OrganizationType }
   ): Promise<SessionUser | null> {
-    if (typeof window !== 'undefined') {
-      const usersKey = 'kids_event_mock_users'
-      const users = JSON.parse(localStorage.getItem(usersKey) || '[]')
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase services are currently unavailable. Please check configuration.')
+    }
 
-      const existing = users.find((u: any) => u.email.toLowerCase().trim() === email.toLowerCase().trim())
-      if (existing) {
-        if (existing.password === password) {
-          return this.loginLocal(email, password)
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
+      password,
+      options: {
+        data: {
+          name: name.trim(),
+          role
         }
+      }
+    })
+
+    if (error) {
+      const msg = error.message?.toLowerCase() || ''
+      if (
+        msg.includes('already registered') ||
+        msg.includes('already exists') ||
+        msg.includes('email_exists') ||
+        msg.includes('user_already_exists')
+      ) {
         throw new Error('This email is already registered. Please log in instead.')
       }
+      throw new Error(error.message || 'Sign up failed. Please try again.')
+    }
 
-      let finalOrgId = organizationId
-      if (role === 'admin' && !finalOrgId && orgDetails) {
-        const newOrg = await dbService.createOrganization({
+    // Supabase returns an empty identities array if an account with this email already exists
+    if (data.user?.identities && data.user.identities.length === 0) {
+      throw new Error('This email is already registered. Please log in instead.')
+    }
+
+    if (!data.user) {
+      throw new Error('Sign up failed. Please try again.')
+    }
+
+    // Handle new organization creation for admins if specified
+    if (role === 'admin' && !organizationId && orgDetails) {
+      try {
+        await dbService.createOrganization({
           name: orgDetails.name,
           type: orgDetails.type,
-          contact_email: email,
+          contact_email: email.trim(),
           logo_url: null,
           address: null,
         })
-        finalOrgId = newOrg.id
-      }
-
-      const mockUserId = crypto.randomUUID()
-      const newUser = { id: mockUserId, email, password, name, role, organizationId: finalOrgId, schoolId }
-      users.push(newUser)
-      localStorage.setItem(usersKey, JSON.stringify(users))
-
-      const sessionUser: SessionUser = {
-        id: mockUserId,
-        email,
-        role,
-        name,
-        organization_id: finalOrgId,
-        school_id: schoolId
-      }
-
-      if (role === 'admin') {
-        if (!finalOrgId) throw new Error('Organization is required for admins')
-        await dbService.createOrganizationAdminProfile({
-          auth_user_id: mockUserId,
-          organization_id: finalOrgId,
-          name,
-          role: 'admin'
-        })
-      } else {
-        await dbService.createParentProfile({
-          auth_user_id: mockUserId,
-          name,
-          email,
-          phone: ''
-        })
-      }
-
-      localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
-      return sessionUser
-    }
-
-    throw new Error('Window undefined')
-  },
-
-  async signUp(
-    email: string,
-    password: string,
-    name: string,
-    role: 'parent' | 'admin',
-    organizationId?: string, // Required if role is admin and linking to existing org
-    schoolId?: string, // legacy for child
-    orgDetails?: { name: string; type: OrganizationType }
-  ): Promise<SessionUser | null> {
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = createClient()
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              name,
-              role
-            }
-          }
-        })
-        
-        if (error) {
-          if (
-            error.message?.toLowerCase().includes('already registered') ||
-            error.message?.toLowerCase().includes('already exists') ||
-            error.message?.toLowerCase().includes('email_exists')
-          ) {
-            try {
-              return await this.login(email, password)
-            } catch {
-              throw new Error('This email is already registered. Please log in instead.')
-            }
-          }
-          throw error
-        }
-
-        if (!data.user) throw new Error('Sign up failed')
-
-        if (data.user.identities && data.user.identities.length === 0) {
-          try {
-            return await this.login(email, password)
-          } catch {
-            throw new Error('This email is already registered. Please log in instead.')
-          }
-        }
-
-        const userId = data.user.id
-        let finalOrgId = organizationId
-
-        try {
-          if (role === 'admin') {
-            if (!finalOrgId && orgDetails) {
-              const newOrg = await dbService.createOrganization({
-                name: orgDetails.name,
-                type: orgDetails.type,
-                contact_email: email,
-                logo_url: null,
-                address: null,
-              })
-              finalOrgId = newOrg.id
-            }
-
-            if (!finalOrgId) throw new Error('Organization is required for admins')
-
-            await dbService.createOrganizationAdminProfile({
-              auth_user_id: userId,
-              organization_id: finalOrgId,
-              name,
-              role: 'admin'
-            })
-          } else {
-            await dbService.createParentProfile({
-              auth_user_id: userId,
-              name,
-              email,
-              phone: ''
-            })
-          }
-        } catch (e) {
-          console.warn('Profile creation failed:', e)
-        }
-
-        // Directly construct active session user so sign up opens dashboard directly without requiring email confirmation waiting
-        const sessionUser: SessionUser = {
-          id: userId,
-          email,
-          role,
-          name,
-          organization_id: finalOrgId
-        }
-
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
-        }
-
-        return sessionUser
-      } catch (err: any) {
-        if (
-          err?.name === 'AuthRetryableFetchError' ||
-          err?.message?.includes('fetch') ||
-          err?.message?.includes('Failed to fetch') ||
-          err?.status === 0
-        ) {
-          console.warn('Supabase Auth network error, falling back to local session:', err)
-          return this.signUpLocal(email, password, name, role, organizationId, schoolId, orgDetails)
-        }
-        throw err
+      } catch (orgErr) {
+        console.warn('[auth] Organization pre-creation note:', orgErr)
       }
     }
 
-    return this.signUpLocal(email, password, name, role, organizationId, schoolId, orgDetails)
-  },
-
-  async loginLocal(email: string, password: string): Promise<SessionUser> {
-    if (typeof window !== 'undefined') {
-      const usersKey = 'kids_event_mock_users'
-      const users = JSON.parse(localStorage.getItem(usersKey) || '[]')
-      const user = users.find((u: any) => u.email === email && u.password === password)
-
-      if (!user) {
-        throw new Error('Invalid email or password')
-      }
-
-      const sessionUser: SessionUser = {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        name: user.name,
-        organization_id: user.organizationId,
-        school_id: user.schoolId
-      }
-
-      localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
-      return sessionUser
-    }
-
-    throw new Error('Window undefined')
+    // Return null to require email confirmation — no active session or direct dashboard bypass
+    return null
   },
 
   async login(email: string, password: string): Promise<SessionUser> {
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = createClient()
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        })
-        if (error) throw error
-        if (!data.user) throw new Error('Login failed')
+    if (!isSupabaseConfigured()) {
+      throw new Error('Supabase services are currently unavailable. Please check configuration.')
+    }
 
-        const userId = data.user.id
-        const userEmail = data.user.email || email
-        const userName: string =
-          (data.user.user_metadata?.name as string | undefined) ||
-          userEmail.split('@')[0]
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password
+    })
 
-        const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim());
-        const superAdminProfile = await dbService.getSuperAdminProfile(userId)
-        if (isAllowlistedAdmin || superAdminProfile) {
-          return {
-            id: userId,
-            email: userEmail,
-            role: 'super_admin',
-            name: superAdminProfile?.name || userName || 'Platform Administrator',
-            is_super_admin: true
-          }
-        }
+    if (error) {
+      const msg = error.message?.toLowerCase() || ''
+      if (msg.includes('invalid login credentials')) {
+        throw new Error('Invalid email or password.')
+      }
+      if (msg.includes('email not confirmed')) {
+        throw new Error('Please confirm your email address before logging in. Check your inbox for the confirmation link.')
+      }
+      throw new Error(error.message || 'Login failed. Please try again.')
+    }
 
-        const adminProfile = await dbService.getOrganizationAdminProfile(userId)
-        if (adminProfile) {
-          return {
-            id: userId,
-            email: userEmail,
-            role: 'admin',
-            name: adminProfile.name,
-            organization_id: adminProfile.organization_id
-          }
-        }
+    if (!data.user) {
+      throw new Error('Login failed. Please try again.')
+    }
 
-        let parentProfile = await dbService.getParentProfile(userId)
+    const userId = data.user.id
+    const userEmail = data.user.email || email
+    const userName: string =
+      (data.user.user_metadata?.name as string | undefined) ||
+      userEmail.split('@')[0]
 
-        if (!parentProfile) {
-          console.warn('[auth] No parent profile found — attempting self-heal insert')
-          try {
-            parentProfile = await dbService.createParentProfile({
-              auth_user_id: userId,
-              name: userName,
-              email: userEmail,
-              phone: ''
-            })
-          } catch (healErr: any) {
-            console.error('[auth] Self-heal failed:', healErr?.message)
-            throw new Error(
-              'Account found but profile is missing. ' +
-              'Please run the SQL fix in your Supabase dashboard (fix_auth_trigger.sql).'
-            )
-          }
-        }
-
-        return {
-          id: userId,
-          email: userEmail,
-          role: 'parent',
-          name: parentProfile.name
-        }
-      } catch (err: any) {
-        if (
-          err?.name === 'AuthRetryableFetchError' ||
-          err?.message?.includes('fetch') ||
-          err?.message?.includes('Failed to fetch') ||
-          err?.status === 0
-        ) {
-          console.warn('Supabase Auth network error, falling back to local login:', err)
-          return this.loginLocal(email, password)
-        }
-        throw err
+    const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim())
+    const superAdminProfile = await dbService.getSuperAdminProfile(userId)
+    if (isAllowlistedAdmin || superAdminProfile) {
+      return {
+        id: userId,
+        email: userEmail,
+        role: 'super_admin',
+        name: superAdminProfile?.name || userName || 'Platform Administrator',
+        is_super_admin: true
       }
     }
 
-    return this.loginLocal(email, password)
+    const adminProfile = await dbService.getOrganizationAdminProfile(userId)
+    if (adminProfile) {
+      return {
+        id: userId,
+        email: userEmail,
+        role: 'admin',
+        name: adminProfile.name,
+        organization_id: adminProfile.organization_id
+      }
+    }
+
+    const parentProfile = await dbService.getParentProfile(userId)
+
+    return {
+      id: userId,
+      email: userEmail,
+      role: 'parent',
+      name: parentProfile?.name || userName
+    }
   },
 
   async logout(): Promise<void> {

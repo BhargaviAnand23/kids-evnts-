@@ -621,17 +621,7 @@ export const dbService = {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       const { data, error } = await supabase.from('parents').insert([profile]).select().single()
-      if (error) {
-        if (error.code === '42501' || error.message?.includes('row-level security policy')) {
-          console.warn('[db] Parent profile insert deferred due to RLS (will self-heal on login):', error.message)
-          return {
-            id: profile.auth_user_id,
-            ...profile,
-            created_at: new Date().toISOString(),
-          }
-        }
-        throw error
-      }
+      if (error) throw error
       return data
     }
 
@@ -792,17 +782,7 @@ export const dbService = {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       const { data, error } = await supabase.from('organization_admins').upsert([profile], { onConflict: 'auth_user_id' }).select().single()
-      if (error) {
-        if (error.code === '42501' || error.message?.includes('row-level security policy')) {
-          console.warn('[db] Org admin profile insert deferred due to RLS (will self-heal on login):', error.message)
-          return {
-            id: profile.auth_user_id,
-            ...profile,
-            created_at: new Date().toISOString(),
-          }
-        }
-        throw error
-      }
+      if (error) throw error
       return data
     }
 
@@ -941,24 +921,30 @@ export const dbService = {
 
       // If tier_id is specified, perform tier seat check and decrement
       if (bookingData.tier_id) {
-        const { data: tier, error: tierErr } = await supabase
-          .from('event_seating_tiers')
-          .select('*')
-          .eq('id', bookingData.tier_id)
-          .single()
-        
-        if (tierErr || !tier) throw new Error('Selected seating tier not found')
-        if (tier.tier_seats_available <= 0) {
-          throw new Error(`Sorry, the ${tier.tier_name} tier is sold out!`)
-        }
+        try {
+          const { data: tier, error: tierErr } = await supabase
+            .from('event_seating_tiers')
+            .select('*')
+            .eq('id', bookingData.tier_id)
+            .single()
+          
+          if (!tierErr && tier) {
+            if (tier.tier_seats_available <= 0) {
+              throw new Error(`Sorry, the ${tier.tier_name} tier is sold out!`)
+            }
 
-        await supabase
-          .from('event_seating_tiers')
-          .update({ tier_seats_available: Math.max(0, tier.tier_seats_available - 1) })
-          .eq('id', bookingData.tier_id)
+            await supabase
+              .from('event_seating_tiers')
+              .update({ tier_seats_available: Math.max(0, tier.tier_seats_available - 1) })
+              .eq('id', bookingData.tier_id)
 
-        if (!bookingData.tier_name) {
-          bookingData.tier_name = tier.tier_name;
+            if (!bookingData.tier_name) {
+              bookingData.tier_name = tier.tier_name;
+            }
+          }
+        } catch (tierError: any) {
+          if (tierError?.message?.includes('sold out')) throw tierError;
+          console.warn('[db] Seating tier lookup skipped:', tierError?.message);
         }
       }
 
@@ -980,12 +966,40 @@ export const dbService = {
         .update({ seats_available: Math.max(0, event.seats_available - 1) })
         .eq('id', bookingData.event_id)
 
-      const { data, error } = await supabase.from('bookings').insert([{
-        ...bookingData,
+      const payload: Record<string, any> = {
+        event_id: bookingData.event_id,
+        child_id: bookingData.child_id,
+        parent_id: bookingData.parent_id,
         status: 'confirmed',
         payment_status: 'paid',
         booking_reference: reference
-      }]).select().single()
+      }
+
+      if (bookingData.tier_id) {
+        payload.tier_id = bookingData.tier_id
+      }
+      if (bookingData.tier_name) {
+        payload.tier_name = bookingData.tier_name
+      }
+
+      let { data, error } = await supabase.from('bookings').insert([payload]).select().single()
+
+      // Fallback: If DB schema is missing tier_id/tier_name columns, retry without tier properties
+      if (error && (error.message?.includes('tier_id') || error.message?.includes('schema cache') || error.code === 'PGRST204')) {
+        console.warn('[db] Retrying booking insert without tier_id/tier_name due to DB schema cache:', error.message)
+        const fallbackPayload = {
+          event_id: bookingData.event_id,
+          child_id: bookingData.child_id,
+          parent_id: bookingData.parent_id,
+          status: 'confirmed',
+          payment_status: 'paid',
+          booking_reference: reference
+        }
+        const retry = await supabase.from('bookings').insert([fallbackPayload]).select().single()
+        data = retry.data
+        error = retry.error
+      }
+
       if (error) throw error
       return data
     }

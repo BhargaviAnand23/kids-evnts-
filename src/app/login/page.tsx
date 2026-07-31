@@ -37,13 +37,10 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard/parent');
       }
-    } catch (err: unknown) {
-      const e = err as { message?: string; error_description?: string };
-      const msg = typeof e?.message === 'string' && e.message.trim()
-        ? e.message.trim()
-        : typeof e?.error_description === 'string' && e.error_description.trim()
-          ? e.error_description.trim()
-          : 'Something went wrong. Please try again.';
+    } catch (err: any) {
+      const msg = typeof err?.message === 'string' && err.message.trim()
+        ? err.message.trim()
+        : 'Something went wrong. Please try again.';
       setError(msg);
     } finally {
       setLoading(false);
