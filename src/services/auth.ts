@@ -131,90 +131,21 @@ export const authService = {
     return null
   },
 
-  async signUp(
+  async signUpLocal(
     email: string,
     password: string,
     name: string,
     role: 'parent' | 'admin',
-    organizationId?: string, // Required if role is admin and linking to existing org
-    schoolId?: string, // legacy for child
+    organizationId?: string,
+    schoolId?: string,
     orgDetails?: { name: string; type: OrganizationType }
   ): Promise<SessionUser | null> {
-    if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role
-          }
-        }
-      })
-      
-      if (error) throw error
-      if (!data.user) throw new Error('Sign up failed')
-      if (data.user.identities && data.user.identities.length === 0) {
-        throw new Error('User already registered')
-      }
-
-      const userId = data.user.id
-      let finalOrgId = organizationId
-
-      try {
-        if (role === 'admin') {
-          if (!finalOrgId && orgDetails) {
-            // Step 1: Create organization first as an authenticated user
-            const newOrg = await dbService.createOrganization({
-              name: orgDetails.name,
-              type: orgDetails.type,
-              contact_email: email,
-              logo_url: null,
-              address: null,
-            })
-            finalOrgId = newOrg.id
-          }
-
-          if (!finalOrgId) throw new Error('Organization is required for admins')
-
-          // Step 2: Link user to organization in organization_admins
-          await dbService.createOrganizationAdminProfile({
-            auth_user_id: userId,
-            organization_id: finalOrgId,
-            name,
-            role: 'admin'
-          })
-        } else {
-          await dbService.createParentProfile({
-            auth_user_id: userId,
-            name,
-            email,
-            phone: ''
-          })
-        }
-      } catch (e) {
-        console.warn('Profile creation failed:', e)
-      }
-
-      if (!data.session) return null // Email confirmation pending
-
-      return {
-        id: userId,
-        email,
-        role,
-        name,
-        organization_id: finalOrgId
-      }
-    }
-
-    // Local Storage Mock Auth
     if (typeof window !== 'undefined') {
       const usersKey = 'kids_event_mock_users'
       const users = JSON.parse(localStorage.getItem(usersKey) || '[]')
-      
+
       if (users.find((u: any) => u.email === email)) {
-        throw new Error('User already exists')
+        throw new Error('User already registered')
       }
 
       let finalOrgId = organizationId
@@ -243,7 +174,6 @@ export const authService = {
         school_id: schoolId
       }
 
-      // Automatically create the profiles in local storage tables
       if (role === 'admin') {
         if (!finalOrgId) throw new Error('Organization is required for admins')
         await dbService.createOrganizationAdminProfile({
@@ -268,79 +198,98 @@ export const authService = {
     throw new Error('Window undefined')
   },
 
-  async login(email: string, password: string): Promise<SessionUser> {
+  async signUp(
+    email: string,
+    password: string,
+    name: string,
+    role: 'parent' | 'admin',
+    organizationId?: string, // Required if role is admin and linking to existing org
+    schoolId?: string, // legacy for child
+    orgDetails?: { name: string; type: OrganizationType }
+  ): Promise<SessionUser | null> {
     if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      if (error) throw error
-      if (!data.user) throw new Error('Login failed')
-
-      const userId = data.user.id
-      const userEmail = data.user.email || email
-      const userName: string =
-        (data.user.user_metadata?.name as string | undefined) ||
-        userEmail.split('@')[0]
-
-      // Check super admin profile first
-      const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim());
-      const superAdminProfile = await dbService.getSuperAdminProfile(userId)
-      if (isAllowlistedAdmin || superAdminProfile) {
-        return {
-          id: userId,
-          email: userEmail,
-          role: 'super_admin',
-          name: superAdminProfile?.name || userName || 'Platform Administrator',
-          is_super_admin: true
+      try {
+        const supabase = createClient()
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+              role
+            }
+          }
+        })
+        
+        if (error) throw error
+        if (!data.user) throw new Error('Sign up failed')
+        if (data.user.identities && data.user.identities.length === 0) {
+          throw new Error('User already registered')
         }
-      }
 
-      // Check admin profile first
-      const adminProfile = await dbService.getOrganizationAdminProfile(userId)
-      if (adminProfile) {
-        return {
-          id: userId,
-          email: userEmail,
-          role: 'admin',
-          name: adminProfile.name,
-          organization_id: adminProfile.organization_id
-        }
-      }
+        const userId = data.user.id
+        let finalOrgId = organizationId
 
-      // Check parent profile
-      let parentProfile = await dbService.getParentProfile(userId)
-
-      // Self-heal: if no parent profile exists (user signed up before trigger was deployed,
-      // or email was confirmed before trigger ran), create the profile now on first login.
-      if (!parentProfile) {
-        console.warn('[auth] No parent profile found — attempting self-heal insert')
         try {
-          parentProfile = await dbService.createParentProfile({
-            auth_user_id: userId,
-            name: userName,
-            email: userEmail,
-            phone: ''
-          })
-        } catch (healErr: any) {
-          console.error('[auth] Self-heal failed:', healErr?.message)
-          throw new Error(
-            'Account found but profile is missing. ' +
-            'Please run the SQL fix in your Supabase dashboard (fix_auth_trigger.sql).'
-          )
-        }
-      }
+          if (role === 'admin') {
+            if (!finalOrgId && orgDetails) {
+              const newOrg = await dbService.createOrganization({
+                name: orgDetails.name,
+                type: orgDetails.type,
+                contact_email: email,
+                logo_url: null,
+                address: null,
+              })
+              finalOrgId = newOrg.id
+            }
 
-      return {
-        id: userId,
-        email: userEmail,
-        role: 'parent',
-        name: parentProfile.name
+            if (!finalOrgId) throw new Error('Organization is required for admins')
+
+            await dbService.createOrganizationAdminProfile({
+              auth_user_id: userId,
+              organization_id: finalOrgId,
+              name,
+              role: 'admin'
+            })
+          } else {
+            await dbService.createParentProfile({
+              auth_user_id: userId,
+              name,
+              email,
+              phone: ''
+            })
+          }
+        } catch (e) {
+          console.warn('Profile creation failed:', e)
+        }
+
+        if (!data.session) return null // Email confirmation pending
+
+        return {
+          id: userId,
+          email,
+          role,
+          name,
+          organization_id: finalOrgId
+        }
+      } catch (err: any) {
+        if (
+          err?.name === 'AuthRetryableFetchError' ||
+          err?.message?.includes('fetch') ||
+          err?.message?.includes('Failed to fetch') ||
+          err?.status === 0
+        ) {
+          console.warn('Supabase Auth network error, falling back to local session:', err)
+          return this.signUpLocal(email, password, name, role, organizationId, schoolId, orgDetails)
+        }
+        throw err
       }
     }
 
-    // Local Storage Mock login
+    return this.signUpLocal(email, password, name, role, organizationId, schoolId, orgDetails)
+  },
+
+  async loginLocal(email: string, password: string): Promise<SessionUser> {
     if (typeof window !== 'undefined') {
       const usersKey = 'kids_event_mock_users'
       const users = JSON.parse(localStorage.getItem(usersKey) || '[]')
@@ -364,6 +313,89 @@ export const authService = {
     }
 
     throw new Error('Window undefined')
+  },
+
+  async login(email: string, password: string): Promise<SessionUser> {
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient()
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        })
+        if (error) throw error
+        if (!data.user) throw new Error('Login failed')
+
+        const userId = data.user.id
+        const userEmail = data.user.email || email
+        const userName: string =
+          (data.user.user_metadata?.name as string | undefined) ||
+          userEmail.split('@')[0]
+
+        const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim());
+        const superAdminProfile = await dbService.getSuperAdminProfile(userId)
+        if (isAllowlistedAdmin || superAdminProfile) {
+          return {
+            id: userId,
+            email: userEmail,
+            role: 'super_admin',
+            name: superAdminProfile?.name || userName || 'Platform Administrator',
+            is_super_admin: true
+          }
+        }
+
+        const adminProfile = await dbService.getOrganizationAdminProfile(userId)
+        if (adminProfile) {
+          return {
+            id: userId,
+            email: userEmail,
+            role: 'admin',
+            name: adminProfile.name,
+            organization_id: adminProfile.organization_id
+          }
+        }
+
+        let parentProfile = await dbService.getParentProfile(userId)
+
+        if (!parentProfile) {
+          console.warn('[auth] No parent profile found — attempting self-heal insert')
+          try {
+            parentProfile = await dbService.createParentProfile({
+              auth_user_id: userId,
+              name: userName,
+              email: userEmail,
+              phone: ''
+            })
+          } catch (healErr: any) {
+            console.error('[auth] Self-heal failed:', healErr?.message)
+            throw new Error(
+              'Account found but profile is missing. ' +
+              'Please run the SQL fix in your Supabase dashboard (fix_auth_trigger.sql).'
+            )
+          }
+        }
+
+        return {
+          id: userId,
+          email: userEmail,
+          role: 'parent',
+          name: parentProfile.name
+        }
+      } catch (err: any) {
+        if (
+          err?.name === 'AuthRetryableFetchError' ||
+          err?.message?.includes('fetch') ||
+          err?.message?.includes('Failed to fetch') ||
+          err?.status === 0
+        ) {
+          console.warn('Supabase Auth network error, falling back to local login:', err)
+          return this.loginLocal(email, password)
+        }
+        throw err
+      }
+    }
+
+    return this.loginLocal(email, password)
   },
 
   async logout(): Promise<void> {

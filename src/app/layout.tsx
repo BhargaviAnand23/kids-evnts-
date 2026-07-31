@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsentBanner } from "@/components/shared/CookieConsentBanner";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 const inter = Inter({ subsets: ["latin"], display: 'swap' });
 
@@ -22,8 +23,6 @@ export const metadata: Metadata = {
     ],
   },
 };
-
-import { PageTransition } from "@/components/layout/PageTransition";
 
 export default function RootLayout({
   children,
