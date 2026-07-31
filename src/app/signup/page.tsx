@@ -72,23 +72,40 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: unknown) {
+      console.error('Signup error:', err);
       let msg = '';
       if (typeof err === 'string') {
         msg = err;
+      } else if (err instanceof Error) {
+        msg = err.message;
       } else if (err && typeof err === 'object') {
         const e = err as Record<string, any>;
         if (typeof e.message === 'string') msg = e.message;
         else if (typeof e.error_description === 'string') msg = e.error_description;
         else if (typeof e.details === 'string') msg = e.details;
+        else if (typeof e.msg === 'string') msg = e.msg;
       }
-      msg = msg.trim();
+
+      msg = (msg || '').trim();
+
       if (!msg || msg === '{}' || msg === '[]' || msg === '[object Object]') {
         msg = 'Sign up failed. Please try again.';
       }
+
       const lower = msg.toLowerCase();
-      if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('user_already_exists') || lower.includes('email_exists')) {
+      if (
+        lower.includes('already registered') ||
+        lower.includes('already exists') ||
+        lower.includes('user_already_exists') ||
+        lower.includes('email_exists') ||
+        lower.includes('email already in use') ||
+        lower.includes('email_taken')
+      ) {
         msg = 'This email is already registered. Please log in instead.';
+      } else if (lower.includes('rate limit')) {
+        msg = 'Too many sign-up attempts. Please wait a minute and try again.';
       }
+
       setError(msg);
     } finally {
       setLoading(false);
