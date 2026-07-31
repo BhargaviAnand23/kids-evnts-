@@ -49,14 +49,14 @@ export function HappyKidsGallery() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
           <div>
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-purple-100 shadow-sm text-xs font-semibold text-purple-700">
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-purple-100 shadow-sm text-caption font-semibold text-purple-700">
               <Heart className="w-3.5 h-3.5 fill-purple-600 text-purple-600" /> Real Moments
             </div>
-            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mt-1">
+            <h3 className="text-section-title font-bold text-slate-900 mt-1">
               Happy Kids in Action
             </h3>
           </div>
-          <p className="text-slate-500 text-xs sm:text-sm max-w-md text-left sm:text-right">
+          <p className="text-slate-500 text-caption max-w-md text-left sm:text-right">
             Over 5,000+ children discovering their passions through verified local activities every week.
           </p>
         </div>
@@ -75,10 +75,10 @@ export function HappyKidsGallery() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <span className="font-bold text-slate-900 text-xs sm:text-sm group-hover:text-purple-700 leading-tight">
+              <span className="font-bold text-slate-900 text-caption group-hover:text-purple-700 leading-tight">
                 {item.caption}
               </span>
-              <span className="text-[11px] text-slate-500 mt-0.5 font-medium">
+              <span className="text-micro text-slate-500 mt-0.5 font-medium">
                 {item.activity}
               </span>
             </div>

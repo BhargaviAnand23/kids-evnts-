@@ -137,11 +137,11 @@ export default function SignupPage() {
     <div className="bg-slate-50 min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16 px-6 md:px-16 lg:px-24 relative overflow-hidden">
       <div className="max-w-md w-full bg-white rounded-3xl p-6 sm:p-8 shadow-xl shadow-purple-900/5 border border-slate-100 relative z-10">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-purple-600 tracking-tight mb-2 block">
+          <Link href="/" className="text-section-title font-bold text-purple-600 tracking-tight mb-2 block">
             Kidspire
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Create an account</h1>
-          <p className="text-slate-500 text-sm md:text-base">Join thousands of parents making weekends special</p>
+          <h1 className="text-page-title font-bold text-slate-900">Create an account</h1>
+          <p className="text-slate-500 text-body">Join thousands of parents making weekends special</p>
         </div>
 
         <Card className="border-none shadow-2xl shadow-orange-900/10 mb-6">
@@ -151,7 +151,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => { setRole('parent'); setError(null); }}
-                className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-all ${
+                className={`flex-1 rounded-lg py-2 text-caption font-semibold transition-all ${
                   role === 'parent'
                     ? 'bg-white shadow-sm text-slate-900'
                     : 'text-slate-500 hover:text-slate-900'
@@ -162,7 +162,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={() => { setRole('admin'); setError(null); }}
-                className={`flex-1 py-2 rounded-lg text-sm font-semibold transition-all ${
+                className={`flex-1 py-2 rounded-lg text-caption font-semibold transition-all ${
                   role === 'admin'
                     ? 'bg-white shadow-sm text-slate-900'
                     : 'text-slate-500 hover:text-slate-900'

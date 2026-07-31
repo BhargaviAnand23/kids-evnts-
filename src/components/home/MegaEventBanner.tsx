@@ -25,28 +25,28 @@ export function MegaEventBanner() {
             {/* Left — text block */}
             <div className="max-w-lg">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-xs font-bold mb-4 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 text-amber-300 text-caption font-bold mb-4 backdrop-blur-sm">
                 <Trophy className="w-3.5 h-3.5" />
                 Upcoming Mega Events
               </div>
 
               {/* Title */}
-              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-2 leading-tight tracking-tight drop-shadow-md">
+              <h2 className="text-hero font-extrabold text-white mb-2 leading-tight tracking-tight drop-shadow-md">
                 Kids Sports Festival 2025
               </h2>
 
               {/* Activity tags */}
-              <p className="text-purple-200 text-sm sm:text-base font-medium mb-5">
+              <p className="text-purple-200 text-body font-medium mb-5">
                 Football&nbsp;•&nbsp;Basketball&nbsp;•&nbsp;Fun&nbsp;Games
               </p>
 
               {/* Meta — date + location */}
               <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-white/80 text-sm">
+                <div className="flex items-center gap-2 text-white/80 text-caption">
                   <Calendar className="w-4 h-4 text-purple-300 shrink-0" />
                   <span>Sep 10 – Sep 12, 2025</span>
                 </div>
-                <div className="flex items-center gap-2 text-white/80 text-sm">
+                <div className="flex items-center gap-2 text-white/80 text-caption">
                   <MapPin className="w-4 h-4 text-purple-300 shrink-0" />
                   <span>Chennai Stadium, Chennai</span>
                 </div>
@@ -57,7 +57,7 @@ export function MegaEventBanner() {
             <div className="shrink-0">
               <a
                 href="#"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-purple-700 font-bold text-sm sm:text-base hover:bg-purple-50 active:scale-95 transition-all duration-150 shadow-lg shadow-purple-900/30"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-purple-700 font-bold text-body hover:bg-purple-50 active:scale-95 transition-all duration-150 shadow-lg shadow-purple-900/30"
               >
                 Know More
                 <ArrowRight className="w-4 h-4" />

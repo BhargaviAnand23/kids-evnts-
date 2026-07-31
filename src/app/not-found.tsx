@@ -9,8 +9,8 @@ export default function NotFound() {
       <div className="w-32 h-32 bg-purple-100 rounded-full flex items-center justify-center mb-8">
         <span className="text-4xl sm:text-5xl font-bold text-purple-600">404</span>
       </div>
-      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">Page not found</h1>
-      <p className="text-slate-600 text-base mb-10 max-w-md mx-auto">
+      <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">Page not found</h1>
+      <p className="text-slate-600 text-body mb-10 max-w-md mx-auto">
         Oops! The page you're looking for doesn't exist or has been moved. Let's get you back on track.
       </p>
       <Button size="lg" className="h-14 px-8" asChild>

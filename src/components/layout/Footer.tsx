@@ -13,19 +13,19 @@ export function Footer() {
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-[32px] p-8 md:p-12 flex flex-col lg:flex-row items-center justify-between mb-20 md:mb-24 relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=2940')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
             <div className="mb-8 lg:mb-0 lg:mr-10 relative z-10 max-w-2xl text-center lg:text-left">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">Ready to Make Every Weekend Special?</h2>
-              <p className="text-purple-100 text-base leading-relaxed">Join Kidspire today and discover hundreds of engaging sports, arts, and hobby activities for your child.</p>
+              <h2 className="text-section-title font-bold text-white mb-4">Ready to Make Every Weekend Special?</h2>
+              <p className="text-purple-100 text-body leading-relaxed">Join Kidspire today and discover hundreds of engaging sports, arts, and hobby activities for your child.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto relative z-10">
               <Link
                 href="/explore"
-                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-sm md:text-base bg-white text-purple-700 hover:bg-slate-100 shadow-md transition-all whitespace-nowrap"
+                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-body bg-white text-purple-700 hover:bg-slate-100 shadow-md transition-all whitespace-nowrap"
               >
                 Explore Activities
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-sm md:text-base border-2 border-white/80 text-white hover:bg-white/15 hover:border-white transition-all whitespace-nowrap"
+                className="inline-flex items-center justify-center rounded-full font-bold h-12 md:h-14 px-8 text-white text-body border-2 border-white/80 hover:bg-white/15 hover:border-white transition-all whitespace-nowrap"
               >
                 Sign Up Free
               </Link>
@@ -36,23 +36,23 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           <div className="lg:col-span-2">
             <div className="flex flex-col mb-6">
-              <Link href="/" className="text-3xl font-bold text-white tracking-tight">
+              <Link href="/" className="text-section-title font-bold text-white tracking-tight">
                 Kidspire
               </Link>
-              <span className="text-xs uppercase tracking-widest text-slate-400 font-semibold mt-1">
+              <span className="text-caption uppercase tracking-widest text-slate-400 font-semibold mt-1">
                 Play &middot; Explore &middot; Shine
               </span>
             </div>
-            <p className="text-slate-400 mb-8 max-w-md leading-relaxed text-base">
+            <p className="text-slate-400 mb-8 max-w-md leading-relaxed text-body">
               The premier platform for finding and booking the best sports, arts, and hobby activities for kids and young people.
             </p>
             <div className="flex flex-wrap gap-4">
               {/* Trust Badges */}
-              <div className="flex items-center bg-slate-800/80 rounded-full px-4 py-2 text-sm text-slate-300">
+              <div className="flex items-center bg-slate-800/80 rounded-full px-4 py-2 text-caption text-slate-300">
                 <Shield className="w-4 h-4 text-green-400 mr-2" />
                 <span>Verified Partners</span>
               </div>
-              <div className="flex items-center bg-slate-800/80 rounded-full px-4 py-2 text-sm text-slate-300">
+              <div className="flex items-center bg-slate-800/80 rounded-full px-4 py-2 text-slate-300 text-caption">
                 <Award className="w-4 h-4 text-orange-400 mr-2" />
                 <span>Top Rated Activities</span>
               </div>
@@ -60,8 +60,8 @@ export function Footer() {
           </div>
           
           <div>
-            <h4 className="text-white font-semibold text-lg mb-6">Discover</h4>
-            <ul className="space-y-4 text-slate-400">
+            <h4 className="text-white font-semibold text-card-title mb-6">Discover</h4>
+            <ul className="space-y-4 text-slate-400 text-body">
               <li><Link href="/explore" className="hover:text-purple-400 transition-colors">Explore Activities</Link></li>
               <li><Link href="/categories" className="hover:text-purple-400 transition-colors">Categories</Link></li>
               <li><Link href="/how-it-works" className="hover:text-purple-400 transition-colors">How It Works</Link></li>
@@ -70,8 +70,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold text-lg mb-6">Organizers</h4>
-            <ul className="space-y-4 text-slate-400">
+            <h4 className="text-white font-semibold text-card-title mb-6">Organizers</h4>
+            <ul className="space-y-4 text-slate-400 text-body">
               <li><Link href="/list-your-event" className="hover:text-purple-400 transition-colors font-medium text-purple-300">List Your Event</Link></li>
               <li><Link href="/signup" className="hover:text-purple-400 transition-colors">Partner Signup</Link></li>
               <li><Link href="/login" className="hover:text-purple-400 transition-colors">Partner Login</Link></li>
@@ -80,8 +80,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold text-lg mb-6">Legal</h4>
-            <ul className="space-y-4 text-slate-400">
+            <h4 className="text-white font-semibold text-card-title mb-6">Legal</h4>
+            <ul className="space-y-4 text-slate-400 text-body">
               <li><Link href="/terms" className="hover:text-purple-400 transition-colors">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-purple-400 transition-colors">Privacy Policy</Link></li>
               <li><Link href="/refund-policy" className="hover:text-purple-400 transition-colors">Refund Policy</Link></li>
@@ -90,7 +90,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between text-slate-500">
+        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between text-slate-500 text-caption">
           <p>&copy; {new Date().getFullYear()} Kidspire. All rights reserved.</p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
             <span className="flex items-center">

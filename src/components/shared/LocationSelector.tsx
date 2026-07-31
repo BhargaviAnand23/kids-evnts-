@@ -154,7 +154,7 @@ export function LocationSelector({
         >
           <div className="flex items-center min-w-0 flex-1">
             <MapPin className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
-            <span className="font-semibold text-slate-800 text-sm md:text-base lg:text-lg truncate group-hover:text-purple-600 transition-colors">
+            <span className="font-semibold text-slate-800 text-body truncate group-hover:text-purple-600 transition-colors">
               {selectedCity === 'All' ? 'All Cities' : selectedCity}
             </span>
           </div>
@@ -164,7 +164,7 @@ export function LocationSelector({
         <button
           type="button"
           onClick={() => setIsOpen(v => !v)}
-          className={`flex items-center justify-between gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-purple-700 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 shrink-0 font-medium text-xs sm:text-sm cursor-pointer shadow-sm ${isFullWidth ? 'w-full' : ''}`}
+          className={`flex items-center justify-between gap-1.5 px-3.5 py-1.5 rounded-full bg-slate-50 border border-slate-200/80 text-slate-700 hover:text-purple-700 hover:border-purple-300 hover:bg-purple-50/50 transition-all duration-200 shrink-0 font-medium text-caption cursor-pointer shadow-sm ${isFullWidth ? 'w-full' : ''}`}
           title="Select city or location"
           aria-label="Select location"
         >
@@ -191,8 +191,8 @@ export function LocationSelector({
                 <MapPin className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-slate-900 text-sm">Select Your City</h3>
-                <p className="text-[11px] text-slate-500">Filter activities & events near you</p>
+                <h3 className="font-bold text-slate-900 text-body">Select Your City</h3>
+                <p className="text-micro text-slate-500">Filter activities & events near you</p>
               </div>
             </div>
             <button
@@ -208,7 +208,7 @@ export function LocationSelector({
             type="button"
             onClick={handleDetectLocation}
             disabled={detecting}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-700 font-bold py-2.5 px-4 rounded-2xl text-xs hover:from-purple-100 hover:to-indigo-100 transition-all duration-200 mb-4 shadow-sm"
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 text-purple-700 font-bold py-2.5 px-4 rounded-2xl text-caption hover:from-purple-100 hover:to-indigo-100 transition-all duration-200 mb-4 shadow-sm"
           >
             {detecting ? (
               <Loader2 className="w-4 h-4 animate-spin text-purple-600" />
@@ -219,7 +219,7 @@ export function LocationSelector({
           </button>
 
           {detectMsg && (
-            <div className="text-[11px] font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-xl mb-3 text-center">
+            <div className="text-micro font-semibold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-xl mb-3 text-center">
               {detectMsg}
             </div>
           )}
@@ -232,7 +232,7 @@ export function LocationSelector({
               placeholder="Search city…"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-1.5 text-caption text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
 
@@ -248,17 +248,17 @@ export function LocationSelector({
                     setSelectedCity(city.name);
                     setIsOpen(false);
                   }}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-caption font-semibold transition-all duration-150 cursor-pointer ${
                     isSelected
                       ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
                       : 'text-slate-700 hover:bg-purple-50 hover:text-purple-700'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className="text-base">{city.icon}</span>
+                    <span className="text-body-lg">{city.icon}</span>
                     <div className="text-left">
                       <p className="font-bold leading-tight">{city.name}</p>
-                      <p className={`text-[10px] ${isSelected ? 'text-purple-200' : 'text-slate-400'}`}>
+                      <p className={`text-micro ${isSelected ? 'text-purple-200' : 'text-slate-400'}`}>
                         {city.state}
                       </p>
                     </div>

@@ -40,9 +40,9 @@ export default function EmailVerifiedPage() {
           </div>
         </div>
 
-        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">Email Verified!</h1>
-        <p className="text-slate-600 text-lg mb-2">Your email address has been successfully confirmed.</p>
-        <p className="text-slate-500 text-sm mb-10">
+        <h1 className="text-page-title font-bold text-slate-900 mb-4">Email Verified!</h1>
+        <p className="text-slate-600 text-body-lg mb-2">Your email address has been successfully confirmed.</p>
+        <p className="text-slate-500 text-body mb-10">
           Your Kidspire account is now active. You can explore events, book activities for your children, and manage everything from your dashboard.
         </p>
 

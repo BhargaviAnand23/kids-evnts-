@@ -109,13 +109,13 @@ export function Hero() {
           <div className="flex-1 text-center lg:text-left">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100/80 text-purple-700 text-xs sm:text-sm font-semibold mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100/80 text-purple-700 text-caption font-semibold mb-6 shadow-sm">
               <SparkDoodle className="w-4 h-4 text-purple-500" />
               <span>The #1 Youth Activity Platform</span>
             </div>
 
             {/* Word-by-Word Reveal Heading */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 leading-[1.12] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
+            <h1 className="text-hero font-extrabold text-slate-900 leading-[1.15] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
               {headingWords.map((word, i) => (
                 <motion.span
                   key={i}
@@ -129,7 +129,7 @@ export function Hero() {
               ))}
             </h1>
 
-            <p className="text-slate-600 text-base md:text-lg lg:text-xl xl:text-2xl mb-8 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-slate-600 text-body-lg mb-8 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed">
               Discover, book, and track top-rated sports, arts, music, and learning programs designed for children of all ages — all in one seamless place.
             </p>
 

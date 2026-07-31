@@ -26,6 +26,16 @@ const config: Config = {
           950: "#2e1065",
         }
       },
+      fontSize: {
+        'hero': ['clamp(2rem, 4vw + 0.5rem, 3.25rem)', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+        'page-title': ['clamp(1.5rem, 2.5vw + 0.5rem, 2.35rem)', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
+        'section-title': ['clamp(1.25rem, 1.8vw + 0.5rem, 1.85rem)', { lineHeight: '1.25', letterSpacing: '-0.01em' }],
+        'card-title': ['clamp(1rem, 1vw + 0.5rem, 1.25rem)', { lineHeight: '1.35' }],
+        'body-lg': ['clamp(0.95rem, 0.5vw + 0.6rem, 1.125rem)', { lineHeight: '1.6' }],
+        'body': ['clamp(0.875rem, 0.3vw + 0.6rem, 1rem)', { lineHeight: '1.5' }],
+        'caption': ['clamp(0.75rem, 0.25vw + 0.55rem, 0.875rem)', { lineHeight: '1.4' }],
+        'micro': ['clamp(0.6875rem, 0.15vw + 0.5rem, 0.75rem)', { lineHeight: '1.3' }],
+      },
     },
   },
   plugins: [],

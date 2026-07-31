@@ -194,8 +194,8 @@ function SuperAdminContent() {
               ⚡
             </div>
             <div>
-              <h2 className="font-extrabold text-white text-lg leading-tight">Kidspire Admin</h2>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+              <h2 className="font-extrabold text-white text-card-title leading-tight">Kidspire Admin</h2>
+              <span className="text-micro font-bold uppercase tracking-wider text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
                 Staff Control Panel
               </span>
             </div>
@@ -217,18 +217,18 @@ function SuperAdminContent() {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id as AdminTab)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs sm:text-sm font-semibold transition-all duration-150 cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-caption font-semibold transition-all duration-150 cursor-pointer ${
                     isActive
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/25'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                    <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </div>
-                  {item.badge && (
-                    <span className="bg-orange-500 text-white font-bold text-[10px] px-2 py-0.5 rounded-full animate-pulse">
+                  {item.badge !== null && (
+                    <span className="bg-orange-500 text-white font-bold text-micro px-2 py-0.5 rounded-full animate-pulse">
                       {item.badge}
                     </span>
                   )}
@@ -238,27 +238,34 @@ function SuperAdminContent() {
           </nav>
         </div>
 
-        {/* Sidebar Footer */}
-        <div className="pt-6 border-t border-slate-800/80 mt-6">
-          <div className="flex items-center justify-between">
-            <div className="text-xs">
-              <p className="font-bold text-slate-200">Staff Admin</p>
-              <p className="text-[10px] text-slate-500 font-mono">admin@kidspire.com</p>
+        {/* User Card at Bottom of Sidebar */}
+        <div className="pt-6 border-t border-slate-800 mt-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/40 text-purple-300 font-bold flex items-center justify-center text-caption">
+              SA
             </div>
-            <Link href="/" className="text-slate-400 hover:text-white p-2 rounded-xl hover:bg-slate-800 transition-colors" title="Exit to Website">
-              <LogOut className="w-4 h-4" />
-            </Link>
+            <div className="truncate">
+              <p className="text-caption font-bold text-slate-200 truncate">Super Admin</p>
+              <p className="text-micro text-slate-500 font-mono">admin@kidspire.com</p>
+            </div>
           </div>
+          <Link
+            href="/"
+            title="Exit to Website"
+            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+          </Link>
         </div>
       </aside>
 
-      {/* ── Main Content Area ────────────────────────────────────────────── */}
-      <main className="flex-1 p-6 md:p-10 max-w-screen-2xl mx-auto overflow-y-auto">
+      {/* ── Main Panel Content ─────────────────────────────────────────────── */}
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
 
-        {/* Header Bar */}
+        {/* Top Header Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-800">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white capitalize flex items-center gap-3">
+            <h1 className="text-page-title font-extrabold text-white capitalize flex items-center gap-3">
               {activeTab === 'overview' && 'Platform Overview'}
               {activeTab === 'events' && 'Events & Listing Approvals'}
               {activeTab === 'users' && 'User Management & Roles'}
@@ -266,7 +273,7 @@ function SuperAdminContent() {
               {activeTab === 'bookings' && 'Bookings & Financial Records'}
               {activeTab === 'settings' && 'Platform Configuration'}
             </h1>
-            <p className="text-slate-400 text-xs sm:text-sm mt-1">
+            <p className="text-slate-400 text-caption mt-1">
               Manage platform events, parent accounts, organizers, and financial payout logs.
             </p>
           </div>
@@ -275,7 +282,7 @@ function SuperAdminContent() {
             <button
               onClick={loadAllAdminData}
               disabled={loading}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-caption font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-purple-400' : ''}`} />
               <span>Refresh Data</span>
@@ -283,7 +290,7 @@ function SuperAdminContent() {
 
             <Link
               href="/"
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-xs font-semibold text-purple-300 hover:bg-purple-600/30 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 border border-purple-500/30 text-caption font-semibold text-purple-300 hover:bg-purple-600/30 transition-all"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>View Main Site</span>

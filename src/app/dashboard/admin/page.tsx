@@ -90,8 +90,8 @@ export default function AdminDashboard() {
 
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Partner Dashboard</h1>
-            {orgName && <p className="text-slate-500 mt-1">{orgName}</p>}
+            <h1 className="text-page-title font-bold text-slate-900">Partner Dashboard</h1>
+            {orgName && <p className="text-slate-500 text-body mt-1">{orgName}</p>}
           </div>
           <Link href="/dashboard/admin/events/new">
             <Button>+ Create New Event</Button>

@@ -130,10 +130,10 @@ export function TrendingEvents() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
           <div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 tracking-tight">Trending Activities</h2>
-            <p className="text-slate-600 text-sm sm:text-base lg:text-lg">Discover the most popular events and classes happening around you.</p>
+            <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Trending Activities</h2>
+            <p className="text-slate-600 text-body">Discover the most popular events and classes happening around you.</p>
           </div>
-          <Link href="/explore" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-sm sm:text-base lg:text-lg">
+          <Link href="/explore" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-body">
             View All Activities
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>

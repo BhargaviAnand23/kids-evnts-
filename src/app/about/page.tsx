@@ -10,18 +10,18 @@ export default function AboutPage() {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Our Story & Mission
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">About Kidspire</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4">About Kidspire</h1>
+          <p className="text-slate-600 text-body">
             Empowering parents to discover, book, and manage verified extracurricular sports, arts, and hobby activities for kids and teens.
           </p>
         </div>
 
         {/* Story Section */}
         <div className="prose prose-slate max-w-none text-slate-600 leading-relaxed mb-12 space-y-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Why Kidspire Exists</h2>
+          <h2 className="text-section-title font-bold text-slate-900">Why Kidspire Exists</h2>
           <p>
             Finding high-quality, safe, and engaging weekend activities for children used to mean digging through endless social media groups, sending unreturned messages, and dealing with fragmented registration forms. We built Kidspire to change that forever.
           </p>
@@ -34,24 +34,24 @@ export default function AboutPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div className="p-6 rounded-2xl bg-purple-50/50 border border-purple-100">
             <Shield className="w-8 h-8 text-purple-600 mb-3" />
-            <h3 className="font-bold text-lg text-slate-900 mb-2">Safety & Trust First</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-bold text-card-title text-slate-900 mb-2">Safety & Trust First</h3>
+            <p className="text-caption text-slate-600">
               We vet every partner organization, verifying instructor credentials, facility safety standards, and child safety compliance before listing.
             </p>
           </div>
 
           <div className="p-6 rounded-2xl bg-orange-50/50 border border-orange-100">
             <Users className="w-8 h-8 text-orange-600 mb-3" />
-            <h3 className="font-bold text-lg text-slate-900 mb-2">Empowering Organizers</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-bold text-card-title text-slate-900 mb-2">Empowering Organizers</h3>
+            <p className="text-caption text-slate-600">
               We provide grassroots coaches and local academies with modern booking tools, student management, and instant digital payments.
             </p>
           </div>
 
           <div className="p-6 rounded-2xl bg-blue-50/50 border border-blue-100">
             <Heart className="w-8 h-8 text-blue-600 mb-3" />
-            <h3 className="font-bold text-lg text-slate-900 mb-2">Enriching Childhoods</h3>
-            <p className="text-sm text-slate-600">
+            <h3 className="font-bold text-card-title text-slate-900 mb-2">Enriching Childhoods</h3>
+            <p className="text-caption text-slate-600">
               We believe every child deserves access to healthy physical activity, creative expression, and social skill-building outside the school classroom.
             </p>
           </div>

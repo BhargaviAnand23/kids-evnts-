@@ -252,13 +252,13 @@ export default function ParentDashboard() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-slate-900">My Dashboard</h1>
-            {user && <p className="text-slate-500 mt-1">Welcome back, {user.name.split(' ')[0]}!</p>}
+            <h1 className="text-page-title font-bold text-slate-900">My Dashboard</h1>
+            {user && <p className="text-slate-500 text-body mt-1">Welcome back, {user.name.split(' ')[0]}!</p>}
           </div>
           {notifications.length > 0 && (
             <div className="relative">
               <Bell className="w-6 h-6 text-slate-500" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-purple-600 text-white text-micro font-bold rounded-full flex items-center justify-center">
                 {notifications.length}
               </span>
             </div>

@@ -45,10 +45,10 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
         aria-label="Profile menu"
       >
         {/* Avatar circle */}
-        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+        <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-caption font-bold shrink-0">
           {getInitials(user.name)}
         </div>
-        <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate hidden xl:block">
+        <span className="text-body font-medium text-slate-700 max-w-[120px] truncate hidden xl:block">
           {user.name.split(' ')[0]}
         </span>
         <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} />
@@ -59,9 +59,9 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
         <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
           {/* User info */}
           <div className="px-4 py-3 border-b border-slate-100 mb-1">
-            <p className="text-sm font-semibold text-slate-900 truncate">{user.name}</p>
-            <p className="text-xs text-slate-500 truncate">{user.email}</p>
-            <span className={`inline-block mt-1.5 text-[10px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
+            <p className="text-body font-semibold text-slate-900 truncate">{user.name}</p>
+            <p className="text-caption text-slate-500 truncate">{user.email}</p>
+            <span className={`inline-block mt-1.5 text-micro font-semibold uppercase tracking-wide px-2 py-0.5 rounded-full ${
               isSuperAdmin ? 'bg-purple-100 text-purple-700 border border-purple-200' :
               user.role === 'admin' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700'
             }`}>
@@ -72,7 +72,7 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
           <Link
             href={dashboardHref}
             onClick={() => setOpen(false)}
-            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-colors font-medium"
+            className="flex items-center gap-2.5 px-4 py-2.5 text-body text-slate-700 hover:bg-purple-50 hover:text-purple-700 transition-colors font-medium"
           >
             <LayoutDashboard className="w-4 h-4 text-purple-600" />
             {isSuperAdmin ? 'Super Admin Dashboard' : 'My Dashboard'}
@@ -80,7 +80,7 @@ function ProfileMenu({ user, onLogout }: { user: SessionUser; onLogout: () => vo
 
           <button
             onClick={() => { setOpen(false); onLogout(); }}
-            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            className="flex items-center gap-2.5 w-full px-4 py-2.5 text-body text-red-600 hover:bg-red-50 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Log Out
@@ -161,22 +161,22 @@ export function Header() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 h-20 flex items-center justify-between gap-4">
         {/* Logo and Tagline */}
         <div className="flex flex-col shrink-0">
-          <Link href="/" className="text-2xl font-bold text-purple-600 tracking-tight">
+          <Link href="/" className="text-section-title font-bold text-purple-600 tracking-tight">
             Kidspire
           </Link>
-          <span className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold -mt-0.5">
+          <span className="text-micro uppercase tracking-widest text-slate-500 font-semibold -mt-0.5">
             Play &middot; Explore &middot; Shine
           </span>
         </div>
 
         {/* Navigation */}
         <nav className="hidden lg:flex items-center space-x-4 xl:space-x-7 shrink-0">
-          <Link href="/" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Home</Link>
-          <Link href="/explore" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Explore</Link>
-          <Link href="/categories" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Categories</Link>
-          <Link href="/how-it-works" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">How It Works</Link>
-          <Link href="/list-your-event" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">List Your Event</Link>
-          <Link href="/contact" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Contact</Link>
+          <Link href="/" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Home</Link>
+          <Link href="/explore" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Explore</Link>
+          <Link href="/categories" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Categories</Link>
+          <Link href="/how-it-works" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">How It Works</Link>
+          <Link href="/list-your-event" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">List Your Event</Link>
+          <Link href="/contact" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Contact</Link>
         </nav>
 
         {/* Right side actions */}
@@ -210,7 +210,7 @@ export function Header() {
               >
                 <Bell className="w-5 h-5" />
                 {notifications.length > 0 && (
-                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-[9px] font-bold text-white border-2 border-white">
+                  <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-orange-500 text-micro font-bold text-white border-2 border-white">
                     {notifications.length > 9 ? '9+' : notifications.length}
                   </span>
                 )}
@@ -220,27 +220,27 @@ export function Header() {
               {notifOpen && (
                 <div className="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 z-50 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100">
-                    <p className="font-semibold text-slate-900 text-sm">Notifications</p>
+                    <p className="font-semibold text-slate-900 text-body">Notifications</p>
                     {notifications.length > 0 && (
                       <Link href="/dashboard/parent" onClick={() => setNotifOpen(false)}
-                        className="text-xs text-purple-600 font-medium hover:underline">
+                        className="text-caption text-purple-600 font-medium hover:underline">
                         View all
                       </Link>
                     )}
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-slate-400 text-sm">
+                    <div className="px-4 py-8 text-center text-slate-400 text-body">
                       <Bell className="w-8 h-8 mx-auto mb-2 opacity-30" />
                       {user ? 'No new notifications' : 'Log in to see notifications'}
                     </div>
                   ) : (
                     <div className="divide-y divide-slate-50 max-h-64 overflow-y-auto">
                       {notifications.map((n: any) => (
-                        <div key={n.id} className={`px-4 py-3 text-sm ${
+                        <div key={n.id} className={`px-4 py-3 text-body ${
                           n.type === 'success' ? 'bg-green-50/60' : 'bg-white'
                         }`}>
-                          <p className="font-semibold text-slate-900 text-xs">{n.title}</p>
-                          <p className="text-slate-500 text-xs mt-0.5 line-clamp-2">{n.message}</p>
+                          <p className="font-semibold text-slate-900 text-caption">{n.title}</p>
+                          <p className="text-slate-500 text-caption mt-0.5 line-clamp-2">{n.message}</p>
                         </div>
                       ))}
                     </div>
@@ -262,7 +262,7 @@ export function Header() {
               <ProfileMenu user={user} onLogout={handleLogout} />
             ) : (
               <div className="flex items-center space-x-3">
-                <Link href="/login" className="text-sm font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">
+                <Link href="/login" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">
                   Log In
                 </Link>
                 <Button size="sm" className="whitespace-nowrap" asChild>

@@ -73,13 +73,13 @@ export default function ListYourEventPage() {
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-4 border border-purple-100">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3.5 py-1.5 rounded-full inline-flex items-center gap-1.5 mb-4 border border-purple-100">
             <Sparkles className="w-3.5 h-3.5" /> For Activity Organizers & Coaches
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 tracking-tight">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">
             List Your Activity on Kidspire
           </h1>
-          <p className="text-slate-600 text-base leading-relaxed">
+          <p className="text-slate-600 text-body leading-relaxed">
             Reach thousands of local parents actively looking for sports camps, arts classes, music lessons, and youth events. Choose the submission method that works best for you.
           </p>
         </div>
@@ -93,11 +93,11 @@ export default function ListYourEventPage() {
               <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 mb-6 shrink-0">
                 <LayoutDashboard className="w-7 h-7" />
               </div>
-              <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full w-fit mb-3">
+              <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full w-fit mb-3">
                 Recommended for Power Users
               </span>
-              <h2 className="text-2xl font-bold text-slate-900 mb-3">Option 1: Partner Dashboard</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-6">
+              <h2 className="text-section-title font-bold text-slate-900 mb-3">Option 1: Partner Dashboard</h2>
+              <p className="text-slate-600 text-body leading-relaxed mb-6">
                 Create a free organizer account to list activities anytime, track attendee registrations, manage ticket sales, and view analytics in real time.
               </p>
               

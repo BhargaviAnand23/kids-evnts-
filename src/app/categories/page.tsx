@@ -30,11 +30,11 @@ export default function CategoriesPage() {
 
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Activity Directory
           </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-3 tracking-tight">Categories</h1>
-          <p className="text-slate-600 text-sm sm:text-base lg:text-lg">
+          <h1 className="text-page-title font-bold text-slate-900 mb-3 tracking-tight">Categories</h1>
+          <p className="text-slate-600 text-body">
             Browse through our curated directory of youth activities. Select any category to view all matching events and classes.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function CategoriesPage() {
               <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
               {/* Category name + Explore link */}
               <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                <span className="font-bold text-sm sm:text-base text-white drop-shadow-md leading-tight block text-center mb-0.5">
+                <span className="font-bold text-card-title text-white drop-shadow-md leading-tight block text-center mb-0.5">
                   {category.name}
                 </span>
                 <span className="flex items-center justify-center text-white/70 text-xs font-medium group-hover:text-white transition-colors">

@@ -190,10 +190,25 @@ export default function ProfileKidsPage() {
     }
   };
 
-  const copyReferralCode = () => {
-    navigator.clipboard.writeText('KIDSPIRE-SPARKLE2026');
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2500);
+  const copyReferralCode = async () => {
+    const text = 'Use my referral code KIDSPIRE-SPARKLE2026 to get 50 bonus points on Kidspire!';
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join Kidspire',
+          text,
+          url: typeof window !== 'undefined' ? window.location.origin : '',
+        });
+        return;
+      } catch (err) {
+        if ((err as Error)?.name === 'AbortError') return;
+      }
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      await navigator.clipboard.writeText('KIDSPIRE-SPARKLE2026');
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2500);
+    }
   };
 
   const upcomingBookings = bookings.filter(b => b.status === 'confirmed');

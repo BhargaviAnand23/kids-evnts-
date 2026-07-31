@@ -37,11 +37,11 @@ export default function HowItWorksPage() {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Simple 4-Step Process
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">How Kidspire Works</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4">How Kidspire Works</h1>
+          <p className="text-slate-600 text-body">
             A seamless experience designed for busy parents to find, book, and enjoy youth activities in minutes.
           </p>
         </div>
@@ -55,12 +55,12 @@ export default function HowItWorksPage() {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="text-xs font-bold font-mono text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
+                  <span className="text-caption font-bold font-mono text-purple-600 bg-purple-100 px-2 py-0.5 rounded">
                     STEP {step.num}
                   </span>
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900">{step.title}</h3>
+                  <h3 className="text-card-title font-bold text-slate-900">{step.title}</h3>
                 </div>
-                <p className="text-slate-600 text-base leading-relaxed">{step.desc}</p>
+                <p className="text-slate-600 text-body leading-relaxed">{step.desc}</p>
               </div>
             </div>
           ))}
@@ -69,8 +69,8 @@ export default function HowItWorksPage() {
         {/* FAQ Teaser */}
         <div className="p-8 rounded-2xl bg-purple-600 text-white flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-lg md:text-xl font-bold mb-1">Have questions about cancellations or safety?</h3>
-            <p className="text-purple-100 text-base">Read our parent guide and verified organizer policies.</p>
+            <h3 className="text-card-title font-bold mb-1">Have questions about cancellations or safety?</h3>
+            <p className="text-purple-100 text-body">Read our parent guide and verified organizer policies.</p>
           </div>
           <Button size="lg" className="bg-white text-purple-900 hover:bg-purple-50 shrink-0" asChild>
             <Link href="/faq">

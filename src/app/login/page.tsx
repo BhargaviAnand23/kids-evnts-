@@ -57,11 +57,11 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link href="/" className="text-3xl font-bold text-purple-600 tracking-tight mb-2 block">
+          <Link href="/" className="text-section-title font-bold text-purple-600 tracking-tight mb-2 block">
             Kidspire
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Welcome back</h1>
-          <p className="text-slate-500 text-sm md:text-base">Log in to manage your bookings and saved events</p>
+          <h1 className="text-page-title font-bold text-slate-900">Welcome back</h1>
+          <p className="text-slate-500 text-body">Log in to manage your bookings and saved events</p>
         </div>
 
         <Card className="border-none shadow-2xl shadow-purple-900/10 mb-6">

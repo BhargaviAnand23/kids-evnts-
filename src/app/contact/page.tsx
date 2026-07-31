@@ -10,11 +10,11 @@ export default function ContactPage() {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             We're Here to Help
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">Contact Us</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4">Contact Us</h1>
+          <p className="text-slate-600 text-body">
             Have questions about an activity booking, partner registration, or safety guidelines? Get in touch with our team.
           </p>
         </div>
@@ -22,16 +22,16 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
           {/* Contact Details */}
           <div className="space-y-6">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">Get in Touch</h2>
+            <h2 className="text-section-title font-bold text-slate-900 mb-4">Get in Touch</h2>
             
             <div className="flex items-start space-x-4">
               <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center shrink-0">
                 <Mail className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900 text-sm">Customer Support Email</h4>
-                <p className="text-slate-600 text-sm">support@kidspire.com</p>
-                <p className="text-slate-400 text-xs mt-0.5">Response within 24 hours</p>
+                <h4 className="font-semibold text-slate-900 text-caption">Customer Support Email</h4>
+                <p className="text-slate-600 text-caption">support@kidspire.com</p>
+                <p className="text-slate-400 text-micro mt-0.5">Response within 24 hours</p>
               </div>
             </div>
 
@@ -40,9 +40,9 @@ export default function ContactPage() {
                 <Phone className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900 text-sm">Helpline & Hotline</h4>
-                <p className="text-slate-600 text-sm">+91 (044) 4800-5900</p>
-                <p className="text-slate-400 text-xs mt-0.5">Mon - Sat: 9:00 AM - 6:00 PM IST</p>
+                <h4 className="font-semibold text-slate-900 text-caption">Helpline & Hotline</h4>
+                <p className="text-slate-600 text-caption">+91 (044) 4800-5900</p>
+                <p className="text-slate-400 text-micro mt-0.5">Mon - Sat: 9:00 AM - 6:00 PM IST</p>
               </div>
             </div>
 
@@ -51,9 +51,9 @@ export default function ContactPage() {
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-900 text-sm">Headquarters</h4>
-                <p className="text-slate-600 text-sm">Kidspire Technologies Pvt. Ltd.</p>
-                <p className="text-slate-500 text-xs">Anna Salai, T. Nagar, Chennai, Tamil Nadu 600017</p>
+                <h4 className="font-semibold text-slate-900 text-caption">Headquarters</h4>
+                <p className="text-slate-600 text-caption">Kidspire Technologies Pvt. Ltd.</p>
+                <p className="text-slate-500 text-micro">Anna Salai, T. Nagar, Chennai, Tamil Nadu 600017</p>
               </div>
             </div>
 

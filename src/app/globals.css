@@ -56,6 +56,33 @@
   }
 }
 
+@layer utilities {
+  .type-hero {
+    @apply text-hero font-extrabold tracking-tight;
+  }
+  .type-page-title {
+    @apply text-page-title font-bold tracking-tight;
+  }
+  .type-section-title {
+    @apply text-section-title font-bold tracking-tight;
+  }
+  .type-card-title {
+    @apply text-card-title font-bold;
+  }
+  .type-body-lg {
+    @apply text-body-lg font-normal;
+  }
+  .type-body {
+    @apply text-body font-normal;
+  }
+  .type-caption {
+    @apply text-caption font-medium;
+  }
+  .type-micro {
+    @apply text-micro font-medium;
+  }
+}
+
 @keyframes heartPop {
   0% { transform: scale(1); }
   50% { transform: scale(1.22); }

@@ -122,10 +122,10 @@ export function ActivityQuiz() {
 
         {/* Section Header */}
         <div className="text-center mb-8">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-bold uppercase tracking-wider mb-3">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-purple-100 text-purple-700 text-caption font-bold uppercase tracking-wider mb-3">
             <Sparkles className="w-3.5 h-3.5" /> Activity Finder Quiz
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 tracking-tight">
+          <h2 className="text-section-title font-bold text-slate-900 tracking-tight">
             Find Your Child's Ideal Activity in 30 Seconds
           </h2>
         </div>
@@ -139,15 +139,15 @@ export function ActivityQuiz() {
                 <div className="w-16 h-16 bg-purple-100 rounded-3xl flex items-center justify-center mx-auto mb-5 text-3xl">
                   🎯
                 </div>
-                <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">
+                <h3 className="text-card-title font-bold text-slate-900 mb-3">
                   Not sure what to book next?
                 </h3>
-                <p className="text-slate-600 max-w-md mx-auto mb-8 text-sm sm:text-base leading-relaxed">
+                <p className="text-slate-600 max-w-md mx-auto mb-8 text-body leading-relaxed">
                   Answer 3 quick questions about your child's personality and preferences, and we'll instantly recommend top matching activities!
                 </p>
                 <button
                   onClick={() => setCurrentStep(1)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-purple-500/25 hover:scale-105 transition-all text-base inline-flex items-center gap-2 cursor-pointer"
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3.5 rounded-full shadow-lg shadow-purple-500/25 hover:scale-105 transition-all text-body inline-flex items-center gap-2 cursor-pointer"
                 >
                   Start 30-Sec Quiz <ArrowRight className="w-5 h-5" />
                 </button>
@@ -158,7 +158,7 @@ export function ActivityQuiz() {
             {currentStep >= 1 && currentStep <= 3 && activeQuestion && (
               <div>
                 {/* Progress bar */}
-                <div className="flex items-center justify-between text-xs font-bold text-slate-400 mb-2">
+                <div className="flex items-center justify-between text-caption font-bold text-slate-400 mb-2">
                   <span>Question {currentStep} of 3</span>
                   <span>{Math.round((currentStep / 3) * 100)}% Completed</span>
                 </div>
@@ -170,10 +170,10 @@ export function ActivityQuiz() {
                 </div>
 
                 <div className="mb-6">
-                  <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">
+                  <h3 className="text-card-title font-bold text-slate-900 mb-1">
                     {activeQuestion.title}
                   </h3>
-                  <p className="text-slate-500 text-sm">{activeQuestion.subtitle}</p>
+                  <p className="text-slate-500 text-caption">{activeQuestion.subtitle}</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
@@ -184,8 +184,8 @@ export function ActivityQuiz() {
                       className="flex flex-col items-center text-center p-5 rounded-2xl border-2 border-slate-100 hover:border-purple-500 hover:bg-purple-50/50 transition-all cursor-pointer group"
                     >
                       <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">{opt.icon}</span>
-                      <span className="font-bold text-slate-900 text-sm mb-1 group-hover:text-purple-700">{opt.label}</span>
-                      <span className="text-xs text-slate-500 leading-tight">{opt.sublabel}</span>
+                      <span className="font-bold text-slate-900 text-caption mb-1 group-hover:text-purple-700">{opt.label}</span>
+                      <span className="text-micro text-slate-500 leading-tight">{opt.sublabel}</span>
                     </button>
                   ))}
                 </div>
@@ -196,10 +196,10 @@ export function ActivityQuiz() {
             {currentStep === 4 && (
               <div>
                 <div className="text-center mb-8">
-                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-xs font-bold mb-3">
+                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-1.5 rounded-full text-caption font-bold mb-3">
                     <CheckCircle2 className="w-4 h-4" /> Recommended for your child
                   </div>
-                  <h3 className="text-2xl sm:text-3xl font-bold text-slate-900">
+                  <h3 className="text-section-title font-bold text-slate-900">
                     Here are your top activity matches!
                   </h3>
                 </div>
@@ -211,11 +211,11 @@ export function ActivityQuiz() {
                       className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 flex flex-col justify-between hover:shadow-md transition-shadow"
                     >
                       <div>
-                        <span className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full mb-3 ${rec.color}`}>
+                        <span className={`inline-block text-micro font-bold px-2.5 py-0.5 rounded-full mb-3 ${rec.color}`}>
                           {rec.tag}
                         </span>
-                        <h4 className="font-bold text-slate-900 text-base mb-1">{rec.title}</h4>
-                        <p className="text-xs text-slate-500 mb-4">{rec.description}</p>
+                        <h4 className="font-bold text-slate-900 text-body mb-1">{rec.title}</h4>
+                        <p className="text-caption text-slate-500 mb-4">{rec.description}</p>
                       </div>
                       <Link
                         href={`/explore?category=${rec.categorySlug}`}

@@ -13,7 +13,7 @@ export function CardHeader({ className = '', ...props }: React.HTMLAttributes<HT
 }
 
 export function CardTitle({ className = '', ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={`text-xl font-bold leading-none tracking-tight ${className}`} {...props} />;
+  return <h3 className={`text-card-title font-bold leading-none tracking-tight ${className}`} {...props} />;
 }
 
 export function CardContent({ className = '', ...props }: React.HTMLAttributes<HTMLDivElement>) {

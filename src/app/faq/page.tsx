@@ -45,11 +45,11 @@ export default function FaqPage() {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Got Questions?
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h1>
-          <p className="text-slate-600 text-base">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4">Frequently Asked Questions</h1>
+          <p className="text-slate-600 text-body">
             Find quick answers to common questions about bookings, safety verification, payments, and cancellations.
           </p>
         </div>
@@ -58,11 +58,11 @@ export default function FaqPage() {
         <div className="space-y-6 mb-12">
           {faqs.map((faq, idx) => (
             <div key={idx} className="p-6 rounded-2xl bg-slate-50 border border-slate-100 hover:border-purple-200 transition-colors">
-              <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-2 flex items-start">
+              <h3 className="text-card-title font-bold text-slate-900 mb-2 flex items-start">
                 <HelpCircle className="w-5 h-5 text-purple-600 mr-3 mt-0.5 shrink-0" />
                 {faq.q}
               </h3>
-              <p className="text-slate-600 text-base leading-relaxed pl-8">
+              <p className="text-slate-600 text-body leading-relaxed pl-8">
                 {faq.a}
               </p>
             </div>
@@ -71,8 +71,8 @@ export default function FaqPage() {
 
         {/* Still Have Questions */}
         <div className="text-center bg-slate-900 text-white rounded-2xl p-8">
-          <h3 className="text-xl font-bold mb-2">Still need help?</h3>
-          <p className="text-slate-300 text-sm mb-6">Our dedicated parent support team is available Mon-Sat 9 AM to 6 PM IST.</p>
+          <h3 className="text-card-title font-bold mb-2">Still need help?</h3>
+          <p className="text-slate-300 text-caption mb-6">Our dedicated parent support team is available Mon-Sat 9 AM to 6 PM IST.</p>
           <Button size="lg" className="bg-purple-600 hover:bg-purple-700" asChild>
             <Link href="/contact">
               Contact Support <ArrowRight className="w-4 h-4 ml-2" />

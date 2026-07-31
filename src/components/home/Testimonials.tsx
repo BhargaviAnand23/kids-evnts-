@@ -31,8 +31,8 @@ export function Testimonials() {
     <section className="py-12 md:py-16 lg:py-20 bg-slate-50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">Loved by Parents & Partners</h2>
-          <p className="text-slate-600 text-sm sm:text-base lg:text-lg">Don't just take our word for it. Here's what our community has to say about Kidspire.</p>
+          <h2 className="text-section-title font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">Loved by Parents & Partners</h2>
+          <p className="text-slate-600 text-body">Don't just take our word for it. Here's what our community has to say about Kidspire.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -47,15 +47,15 @@ export function Testimonials() {
                     <Star key={i} className={`w-5 h-5 ${i < testimonial.rating ? 'text-orange-400 fill-current' : 'text-slate-200'}`} />
                   ))}
                 </div>
-                <p className="text-slate-700 mb-8 text-base leading-relaxed font-normal">"{testimonial.content}"</p>
+                <p className="text-slate-700 mb-8 text-body leading-relaxed font-normal">"{testimonial.content}"</p>
                 
                 <div className="flex items-center">
                   <div className="w-12 h-12 rounded-full overflow-hidden mr-4 border-2 border-purple-100">
                     <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-900">{testimonial.name}</h4>
-                    <p className="text-sm text-slate-500">{testimonial.role}</p>
+                    <h4 className="font-bold text-card-title text-slate-900">{testimonial.name}</h4>
+                    <p className="text-caption text-slate-500">{testimonial.role}</p>
                   </div>
                 </div>
               </CardContent>

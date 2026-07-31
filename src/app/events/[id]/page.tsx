@@ -11,6 +11,7 @@ import { ageBracketNames, getTypeBadgeStyle, getListingTypeDisplayName } from '@
 import { WishlistHeart } from '@/components/shared/EventCard';
 import { BookOrWaitlistButton } from '@/components/shared/BookOrWaitlistButton';
 import { EventDetailSidebar } from '@/components/events/EventDetailSidebar';
+import { ShareButton } from '@/components/shared/ShareButton';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
@@ -51,9 +52,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Explore
           </Link>
           <div className="flex items-center space-x-3">
-            <button className="p-2 text-slate-400 hover:text-purple-600 rounded-full hover:bg-slate-50 transition-colors">
-              <Share2 className="w-5 h-5" />
-            </button>
+            <ShareButton title={event.title} text={`Check out ${event.title} on Kidspire!`} />
             <WishlistHeart eventId={event.id} />
           </div>
         </div>
@@ -88,15 +87,15 @@ export default async function EventDetailPage({ params }: { params: { id: string
               </Badge>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
+            <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
             
             <div className="flex items-center text-slate-600 mb-8 border-b border-slate-200 pb-8">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xl mr-4">
+              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-card-title mr-4">
                 CS
               </div>
               <div>
-                <p className="font-semibold text-slate-900 text-base">Organized by {event.organizer}</p>
-                <div className="flex items-center text-sm">
+                <p className="font-semibold text-slate-900 text-body">Organized by {event.organizer}</p>
+                <div className="flex items-center text-caption">
                   <Star className="w-4 h-4 text-orange-400 mr-1 fill-current" />
                   <span className="font-bold text-slate-800 mr-1">{event.rating}</span>
                   <span>({event.reviews} reviews)</span>

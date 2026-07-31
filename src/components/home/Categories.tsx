@@ -122,10 +122,10 @@ export function Categories() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
           <div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 tracking-tight">Explore by Category</h2>
-            <p className="text-slate-600 text-sm sm:text-base lg:text-lg">From high-energy sports to creative arts, find the perfect activity that matches your child's interests.</p>
+            <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Explore by Category</h2>
+            <p className="text-slate-600 text-body">From high-energy sports to creative arts, find the perfect activity that matches your child's interests.</p>
           </div>
-          <Link href="/categories" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-sm sm:text-base lg:text-lg">
+          <Link href="/categories" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-body">
             View All Categories 
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -162,7 +162,7 @@ export function Categories() {
 
                 {/* Category name — bottom-pinned bold white text */}
                 <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                  <span className="font-bold text-sm sm:text-base text-white drop-shadow-md leading-tight block text-center">
+                  <span className="font-bold text-card-title text-white drop-shadow-md leading-tight block text-center">
                     {category.name}
                   </span>
                 </div>
@@ -176,8 +176,8 @@ export function Categories() {
 
         {/* Browse by Type */}
         <div className="mb-8 sm:mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4 tracking-tight">Browse by Activity Type</h2>
-          <p className="text-slate-600 text-base">Select from these four listing types to find matching opportunities for your child.</p>
+          <h2 className="text-section-title font-bold text-slate-900 mb-4 tracking-tight">Browse by Activity Type</h2>
+          <p className="text-slate-600 text-body">Select from these four listing types to find matching opportunities for your child.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -31,8 +31,8 @@ export function HowItWorks() {
       <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 transform origin-top-right -z-10"></div>
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">How Kidspire Works</h2>
-          <p className="text-slate-600 text-sm sm:text-base lg:text-lg">We make it incredibly simple for parents to find and manage the best extracurricular activities for their children.</p>
+          <h2 className="text-section-title font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">How Kidspire Works</h2>
+          <p className="text-slate-600 text-body">We make it incredibly simple for parents to find and manage the best extracurricular activities for their children.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
@@ -45,14 +45,14 @@ export function HowItWorks() {
               <div key={index} className="flex flex-col items-center text-center relative group">
                 <div className={`w-24 h-24 rounded-full ${step.color} flex items-center justify-center mb-8 border-8 border-white shadow-xl relative transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className="w-10 h-10" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-sm shadow-md">
+                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-caption shadow-md">
                     {index + 1}
                   </div>
                 </div>
-                <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-4">{step.title}</h3>
-                <p className="text-slate-600 text-base leading-relaxed">{step.description}</p>
+                <h3 className="text-card-title font-bold text-slate-900 mb-4">{step.title}</h3>
+                <p className="text-slate-600 text-body leading-relaxed">{step.description}</p>
                 
-                <ul className="mt-6 space-y-2 text-sm text-slate-500 text-left w-full max-w-[200px] mx-auto">
+                <ul className="mt-6 space-y-2 text-caption text-slate-500 text-left w-full max-w-[200px] mx-auto">
                   <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Verified Organizers</li>
                   <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Instant Confirmation</li>
                   <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Easy Rescheduling</li>
