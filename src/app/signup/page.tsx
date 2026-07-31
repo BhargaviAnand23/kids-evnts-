@@ -72,12 +72,23 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: unknown) {
-      const e = err as { message?: string; error_description?: string };
-      const msg = typeof e?.message === 'string' && e.message.trim()
-        ? e.message.trim()
-        : typeof e?.error_description === 'string' && e.error_description.trim()
-          ? e.error_description.trim()
-          : 'Something went wrong. Please try again.';
+      let msg = '';
+      if (typeof err === 'string') {
+        msg = err;
+      } else if (err && typeof err === 'object') {
+        const e = err as Record<string, any>;
+        if (typeof e.message === 'string') msg = e.message;
+        else if (typeof e.error_description === 'string') msg = e.error_description;
+        else if (typeof e.details === 'string') msg = e.details;
+      }
+      msg = msg.trim();
+      if (!msg || msg === '{}' || msg === '[]' || msg === '[object Object]') {
+        msg = 'Sign up failed. Please try again.';
+      }
+      const lower = msg.toLowerCase();
+      if (lower.includes('already registered') || lower.includes('already exists') || lower.includes('user_already_exists') || lower.includes('email_exists')) {
+        msg = 'This email is already registered. Please log in instead.';
+      }
       setError(msg);
     } finally {
       setLoading(false);
