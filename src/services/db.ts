@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier } from '@/types'
+import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier, Achievement, AchievementVisibility } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -1511,6 +1511,154 @@ export const dbService = {
     const cats = await this.getCategoriesAdmin();
     const updated = cats.filter(c => c.name.toLowerCase() !== categoryName.toLowerCase());
     setLocalStorageData('kids_event_categories', updated);
+  },
+
+  // --- ACHIEVEMENTS & HIGHLIGHTS ---
+  async getAchievements(options?: {
+    visibility?: AchievementVisibility;
+    childId?: string;
+    orgId?: string;
+    reportedOnly?: boolean;
+  }): Promise<Achievement[]> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      let query = supabase
+        .from('achievements')
+        .select(`
+          *,
+          child:children(*),
+          event:events(*),
+          organization:organizations(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (options?.visibility) query = query.eq('visibility', options.visibility);
+      if (options?.childId) query = query.eq('child_id', options.childId);
+      if (options?.orgId) query = query.eq('organization_id', options.orgId);
+      if (options?.reportedOnly) query = query.eq('reported', true);
+
+      const { data, error } = await query;
+      if (!error && data) return data as Achievement[];
+    }
+
+    // LocalStorage Fallback
+    const DEFAULT_ACHIEVEMENTS: Achievement[] = [
+      {
+        id: 'ach-1',
+        child_id: 'child-1',
+        title: '1st Place in Under-10 Swimming Championship 🏆',
+        description: 'Won 1st prize in 50m Freestyle swimming competition at Chennai Sports Complex.',
+        media_url: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=600&auto=format&fit=crop&q=60',
+        media_type: 'image',
+        visibility: 'public_approved',
+        posted_by_role: 'parent',
+        created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
+        child: { id: 'child-1', parent_id: 'p1', name: 'Arjun', age: 8, school_id: null, emergency_contact: null, created_at: '' },
+      },
+      {
+        id: 'ach-2',
+        child_id: 'child-2',
+        title: 'Completed Junior Robotics & AI Masterclass 🤖',
+        description: 'Built an autonomous line-follower robot and earned the Junior Robotics Certificate!',
+        media_url: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=60',
+        media_type: 'image',
+        visibility: 'public_approved',
+        posted_by_role: 'parent',
+        created_at: new Date(Date.now() - 86400000 * 4).toISOString(),
+        child: { id: 'child-2', parent_id: 'p1', name: 'Ananya', age: 11, school_id: null, emergency_contact: null, created_at: '' },
+      },
+      {
+        id: 'ach-3',
+        child_id: 'child-3',
+        title: 'Gold Medalist - Inter-School Martial Arts Tournament 🥋',
+        description: 'Earned Gold in Yellow Belt Kumite sparring routine!',
+        media_url: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=600&auto=format&fit=crop&q=60',
+        media_type: 'image',
+        visibility: 'public_approved',
+        posted_by_role: 'organization_admin',
+        created_at: new Date(Date.now() - 86400000 * 6).toISOString(),
+        child: { id: 'child-3', parent_id: 'p2', name: 'Rohan', age: 9, school_id: null, emergency_contact: null, created_at: '' },
+      }
+    ];
+
+    let items = getLocalStorageData<Achievement[]>('kids_event_achievements', DEFAULT_ACHIEVEMENTS);
+    if (options?.visibility) items = items.filter(a => a.visibility === options.visibility);
+    if (options?.childId) items = items.filter(a => a.child_id === options.childId);
+    if (options?.orgId) items = items.filter(a => a.organization_id === options.orgId);
+    if (options?.reportedOnly) items = items.filter(a => a.reported === true);
+    return items;
+  },
+
+  async createAchievement(data: Omit<Achievement, 'id' | 'created_at'>): Promise<Achievement> {
+    const newAchievement: Achievement = {
+      ...data,
+      id: 'ach-' + Date.now(),
+      created_at: new Date().toISOString(),
+    };
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      const { data: inserted, error } = await supabase.from('achievements').insert([{
+        child_id: data.child_id,
+        organization_id: data.organization_id,
+        event_id: data.event_id,
+        title: data.title,
+        description: data.description,
+        media_url: data.media_url,
+        media_type: data.media_type,
+        visibility: data.visibility,
+        posted_by_role: data.posted_by_role,
+        reported: false,
+      }]).select().single();
+
+      if (!error && inserted) return inserted as Achievement;
+    }
+
+    const items = await this.getAchievements();
+    items.unshift(newAchievement);
+    setLocalStorageData('kids_event_achievements', items);
+    return newAchievement;
+  },
+
+  async updateAchievementStatus(id: string, visibility: AchievementVisibility): Promise<void> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      const { error } = await supabase.from('achievements').update({ visibility, reported: false }).eq('id', id);
+      if (error) console.error('Error updating achievement:', error);
+    }
+
+    const items = await this.getAchievements();
+    const idx = items.findIndex(a => a.id === id);
+    if (idx !== -1) {
+      items[idx].visibility = visibility;
+      items[idx].reported = false;
+      setLocalStorageData('kids_event_achievements', items);
+    }
+  },
+
+  async reportAchievement(id: string): Promise<void> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      await supabase.from('achievements').update({ reported: true }).eq('id', id);
+    }
+
+    const items = await this.getAchievements();
+    const idx = items.findIndex(a => a.id === id);
+    if (idx !== -1) {
+      items[idx].reported = true;
+      setLocalStorageData('kids_event_achievements', items);
+    }
+  },
+
+  async deleteAchievement(id: string): Promise<void> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      await supabase.from('achievements').delete().eq('id', id);
+    }
+
+    const items = await this.getAchievements();
+    const updated = items.filter(a => a.id !== id);
+    setLocalStorageData('kids_event_achievements', updated);
   }
 }
 

@@ -5,14 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Calendar, MapPin, Download, Settings, Heart, Ticket, User, Bell,
-  ChevronRight, X, AlertTriangle, Loader2, CheckCircle2, Star
+  ChevronRight, X, AlertTriangle, Loader2, CheckCircle2, Star,
+  Trophy, ShieldCheck, Lock, Plus, Sparkles
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { authService, SessionUser } from '@/services/auth';
 import { dbService } from '@/services/db';
-import type { Booking } from '@/types';
+import type { Booking, Achievement, Child } from '@/types';
 
 const NAV_LINKS = [
   { href: '/dashboard/parent', label: 'My Bookings', icon: Ticket },
@@ -170,6 +171,234 @@ function ReviewForm({ booking, parentId, onSubmitted }: {
   );
 }
 
+function AddAchievementModal({
+  childrenList,
+  onClose,
+  onCreated,
+}: {
+  childrenList: Child[];
+  onClose: () => void;
+  onCreated: (ach: Achievement) => void;
+}) {
+  const [selectedChildId, setSelectedChildId] = useState(childrenList[0]?.id || '');
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [mediaUrl, setMediaUrl] = useState('');
+  const [mediaType, setMediaType] = useState<'image' | 'video'>('image');
+  const [visibility, setVisibility] = useState<'private' | 'public_pending'>('private');
+
+  const [consentParent, setConsentParent] = useState(false);
+  const [consentPublic, setConsentPublic] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description || !mediaUrl || !selectedChildId) {
+      setError('Please fill in all required fields including photo/video URL.');
+      return;
+    }
+    if (!consentParent) {
+      setError('You must confirm you are the child\'s parent/guardian.');
+      return;
+    }
+    if (visibility === 'public_pending' && !consentPublic) {
+      setError('You must explicitly consent to public sharing guidelines.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const created = await dbService.createAchievement({
+        child_id: selectedChildId,
+        title,
+        description,
+        media_url: mediaUrl,
+        media_type: mediaType,
+        visibility,
+        posted_by_role: 'parent',
+      });
+      onCreated(created);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save achievement');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 my-8">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-purple-600" /> Post Child Accomplishment
+          </h3>
+          <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-700 text-xs p-3 rounded-xl mb-4 border border-red-200">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Select Child</label>
+            {childrenList.length === 0 ? (
+              <p className="text-caption text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                Please register a child profile first in Profile & Kids tab.
+              </p>
+            ) : (
+              <select
+                value={selectedChildId}
+                onChange={e => setSelectedChildId(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-caption text-slate-900 focus:ring-2 focus:ring-purple-500"
+              >
+                {childrenList.map(c => (
+                  <option key={c.id} value={c.id}>{c.name} (Age {c.age})</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Title of Achievement</label>
+            <input
+              type="text"
+              placeholder="e.g. 1st Place in Swimming Championship 🏆"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-caption text-slate-900 focus:ring-2 focus:ring-purple-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Description / Story</label>
+            <textarea
+              rows={3}
+              placeholder="Describe the achievement or milestone…"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-caption text-slate-900 focus:ring-2 focus:ring-purple-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-caption font-bold text-slate-700 mb-1">Photo / Video Media URL</label>
+            <input
+              type="url"
+              placeholder="https://images.unsplash.com/photo-..."
+              value={mediaUrl}
+              onChange={e => setMediaUrl(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-caption text-slate-900 focus:ring-2 focus:ring-purple-500"
+              required
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <label className="flex items-center gap-2 cursor-pointer text-caption font-semibold text-slate-700">
+              <input
+                type="radio"
+                name="mediaType"
+                value="image"
+                checked={mediaType === 'image'}
+                onChange={() => setMediaType('image')}
+                className="text-purple-600 focus:ring-purple-500"
+              />
+              Photo Image
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer text-caption font-semibold text-slate-700">
+              <input
+                type="radio"
+                name="mediaType"
+                value="video"
+                checked={mediaType === 'video'}
+                onChange={() => setMediaType('video')}
+                className="text-purple-600 focus:ring-purple-500"
+              />
+              Video Clip
+            </label>
+          </div>
+
+          {/* Privacy & Sharing Selection */}
+          <div className="border border-purple-100 bg-purple-50/50 p-3.5 rounded-2xl space-y-2.5">
+            <label className="block text-caption font-extrabold text-purple-900">Privacy & Sharing Choice</label>
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="radio"
+                name="visibility"
+                value="private"
+                checked={visibility === 'private'}
+                onChange={() => setVisibility('private')}
+                className="mt-0.5 text-purple-600 focus:ring-purple-500"
+              />
+              <div>
+                <span className="font-bold text-slate-900 text-caption">Keep Private (Only Visible to Me)</span>
+                <p className="text-micro text-slate-500">Stored safely for your private family memory timeline.</p>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="radio"
+                name="visibility"
+                value="public_pending"
+                checked={visibility === 'public_pending'}
+                onChange={() => setVisibility('public_pending')}
+                className="mt-0.5 text-purple-600 focus:ring-purple-500"
+              />
+              <div>
+                <span className="font-bold text-slate-900 text-caption">Submit for Public Highlights (Requires Approval)</span>
+                <p className="text-micro text-slate-500">Subject to Super Admin review before display on public Highlights page.</p>
+              </div>
+            </label>
+          </div>
+
+          {/* Child Protection Safeguard Consent Checkboxes */}
+          <div className="space-y-2 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-micro text-slate-700">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={consentParent}
+                onChange={e => setConsentParent(e.target.checked)}
+                className="mt-0.5 rounded text-purple-600 focus:ring-purple-500"
+              />
+              <span>I confirm I am this child's legal parent/guardian and consent to sharing this accomplishment.</span>
+            </label>
+
+            {visibility === 'public_pending' && (
+              <label className="flex items-start gap-2 cursor-pointer pt-2 border-t border-slate-200">
+                <input
+                  type="checkbox"
+                  checked={consentPublic}
+                  onChange={e => setConsentPublic(e.target.checked)}
+                  className="mt-0.5 rounded text-purple-600 focus:ring-purple-500"
+                />
+                <span className="text-purple-900 font-semibold">
+                  Explicit Consent for Public Display: I understand that if approved by Kidspire admins, this will be displayed showing ONLY my child's first name and age bracket (never full name or school).
+                </span>
+              </label>
+            )}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={submitting}>Cancel</Button>
+            <Button type="submit" size="sm" disabled={submitting || childrenList.length === 0} className="bg-purple-600 hover:bg-purple-700">
+              {submitting ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null} Save Achievement
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function ParentDashboard() {
   const pathname = usePathname();
   const [user, setUser] = useState<SessionUser | null>(null);
@@ -177,7 +406,11 @@ export default function ParentDashboard() {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
   const [pastBookings, setPastBookings] = useState<Booking[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [childrenList, setChildrenList] = useState<Child[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [showAddAchievementModal, setShowAddAchievementModal] = useState(false);
   const [loading, setLoading] = useState(true);
+
   // Track which past bookings already have a review (keyed by event_id)
   const [reviewedEventIds, setReviewedEventIds] = useState<Set<string>>(new Set());
   // Show/hide inline review form per booking
@@ -198,10 +431,12 @@ export default function ParentDashboard() {
       if (!profile) return;
       setParentId(profile.id);
 
-      const [bookings, notifs, existingReviews] = await Promise.all([
+      const [bookings, notifs, existingReviews, kids, myAch] = await Promise.all([
         dbService.getBookingsByParent(profile.id),
         dbService.getNotifications(profile.id),
         dbService.getReviewsByParent(profile.id),
+        dbService.getChildren(profile.id),
+        dbService.getAchievements(),
       ]);
 
       const now = new Date();
@@ -213,6 +448,8 @@ export default function ParentDashboard() {
       setPastBookings([...past, ...cancelled]);
       setNotifications(notifs.filter(n => !n.read).slice(0, 3));
       setReviewedEventIds(new Set(existingReviews.map(r => r.event_id)));
+      setChildrenList(kids);
+      setAchievements(myAch);
     } catch (e) {
       console.error(e);
     } finally {
@@ -482,6 +719,79 @@ export default function ParentDashboard() {
                     </div>
                   </CardContent>
                 </Card>
+              )}
+            </section>
+
+            {/* ── ACHIEVEMENTS & ACCOMPLISHMENTS SECTION ── */}
+            <section className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-amber-500" /> Child Accomplishments & Trophies
+                  </h2>
+                  <p className="text-caption text-slate-500">Track and share your child's milestones, awards, and course completions.</p>
+                </div>
+                <Button
+                  onClick={() => setShowAddAchievementModal(true)}
+                  size="sm"
+                  className="bg-purple-600 hover:bg-purple-700 font-semibold"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Post Accomplishment
+                </Button>
+              </div>
+
+              {showAddAchievementModal && (
+                <AddAchievementModal
+                  childrenList={childrenList}
+                  onClose={() => setShowAddAchievementModal(false)}
+                  onCreated={(newAch) => setAchievements(prev => [newAch, ...prev])}
+                />
+              )}
+
+              {achievements.length === 0 ? (
+                <Card className="border-dashed border-2 border-slate-200">
+                  <CardContent className="p-8 text-center">
+                    <Trophy className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                    <p className="font-semibold text-slate-700 text-body mb-1">No accomplishments posted yet</p>
+                    <p className="text-caption text-slate-500 max-w-md mx-auto mb-4">
+                      Document tournament wins, course completion certificates, or special skills. Keep them private or share with admin approval.
+                    </p>
+                    <Button onClick={() => setShowAddAchievementModal(true)} variant="outline" size="sm">
+                      <Plus className="w-4 h-4 mr-1" /> Post First Achievement
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {achievements.map(ach => (
+                    <Card key={ach.id} className="border-slate-200 overflow-hidden">
+                      <div className="aspect-video relative bg-slate-900 overflow-hidden">
+                        <img src={ach.media_url} alt={ach.title} className="w-full h-full object-cover" />
+                        <div className="absolute top-2 right-2">
+                          {ach.visibility === 'private' && (
+                            <Badge className="bg-slate-900/80 text-slate-200 border-slate-700 text-micro">
+                              🔒 Private
+                            </Badge>
+                          )}
+                          {ach.visibility === 'public_pending' && (
+                            <Badge className="bg-amber-500 text-white font-bold text-micro">
+                              ⏳ Pending Admin Approval
+                            </Badge>
+                          )}
+                          {ach.visibility === 'public_approved' && (
+                            <Badge className="bg-emerald-600 text-white font-bold text-micro">
+                              🌟 Publicly Approved
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-slate-900 text-body mb-1">{ach.title}</h4>
+                        <p className="text-caption text-slate-600 line-clamp-2">{ach.description}</p>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               )}
             </section>
 

@@ -21,13 +21,16 @@ import {
   RefreshCw,
   Eye,
   BarChart3,
-  LineChart as LineChartIcon
+  LineChart as LineChartIcon,
+  Trophy,
+  Flag
 } from 'lucide-react';
 import Link from 'next/link';
 import { AdminGuard } from '@/components/admin/AdminGuard';
 import { dbService as db } from '@/services/db';
-import { Event, Booking, Organization } from '@/types';
+import { Event, Booking, Organization, Achievement } from '@/types';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { motion } from 'framer-motion';
 import {
   ResponsiveContainer,
@@ -41,7 +44,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 
-type AdminTab = 'overview' | 'events' | 'organizations' | 'users' | 'categories' | 'bookings' | 'settings';
+type AdminTab = 'overview' | 'events' | 'organizations' | 'achievements' | 'users' | 'categories' | 'bookings' | 'settings';
 
 export default function SuperAdminPage() {
   return (
@@ -60,6 +63,7 @@ function SuperAdminContent() {
   const [categories, setCategories] = useState<any[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Search & Filter States
@@ -83,23 +87,41 @@ function SuperAdminContent() {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [allEvents, allUsers, allCats, allBookings, allOrgs] = await Promise.all([
+      const [allEvents, allUsers, allCats, allBookings, allOrgs, allAch] = await Promise.all([
         db.getEvents({ status: 'all' }),
         db.getAllUsersAdmin(),
         db.getCategoriesAdmin(),
         db.getBookingsByParent('parent-1').catch(() => []),
         db.getOrganizations(),
+        db.getAchievements(),
       ]);
       setEvents(allEvents);
       setUsers(allUsers);
       setCategories(allCats);
       setBookings(allBookings);
       setOrganizations(allOrgs);
+      setAchievements(allAch);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleApproveAchievement = async (id: string) => {
+    await db.updateAchievementStatus(id, 'public_approved');
+    loadAllAdminData();
+  };
+
+  const handleRejectAchievement = async (id: string) => {
+    await db.updateAchievementStatus(id, 'private');
+    loadAllAdminData();
+  };
+
+  const handleDeleteAchievement = async (id: string) => {
+    if (!confirm('Permanently delete this achievement submission?')) return;
+    await db.deleteAchievement(id);
+    loadAllAdminData();
   };
 
   // Event Actions
@@ -185,6 +207,7 @@ function SuperAdminContent() {
   const approvedEvents = events.filter(e => e.status === 'approved');
   const pendingOrgs = organizations.filter(o => !o.verified);
   const verifiedOrgs = organizations.filter(o => o.verified);
+  const pendingAchievements = achievements.filter(a => a.visibility === 'public_pending' || a.reported === true);
   const totalRevenue = events.reduce((acc, e) => acc + (e.price * (e.seats_total - e.seats_available)), 0);
 
   // Filtered lists
@@ -251,6 +274,7 @@ function SuperAdminContent() {
               { id: 'overview', label: 'Overview', icon: LayoutDashboard, badge: null },
               { id: 'events', label: 'Events & Approvals', icon: Calendar, badge: pendingEvents.length > 0 ? pendingEvents.length : null },
               { id: 'organizations', label: 'Partner Verification', icon: Building2, badge: pendingOrgs.length > 0 ? pendingOrgs.length : null },
+              { id: 'achievements', label: 'Achievements Queue', icon: Trophy, badge: pendingAchievements.length > 0 ? pendingAchievements.length : null },
               { id: 'users', label: 'User Directory', icon: Users, badge: null },
               { id: 'categories', label: 'Categories', icon: Tag, badge: null },
               { id: 'bookings', label: 'Bookings & Revenue', icon: CreditCard, badge: null },
@@ -688,6 +712,93 @@ function SuperAdminContent() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ── TAB: ACHIEVEMENTS MODERATION QUEUE ───────────────────────────── */}
+        {activeTab === 'achievements' && (
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-500" /> Accomplishments & Content Moderation Queue
+                </h3>
+                <p className="text-caption text-slate-500 mt-1">Review public sharing submissions and reported child content for child safety compliance.</p>
+              </div>
+              <Badge className="bg-purple-100 text-purple-700 font-bold px-3 py-1 text-caption">
+                {achievements.length} Total Submissions
+              </Badge>
+            </div>
+
+            {achievements.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 p-8">
+                <Trophy className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+                <h4 className="font-bold text-slate-900 text-lg">No pending achievement submissions</h4>
+                <p className="text-slate-500 text-caption">All child accomplishment submissions have been reviewed.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {achievements.map(ach => (
+                  <div key={ach.id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <Badge className={
+                          ach.visibility === 'public_approved'
+                            ? 'bg-emerald-100 text-emerald-800 font-bold'
+                            : ach.reported
+                            ? 'bg-red-100 text-red-800 font-bold'
+                            : 'bg-amber-100 text-amber-800 font-bold'
+                        }>
+                          {ach.reported ? '🚩 Reported by User' : ach.visibility === 'public_approved' ? '🌟 Approved Public' : '⏳ Pending Review'}
+                        </Badge>
+
+                        <span className="text-micro font-mono text-slate-400">
+                          {new Date(ach.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <div className="aspect-video relative rounded-2xl overflow-hidden bg-slate-900 mb-3">
+                        <img src={ach.media_url} alt={ach.title} className="w-full h-full object-cover" />
+                        <div className="absolute bottom-2 left-2 bg-slate-900/80 text-white text-micro font-bold px-2.5 py-1 rounded-md">
+                          Child: {ach.child?.name || 'Junior'} (Age {ach.child?.age || '—'})
+                        </div>
+                      </div>
+
+                      <h4 className="font-bold text-slate-900 text-card-title mb-1">{ach.title}</h4>
+                      <p className="text-caption text-slate-600 leading-relaxed mb-2">{ach.description}</p>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => handleDeleteAchievement(ach.id)}
+                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-xl text-caption font-bold transition-colors cursor-pointer"
+                      >
+                        Delete
+                      </button>
+
+                      <div className="flex gap-2">
+                        {ach.visibility !== 'private' && (
+                          <button
+                            onClick={() => handleRejectAchievement(ach.id)}
+                            className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-caption font-bold transition-colors cursor-pointer"
+                          >
+                            Keep Private
+                          </button>
+                        )}
+                        {ach.visibility !== 'public_approved' && (
+                          <button
+                            onClick={() => handleApproveAchievement(ach.id)}
+                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-500/20 rounded-xl text-caption font-bold transition-colors cursor-pointer"
+                          >
+                            ✓ Approve for Public
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -140,3 +140,24 @@ export interface Review {
   parent?: { name: string } | null
   event?: { title: string } | null
 }
+
+export type AchievementVisibility = 'private' | 'public_pending' | 'public_approved'
+export type AchievementRole = 'parent' | 'organization_admin' | 'super_admin'
+
+export interface Achievement {
+  id: string
+  child_id?: string | null
+  organization_id?: string | null
+  event_id?: string | null
+  title: string
+  description: string
+  media_url: string
+  media_type: 'image' | 'video'
+  visibility: AchievementVisibility
+  posted_by_role: AchievementRole
+  reported?: boolean
+  created_at: string
+  child?: Child | null
+  event?: Event | null
+  organization?: Organization | null
+}

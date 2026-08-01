@@ -206,5 +206,53 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- -----------------------------------------------------------------------------
+-- 5. ACHIEVEMENTS TABLE & PRIVACY RLS POLICIES (NEW)
+-- -----------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS public.achievements (
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    child_id TEXT REFERENCES public.children(id) ON DELETE CASCADE,
+    organization_id TEXT REFERENCES public.organizations(id) ON DELETE SET NULL,
+    event_id TEXT REFERENCES public.events(id) ON DELETE SET NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    media_url TEXT NOT NULL,
+    media_type TEXT NOT NULL DEFAULT 'image',
+    visibility TEXT NOT NULL DEFAULT 'private',
+    posted_by_role TEXT NOT NULL DEFAULT 'parent',
+    reported BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Enable RLS for Achievements
+ALTER TABLE public.achievements ENABLE ROW LEVEL SECURITY;
+
+-- Public approved achievements are viewable by everyone
+DROP POLICY IF EXISTS "Public approved achievements are viewable by everyone" ON public.achievements;
+CREATE POLICY "Public approved achievements are viewable by everyone"
+    ON public.achievements FOR SELECT
+    USING (visibility = 'public_approved');
+
+-- Parents can view and manage their own children's achievements
+DROP POLICY IF EXISTS "Parents can view their own child achievements" ON public.achievements;
+CREATE POLICY "Parents can view their own child achievements"
+    ON public.achievements FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM public.children c
+            JOIN public.parents p ON c.parent_id = p.id
+            WHERE c.id = achievements.child_id AND p.auth_user_id = auth.uid()
+        )
+    );
+
+-- Super admins have full access to manage all achievements
+DROP POLICY IF EXISTS "Super admins can manage all achievements" ON public.achievements;
+CREATE POLICY "Super admins can manage all achievements"
+    ON public.achievements FOR ALL
+    USING (
+        EXISTS (SELECT 1 FROM public.super_admins sa WHERE sa.auth_user_id = auth.uid())
+    );
+
 -- Verification output
 SELECT 'Migration finished successfully!' AS status;

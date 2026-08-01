@@ -174,6 +174,7 @@ export function Header() {
           <Link href="/" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Home</Link>
           <Link href="/explore" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Explore</Link>
           <Link href="/categories" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Categories</Link>
+          <Link href="/highlights" className="text-body font-semibold text-purple-700 hover:text-purple-800 transition-colors whitespace-nowrap">Highlights ✨</Link>
           <Link href="/how-it-works" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">How It Works</Link>
           <Link href="/list-your-event" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">List Your Event</Link>
           <Link href="/contact" className="text-body font-medium text-slate-600 hover:text-purple-600 transition-colors whitespace-nowrap">Contact</Link>
