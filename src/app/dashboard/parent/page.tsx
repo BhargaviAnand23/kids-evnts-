@@ -230,6 +230,23 @@ export default function ParentDashboard() {
       setCancelledId(cancelTarget.id);
       setUpcomingBookings(prev => prev.filter(b => b.id !== cancelTarget.id));
       setPastBookings(prev => [...prev, { ...cancelTarget, status: 'cancelled', payment_status: 'refunded' }]);
+
+      // Trigger cancellation notification & Resend email
+      fetch('/api/notify/booking-cancellation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          parentId: parentId || cancelTarget.parent_id,
+          parentEmail: user?.email || cancelTarget.parent?.email || '',
+          parentName: user?.name || cancelTarget.parent?.name || 'Parent',
+          eventTitle: cancelTarget.event?.title || 'Activity Event',
+          eventDate: cancelTarget.event?.event_date,
+          childName: cancelTarget.child?.name || 'Child',
+          bookingReference: cancelTarget.booking_reference,
+          refundAmount: cancelTarget.event?.price ? cancelTarget.event.price + 50 + Math.round(cancelTarget.event.price * 0.18) : undefined,
+        }),
+      }).catch(() => {});
+
       setCancelTarget(null);
     } catch (err: any) {
       alert(err.message || 'Failed to cancel booking. Please try again.');

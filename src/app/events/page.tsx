@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
 export default function EventsListingRedirect() {
-  redirect('/explore');
+  redirect('/explore?type=event');
 }
+

@@ -1,107 +1,36 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Trophy, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WavyDivider } from '@/components/ui/SectionDividers';
 
-const categories = [
+const parentCategoryHubs = [
   {
     name: 'Sports Hub',
+    subtitle: '6 Activity Subcategories',
+    description: 'Football, Basketball, Cricket, Swimming, Skating & Cycling',
     link: '/explore?category=sports',
-    photo: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-emerald-900/70',
+    photo: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=800&auto=format&fit=crop&q=60',
+    overlay: 'bg-gradient-to-t from-emerald-950/90 via-emerald-900/60 to-emerald-900/20',
     icon: '⚽',
     animClass: 'animate-bounce-subtle',
-    badge: 'Hub',
+    badge: 'Parent Hub 1',
+    badgeColor: 'bg-emerald-400 text-emerald-950',
+    borderColor: 'border-emerald-300 hover:border-emerald-500',
   },
   {
-    name: 'Football',
-    link: '/explore?category=football',
-    photo: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-green-800/60',
-    icon: '⚽',
-    animClass: 'animate-bounce-subtle',
-  },
-  {
-    name: 'Basketball',
-    link: '/explore?category=basketball',
-    photo: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-orange-700/60',
-    icon: '🏀',
-    animClass: 'animate-bounce-subtle',
-  },
-  {
-    name: 'Dance',
-    link: '/explore?category=dance',
-    photo: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-pink-700/60',
-    icon: '💃',
-    animClass: 'animate-wiggle-subtle',
-  },
-  {
-    name: 'Swimming',
-    link: '/explore?category=swimming',
-    photo: 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-blue-700/60',
-    icon: '🏊',
+    name: 'Talents & Hobbies Hub',
+    subtitle: '10 Activity Subcategories',
+    description: 'Music, Art & Crafts, Dance, Martial Arts, STEM & Robotics, Drama, Chess, Cooking & Public Speaking',
+    link: '/explore?category=talents',
+    photo: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop&q=60',
+    overlay: 'bg-gradient-to-t from-purple-950/90 via-purple-900/60 to-purple-900/20',
+    icon: '🎨',
     animClass: 'animate-float-subtle',
-  },
-  {
-    name: 'Skating',
-    link: '/explore?category=skating',
-    photo: 'https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-teal-700/60',
-    icon: '🛼',
-    animClass: 'animate-float-subtle',
-  },
-  {
-    name: 'Chess',
-    link: '/explore?category=chess',
-    photo: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-slate-700/60',
-    icon: '♟️',
-    animClass: 'animate-pulse-subtle',
-  },
-  {
-    name: 'Cricket',
-    link: '/explore?category=cricket',
-    photo: 'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-sky-700/60',
-    icon: '🏏',
-    animClass: 'animate-bounce-subtle',
-  },
-  {
-    name: 'Music',
-    link: '/explore?category=music',
-    photo: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-purple-700/60',
-    icon: '🎵',
-    animClass: 'animate-wiggle-subtle',
-  },
-  {
-    name: 'Martial Arts',
-    link: '/explore?category=martial-arts',
-    photo: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-red-700/60',
-    icon: '🥋',
-    animClass: 'animate-pulse-subtle',
-  },
-  {
-    name: 'Cycling',
-    link: '/explore?category=cycling',
-    photo: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-emerald-700/60',
-    icon: '🚴',
-    animClass: 'animate-float-subtle',
-  },
-  {
-    name: 'Yoga & Fitness',
-    link: '/explore?category=yoga',
-    photo: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=60',
-    overlay: 'bg-rose-700/60',
-    icon: '🧘',
-    animClass: 'animate-float-subtle',
+    badge: 'Parent Hub 2',
+    badgeColor: 'bg-purple-400 text-purple-950',
+    borderColor: 'border-purple-300 hover:border-purple-500',
   },
 ];
 
@@ -110,18 +39,18 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.06,
+      staggerChildren: 0.12,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
+  hidden: { opacity: 0, y: 24, scale: 0.96 },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.4, ease: 'easeOut' as const }
+    transition: { duration: 0.45, ease: 'easeOut' as const }
   },
 };
 
@@ -132,7 +61,7 @@ export function Categories() {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
           <div>
             <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Explore by Category</h2>
-            <p className="text-slate-600 text-body">From high-energy sports to creative arts, find the perfect activity that matches your child's interests.</p>
+            <p className="text-slate-600 text-body">Choose from our two primary activity hubs — high-energy Sports or creative Talents &amp; Hobbies.</p>
           </div>
           <Link href="/categories" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-body">
             View All Categories 
@@ -140,39 +69,50 @@ export function Categories() {
           </Link>
         </div>
 
+        {/* 2 Main Parent Hub Tiles */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: '-50px' }}
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
         >
-          {categories.map((category) => (
+          {parentCategoryHubs.map((category) => (
             <motion.div key={category.name} variants={itemVariants}>
               <Link
                 href={category.link}
-                className="group relative block h-36 sm:h-40 rounded-[24px] overflow-hidden shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className={`group relative block h-64 sm:h-72 lg:h-80 rounded-[32px] overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-400 border-2 ${category.borderColor}`}
               >
                 {/* Background photo */}
                 <img
                   src={category.photo}
                   alt={category.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
-                {/* Color-tinted overlay */}
+                {/* Gradient overlay */}
                 <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
 
-                {/* Floating micro-animated icon badge */}
-                <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
-                  <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full bg-white/20 backdrop-blur-md text-base shadow-sm ${category.animClass}`}>
-                    {category.icon}
+                {/* Floating Hub Badge */}
+                <div className="absolute top-4 left-4 z-10">
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-micro font-extrabold shadow-md ${category.badgeColor}`}>
+                    <span>{category.icon}</span>
+                    <span>{category.badge}</span>
                   </span>
                 </div>
 
-                {/* Category name — bottom-pinned bold white text */}
-                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-                  <span className="font-bold text-card-title text-white drop-shadow-md leading-tight block text-center">
+                {/* Bottom content info */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col justify-end">
+                  <span className="text-caption font-semibold text-white/80 uppercase tracking-widest mb-1">
+                    {category.subtitle}
+                  </span>
+                  <h3 className="font-extrabold text-2xl sm:text-3xl text-white drop-shadow-md leading-tight mb-2 group-hover:text-purple-200 transition-colors">
                     {category.name}
+                  </h3>
+                  <p className="text-caption text-white/90 line-clamp-2 leading-relaxed mb-4">
+                    {category.description}
+                  </p>
+                  <span className="inline-flex items-center gap-2 text-micro font-bold text-white bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full w-fit group-hover:bg-white group-hover:text-slate-900 transition-all">
+                    Explore Hub Subcategories <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </div>
               </Link>
@@ -181,7 +121,7 @@ export function Categories() {
         </motion.div>
 
         {/* Wavy Section Divider */}
-        <WavyDivider className="my-10 text-purple-200/50" />
+        <WavyDivider className="my-12 text-purple-200/50" />
 
         {/* Browse by Type */}
         <div className="mb-8 sm:mb-12">
@@ -225,7 +165,6 @@ export function Categories() {
               href={type.link}
               className="group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
             >
-              {/* Corner accent gradient circle */}
               <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
               
               <div>

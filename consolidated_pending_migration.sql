@@ -35,20 +35,11 @@ CREATE POLICY "Super admins can manage categories"
         EXISTS (SELECT 1 FROM public.super_admins sa WHERE sa.auth_user_id = auth.uid())
     );
 
--- Seed Top-Level / Standalone Categories & Sports Parent Hub
+-- Seed Top-Level Parent Category Hubs (Sports & Talents)
 INSERT INTO public.categories (id, name, slug, parent_id, display_order, icon_emoji, photo_url)
 VALUES 
     ('cat-sports', 'Sports', 'sports', NULL, 1, '⚽', 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=400&auto=format&fit=crop&q=60'),
-    ('cat-music', 'Music', 'music', NULL, 2, '🎵', 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&auto=format&fit=crop&q=60'),
-    ('cat-martial-arts', 'Martial Arts', 'martial-arts', NULL, 3, '🥋', 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=400&auto=format&fit=crop&q=60'),
-    ('cat-yoga', 'Yoga & Fitness', 'yoga', NULL, 4, '🧘', 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=60'),
-    ('cat-arts', 'Art & Crafts', 'arts', NULL, 5, '🎨', 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&auto=format&fit=crop&q=60'),
-    ('cat-drama', 'Drama & Theater', 'drama', NULL, 6, '🎭', 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=400&auto=format&fit=crop&q=60'),
-    ('cat-cooking', 'Cooking & Baking', 'cooking', NULL, 7, '🍳', 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=60'),
-    ('cat-stem', 'STEM & Robotics', 'stem', NULL, 8, '🤖', 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=60'),
-    ('cat-dance', 'Dance', 'dance', NULL, 9, '💃', 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=60'),
-    ('cat-chess', 'Chess', 'chess', NULL, 10, '♟️', 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=60'),
-    ('cat-speaking', 'Public Speaking', 'speaking', NULL, 11, '🎤', 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&auto=format&fit=crop&q=60')
+    ('cat-talents', 'Talents & Hobbies', 'talents', NULL, 2, '🎨', 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&auto=format&fit=crop&q=60')
 ON CONFLICT (slug) DO UPDATE SET
     name = EXCLUDED.name,
     icon_emoji = EXCLUDED.icon_emoji,
@@ -63,6 +54,24 @@ VALUES
     ('subcat-swimming', 'Swimming', 'swimming', 'cat-sports', 4, '🏊', 'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=60'),
     ('subcat-skating', 'Skating', 'skating', 'cat-sports', 5, '🛼', 'https://images.unsplash.com/photo-1515523110800-9415d13b84a8?w=400&auto=format&fit=crop&q=60'),
     ('subcat-cycling', 'Cycling', 'cycling', 'cat-sports', 6, '🚴', 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&auto=format&fit=crop&q=60')
+ON CONFLICT (slug) DO UPDATE SET
+    name = EXCLUDED.name,
+    parent_id = EXCLUDED.parent_id,
+    photo_url = EXCLUDED.photo_url;
+
+-- Seed Talents & Hobbies Subcategories (parent_id = 'cat-talents')
+INSERT INTO public.categories (id, name, slug, parent_id, display_order, icon_emoji, photo_url)
+VALUES 
+    ('subcat-music', 'Music', 'music', 'cat-talents', 1, '🎵', 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-martial-arts', 'Martial Arts', 'martial-arts', 'cat-talents', 2, '🥋', 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-yoga', 'Yoga & Fitness', 'yoga', 'cat-talents', 3, '🧘', 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-arts', 'Art & Crafts', 'arts', 'cat-talents', 4, '🎨', 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-drama', 'Drama & Theater', 'drama', 'cat-talents', 5, '🎭', 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-cooking', 'Cooking & Baking', 'cooking', 'cat-talents', 6, '🍳', 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-stem', 'STEM & Robotics', 'stem', 'cat-talents', 7, '🤖', 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-dance', 'Dance', 'dance', 'cat-talents', 8, '💃', 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-chess', 'Chess', 'chess', 'cat-talents', 9, '♟️', 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=60'),
+    ('subcat-speaking', 'Public Speaking', 'speaking', 'cat-talents', 10, '🎤', 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&auto=format&fit=crop&q=60')
 ON CONFLICT (slug) DO UPDATE SET
     name = EXCLUDED.name,
     parent_id = EXCLUDED.parent_id,

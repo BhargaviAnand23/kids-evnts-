@@ -201,39 +201,43 @@ function ExploreContent() {
                     </div>
                   </div>
 
-                  {/* Categories Filter (Sports is 2-Tier Parent, others standalone) */}
+                  {/* Categories Filter (Two Parent Hubs: Sports & Talents) */}
                   <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-3 block">Categories</label>
-                    <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 mb-3 block">Categories (Hubs)</label>
+                    <div className="space-y-3">
                       {[
-                        { name: 'Sports', slug: 'sports', isParent: true },
-                        { name: 'Music', slug: 'music' },
-                        { name: 'Martial Arts', slug: 'martial-arts' },
-                        { name: 'Yoga & Fitness', slug: 'yoga' },
-                        { name: 'Art & Crafts', slug: 'arts' },
-                        { name: 'Drama & Theater', slug: 'drama' },
-                        { name: 'Cooking & Baking', slug: 'cooking' },
-                        { name: 'STEM & Robotics', slug: 'stem' },
-                        { name: 'Dance', slug: 'dance' },
-                        { name: 'Chess', slug: 'chess' },
-                        { name: 'Public Speaking', slug: 'speaking' },
-                      ].map((cat) => {
-                        const sportsSubcats = [
-                          { name: 'All Sports', slug: 'sports' },
-                          { name: 'Football', slug: 'football' },
-                          { name: 'Basketball', slug: 'basketball' },
-                          { name: 'Cricket', slug: 'cricket' },
-                          { name: 'Swimming', slug: 'swimming' },
-                          { name: 'Skating', slug: 'skating' },
-                          { name: 'Cycling', slug: 'cycling' },
-                        ];
-
-                        const isSportsSelected = cat.slug === 'sports' && (
-                          categoryParam === 'sports' ||
-                          sportsSubcats.some(s => s.slug === categoryParam)
-                        );
-
-                        const isSelected = isSportsSelected || categoryParam === cat.slug;
+                        {
+                          name: 'Sports Hub',
+                          slug: 'sports',
+                          subcats: [
+                            { name: 'All Sports', slug: 'sports' },
+                            { name: 'Football', slug: 'football' },
+                            { name: 'Basketball', slug: 'basketball' },
+                            { name: 'Cricket', slug: 'cricket' },
+                            { name: 'Swimming', slug: 'swimming' },
+                            { name: 'Skating', slug: 'skating' },
+                            { name: 'Cycling', slug: 'cycling' },
+                          ]
+                        },
+                        {
+                          name: 'Talents & Hobbies Hub',
+                          slug: 'talents',
+                          subcats: [
+                            { name: 'All Talents', slug: 'talents' },
+                            { name: 'Music', slug: 'music' },
+                            { name: 'Martial Arts', slug: 'martial-arts' },
+                            { name: 'Yoga & Fitness', slug: 'yoga' },
+                            { name: 'Art & Crafts', slug: 'arts' },
+                            { name: 'Drama & Theater', slug: 'drama' },
+                            { name: 'Cooking & Baking', slug: 'cooking' },
+                            { name: 'STEM & Robotics', slug: 'stem' },
+                            { name: 'Dance', slug: 'dance' },
+                            { name: 'Chess', slug: 'chess' },
+                            { name: 'Public Speaking', slug: 'speaking' },
+                          ]
+                        }
+                      ].map((hub) => {
+                        const isHubActive = categoryParam === hub.slug || hub.subcats.some(s => s.slug === categoryParam);
 
                         const buildHref = (newVal?: string) => {
                           const p = new URLSearchParams();
@@ -245,44 +249,42 @@ function ExploreContent() {
                         };
 
                         return (
-                          <div key={cat.slug} className="space-y-1.5">
+                          <div key={hub.slug} className="space-y-1.5 bg-slate-50/80 p-2.5 rounded-xl border border-slate-200/80">
                             <Link
-                              href={isSelected && !cat.isParent ? buildHref() : buildHref(cat.slug)}
-                              className="flex items-center justify-between cursor-pointer group py-1"
+                              href={isHubActive && categoryParam === hub.slug ? buildHref() : buildHref(hub.slug)}
+                              className="flex items-center justify-between cursor-pointer group py-0.5"
                             >
-                              <div className="flex items-center space-x-3">
+                              <div className="flex items-center space-x-2.5">
                                 <input
                                   type="checkbox"
-                                  checked={isSelected}
+                                  checked={isHubActive}
                                   readOnly
                                   className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
                                 />
-                                <span className={`text-sm ${isSelected ? 'font-bold text-purple-700' : 'text-slate-600 group-hover:text-purple-600'}`}>
-                                  {cat.name}
+                                <span className={`text-sm font-bold ${isHubActive ? 'text-purple-700' : 'text-slate-800 group-hover:text-purple-600'}`}>
+                                  {hub.name}
                                 </span>
                               </div>
-                              {cat.isParent && (
-                                <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
-                                  Hub
-                                </span>
-                              )}
+                              <span className="text-[10px] font-extrabold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                                Hub
+                              </span>
                             </Link>
 
-                            {/* Sports Subcategory Expander */}
-                            {cat.isParent && isSportsSelected && (
-                              <div className="pl-6 space-y-1.5 pt-1 border-l-2 border-purple-200 ml-2 my-1">
-                                {sportsSubcats.map((sub) => {
+                            {/* Subcategory Expander */}
+                            {isHubActive && (
+                              <div className="pl-5 space-y-1 pt-1.5 border-l-2 border-purple-200 ml-1.5 my-1">
+                                {hub.subcats.map((sub) => {
                                   const isSubSelected = categoryParam === sub.slug;
                                   return (
                                     <Link
                                       key={sub.slug}
                                       href={buildHref(sub.slug)}
-                                      className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors ${
-                                        isSubSelected ? 'bg-purple-600 text-white font-bold' : 'text-slate-600 hover:bg-purple-50 hover:text-purple-700'
+                                      className={`flex items-center justify-between text-xs py-1 px-2.5 rounded-lg transition-colors ${
+                                        isSubSelected ? 'bg-purple-600 text-white font-bold shadow-sm' : 'text-slate-600 hover:bg-purple-50 hover:text-purple-700'
                                       }`}
                                     >
                                       <span>{sub.name}</span>
-                                      {isSubSelected && <span>✓</span>}
+                                      {isSubSelected && <span className="text-[10px]">✓</span>}
                                     </Link>
                                   );
                                 })}

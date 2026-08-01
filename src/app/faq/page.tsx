@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { HelpCircle, ChevronDown, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function FaqPage() {
   const faqs = [
@@ -89,17 +90,24 @@ export default function FaqPage() {
                   </div>
                 </button>
                 
-                <div
-                  className={`grid transition-all duration-300 ease-in-out ${
-                    isOpen ? 'grid-rows-[1fr] opacity-100 pb-5 sm:pb-6 px-5 sm:px-6' : 'grid-rows-[0fr] opacity-0 px-5 sm:px-6'
-                  }`}
-                >
-                  <div className="overflow-hidden">
-                    <p className="text-slate-600 text-body leading-relaxed pl-8 pt-1 border-t border-slate-200/60">
-                      {faq.a}
-                    </p>
-                  </div>
-                </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      key="content"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pb-5 sm:pb-6 px-5 sm:px-6">
+                        <p className="text-slate-600 text-body leading-relaxed pl-8 pt-2 border-t border-purple-200/60">
+                          {faq.a}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}

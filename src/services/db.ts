@@ -305,6 +305,21 @@ export const dbService = {
     return newOrg
   },
 
+  async toggleOrganizationVerification(id: string, verified: boolean): Promise<Organization> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase.from('organizations').update({ verified }).eq('id', id).select().single()
+      if (error) throw error
+      return data
+    }
+    const orgs = getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
+    const idx = orgs.findIndex(o => o.id === id)
+    if (idx === -1) throw new Error('Organization not found')
+    orgs[idx].verified = verified
+    setLocalStorageData('kids_event_organizations', orgs)
+    return orgs[idx]
+  },
+
   async getEvents(filters?: {
     category?: string
     ageBracket?: string
@@ -347,10 +362,8 @@ export const dbService = {
       
       try {
         const { data, error } = await query.order('event_date', { ascending: true })
-        if (!error && data && data.length > 0) {
-          const eventMap = new Map(SEED_EVENTS.map(s => [s.id, s]))
-          data.forEach((d: Event) => eventMap.set(d.id, d))
-          events = Array.from(eventMap.values())
+        if (!error && data) {
+          events = data as Event[]
         } else {
           events = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
         }
@@ -361,35 +374,36 @@ export const dbService = {
       events = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
     }
 
-    if (!events || events.length === 0) {
-      events = SEED_EVENTS
-    } else {
-      // Ensure all seed events are present even if local storage stored a partial set
-      const eventMap = new Map(SEED_EVENTS.map(s => [s.id, s]))
-      events.forEach(e => eventMap.set(e.id, e))
-      events = Array.from(eventMap.values())
-    }
+    // Merge Supabase/local events with SEED_EVENTS (deduplicating by id)
+    const eventMap = new Map<string, Event>()
+    SEED_EVENTS.forEach(s => eventMap.set(s.id, s))
+    events.forEach(e => eventMap.set(e.id, e))
+    let allEvents = Array.from(eventMap.values())
 
     // Apply memory filtering for local/fallback data and double-checks
     if (filters?.category && filters.category !== 'All') {
       const catTarget = filters.category.toLowerCase().replace(/[^a-z0-9]/g, '')
       const SPORTS_SUBCATEGORIES = ['football', 'basketball', 'cricket', 'swimming', 'skating', 'cycling'];
-      events = events.filter(e => {
+      const TALENTS_SUBCATEGORIES = ['music', 'martialarts', 'yoga', 'arts', 'crafts', 'drama', 'cooking', 'baking', 'stem', 'robotics', 'dance', 'chess', 'speaking', 'publicspeaking'];
+      allEvents = allEvents.filter(e => {
         const c = e.category.toLowerCase().replace(/[^a-z0-9]/g, '')
         if (catTarget === 'sports' || catTarget === 'allsports') {
           return c === 'sports' || SPORTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc));
+        }
+        if (catTarget === 'talents' || catTarget === 'alltalents' || catTarget === 'talentshobbies' || catTarget === 'talentsother') {
+          return c === 'talents' || TALENTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc));
         }
         return c === catTarget || c.includes(catTarget) || catTarget.includes(c)
       })
     }
     if (filters?.organizerId && filters.organizerId !== 'All') {
-      events = events.filter(e => e.organizer_id === filters.organizerId)
+      allEvents = allEvents.filter(e => e.organizer_id === filters.organizerId)
     }
     if (filters?.date) {
-      events = events.filter(e => e.event_date === filters.date)
+      allEvents = allEvents.filter(e => e.event_date === filters.date)
     }
     if (filters?.ageBracket && filters.ageBracket !== 'All') {
-      events = events.filter(e => {
+      allEvents = allEvents.filter(e => {
         const ab = e.age_bracket as string
         if (ab === filters.ageBracket) return true
         if (filters.ageBracket === 'early_years' && ab === 'early_kids') return true
@@ -401,15 +415,15 @@ export const dbService = {
     }
     if (filters?.status !== 'all') {
       const targetStatus = filters?.status || 'approved'
-      events = events.filter(e => !e.status || e.status === targetStatus)
+      allEvents = allEvents.filter(e => !e.status || e.status === targetStatus)
     }
     if (filters?.listingType && filters.listingType !== 'All') {
       const targetType = filters.listingType.toLowerCase()
-      events = events.filter(e => (e.listing_type || 'event').toLowerCase() === targetType)
+      allEvents = allEvents.filter(e => (e.listing_type || 'event').toLowerCase() === targetType)
     }
     if (filters?.location && filters.location !== 'All') {
       const locTarget = filters.location.toLowerCase().trim()
-      events = events.filter(e => {
+      allEvents = allEvents.filter(e => {
         if (locTarget === 'online') {
           return e.is_online || (e.location || '').toLowerCase().includes('online')
         }
@@ -420,16 +434,12 @@ export const dbService = {
     }
     if (filters?.keyword) {
       const kw = filters.keyword.toLowerCase()
-      events = events.filter(e =>
+      allEvents = allEvents.filter(e =>
         e.title.toLowerCase().includes(kw) ||
         (e.description || '').toLowerCase().includes(kw) ||
         e.category.toLowerCase().includes(kw) ||
         (e.location || '').toLowerCase().includes(kw)
       )
-    }
-
-    if (!events || events.length === 0) {
-      events = SEED_EVENTS.filter(e => !e.status || e.status === 'approved')
     }
 
     // Helper to sanitize broken legacy image URLs (e.g. photo-1519315901367-f34f815b6719 which returns 404)
@@ -441,7 +451,7 @@ export const dbService = {
     };
 
     // Attach organizer info and sort sponsored events to top
-    const mapped = events.map(event => ({
+    const mapped = allEvents.map(event => ({
       ...event,
       image_url: sanitizeImageUrl(event.image_url),
       organizer: event.organizer || organizations.find(o => o.id === event.organizer_id) || SEED_ORGANIZATIONS[0]
@@ -450,7 +460,7 @@ export const dbService = {
     return mapped.sort((a, b) => {
       if (a.is_sponsored && !b.is_sponsored) return -1
       if (!a.is_sponsored && b.is_sponsored) return 1
-      return 0
+      return new Date(a.event_date).getTime() - new Date(b.event_date).getTime()
     })
   },
 
@@ -953,23 +963,39 @@ export const dbService = {
         }
       }
 
-      // Check overall seat availability to prevent overbooking/race conditions
-      const { data: event, error: eventErr } = await supabase
-        .from('events')
-        .select('seats_available')
-        .eq('id', bookingData.event_id)
-        .single()
-      
-      if (eventErr || !event) throw new Error('Event not found')
-      if (event.seats_available <= 0) {
-        throw new Error('Sorry, this event is sold out! Please join the waitlist.')
+      // Check overall seat availability & perform atomic seat decrement (RPC with fallback)
+      let rpcSuccess = false
+      try {
+        const { data: rpcRes, error: rpcErr } = await supabase.rpc('book_seat', { event_id_param: bookingData.event_id })
+        if (!rpcErr && typeof rpcRes === 'boolean') {
+          if (!rpcRes) {
+            throw new Error('Sorry, this event is sold out! Please join the waitlist.')
+          }
+          rpcSuccess = true
+        }
+      } catch (e: any) {
+        if (e?.message?.includes('sold out')) throw e
+        console.warn('[db] RPC book_seat unavailable, using standard check:', e?.message)
       }
 
-      // Decrement seats_available
-      await supabase
-        .from('events')
-        .update({ seats_available: Math.max(0, event.seats_available - 1) })
-        .eq('id', bookingData.event_id)
+      if (!rpcSuccess) {
+        // Fallback: Read-then-write seat check
+        const { data: event, error: eventErr } = await supabase
+          .from('events')
+          .select('seats_available')
+          .eq('id', bookingData.event_id)
+          .single()
+        
+        if (eventErr || !event) throw new Error('Event not found')
+        if (event.seats_available <= 0) {
+          throw new Error('Sorry, this event is sold out! Please join the waitlist.')
+        }
+
+        await supabase
+          .from('events')
+          .update({ seats_available: Math.max(0, event.seats_available - 1) })
+          .eq('id', bookingData.event_id)
+      }
 
       const payload: Record<string, any> = {
         event_id: bookingData.event_id,

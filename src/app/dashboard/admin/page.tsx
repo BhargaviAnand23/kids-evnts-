@@ -15,6 +15,17 @@ import { dbService } from '@/services/db';
 import { authService } from '@/services/auth';
 import type { Event, Booking } from '@/types';
 import { motion } from 'framer-motion';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  AreaChart,
+  Area,
+  CartesianGrid,
+} from 'recharts';
 
 const SIDEBAR = [
   { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
@@ -291,51 +302,50 @@ export default function AdminDashboard() {
 
             </div>
 
-            {/* Analytics Charts Grid */}
+            {/* Analytics Charts Grid (Recharts) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
               {/* Bar Chart: Top 5 Events by Booking Count */}
               <Card className="border-slate-200 bg-white shadow-sm">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-2">
                   <CardTitle className="text-card-title flex items-center justify-between">
                     <span className="flex items-center gap-2">
-                      <BarChart3 className="w-5 h-5 text-purple-600" /> Top Events by Bookings
+                      <BarChart3 className="w-5 h-5 text-purple-600" /> Bookings Per Event
                     </span>
                     <span className="text-caption text-slate-400 font-normal">Top 5 listings</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="pt-4">
                   {topEventsByBookings.length === 0 ? (
-                    <p className="text-caption text-slate-500 text-center py-10">No event booking data available yet.</p>
+                    <p className="text-caption text-slate-500 text-center py-12">No event booking data available yet.</p>
                   ) : (
-                    topEventsByBookings.map(({ event, count }) => {
-                      const pct = Math.round((count / maxBarCount) * 100);
-                      return (
-                        <div key={event.id} className="space-y-1.5">
-                          <div className="flex justify-between items-center text-caption font-semibold text-slate-800">
-                            <span className="truncate max-w-[220px]" title={event.title}>{event.title}</span>
-                            <span className="text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded text-micro">
-                              {count} bookings
-                            </span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${Math.max(pct, 8)}%` }}
-                              transition={{ duration: 0.6, ease: 'easeOut' }}
-                              className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 rounded-full"
-                            />
-                          </div>
-                        </div>
-                      );
-                    })
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart
+                          data={topEventsByBookings.map(t => ({
+                            name: t.event.title.length > 18 ? t.event.title.substring(0, 18) + '…' : t.event.title,
+                            bookings: t.count
+                          }))}
+                          margin={{ top: 10, right: 10, left: -20, bottom: 20 }}
+                        >
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} interval={0} angle={-15} textAnchor="end" />
+                          <YAxis tick={{ fontSize: 11, fill: '#64748b' }} allowDecimals={false} />
+                          <Tooltip
+                            contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', borderColor: '#e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '12px' }}
+                            cursor={{ fill: '#f8fafc' }}
+                          />
+                          <Bar dataKey="bookings" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
                   )}
                 </CardContent>
               </Card>
 
               {/* Line Chart: 30-Day Booking Trend */}
               <Card className="border-slate-200 bg-white shadow-sm">
-                <CardHeader className="pb-4">
+                <CardHeader className="pb-2">
                   <CardTitle className="text-card-title flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <LineChart className="w-5 h-5 text-purple-600" /> 30-Day Booking Trend
@@ -343,30 +353,25 @@ export default function AdminDashboard() {
                     <span className="text-caption text-slate-400 font-normal">Daily volume</span>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-44 flex items-end gap-1 pt-6 pb-2 px-1 border-b border-slate-200">
-                    {last30DaysTrend.map((d, i) => {
-                      const heightPct = Math.max(Math.round((d.count / maxTrendCount) * 100), 10);
-                      return (
-                        <div key={i} className="flex-1 flex flex-col items-center group relative">
-                          {/* Tooltip */}
-                          <div className="absolute -top-8 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
-                            {d.dateLabel}: {d.count}
-                          </div>
-                          <motion.div
-                            initial={{ height: 0 }}
-                            animate={{ height: `${heightPct}%` }}
-                            transition={{ duration: 0.4, delay: i * 0.01 }}
-                            className="w-full bg-purple-500 hover:bg-purple-600 rounded-t transition-colors opacity-80 hover:opacity-100"
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="flex justify-between text-micro text-slate-400 mt-2 font-medium">
-                    <span>{last30DaysTrend[0]?.dateLabel}</span>
-                    <span>{last30DaysTrend[14]?.dateLabel}</span>
-                    <span>Today</span>
+                <CardContent className="pt-4">
+                  <div className="h-64 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={last30DaysTrend} margin={{ top: 10, right: 10, left: -20, bottom: 10 }}>
+                        <defs>
+                          <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#7c3aed" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="dateLabel" tick={{ fontSize: 10, fill: '#94a3b8' }} interval={6} />
+                        <YAxis tick={{ fontSize: 11, fill: '#64748b' }} allowDecimals={false} />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#ffffff', borderRadius: '12px', borderColor: '#e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', fontSize: '12px' }}
+                        />
+                        <Area type="monotone" dataKey="count" name="Bookings" stroke="#7c3aed" strokeWidth={2.5} fillOpacity={1} fill="url(#purpleGradient)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </div>
                 </CardContent>
               </Card>
