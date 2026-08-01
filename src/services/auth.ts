@@ -53,14 +53,40 @@ export const authService = {
     }
 
     // 2. Check if organization admin
-    const adminProfile = await dbService.getOrganizationAdminProfile(user.id)
-    if (adminProfile) {
+    let adminProfile = await dbService.getOrganizationAdminProfile(user.id)
+    if (adminProfile || user.user_metadata?.role === 'admin') {
+      let orgId = adminProfile?.organization_id
+
+      if (!orgId) {
+        const orgs = await dbService.getOrganizations()
+        let matchedOrg = orgs.find(o => o.contact_email?.toLowerCase() === userEmail)
+
+        if (!matchedOrg) {
+          matchedOrg = await dbService.createOrganization({
+            name: user.user_metadata?.name ? `${user.user_metadata.name}'s Academy` : 'Partner Organization',
+            type: 'club',
+            contact_email: userEmail,
+            logo_url: null,
+            address: null,
+          })
+        }
+
+        orgId = matchedOrg.id
+
+        adminProfile = await dbService.createOrganizationAdminProfile({
+          auth_user_id: user.id,
+          organization_id: orgId,
+          name: adminProfile?.name || user.user_metadata?.name || userEmail.split('@')[0],
+          role: 'admin',
+        })
+      }
+
       return {
         id: user.id,
         email: user.email || '',
         role: 'admin',
-        name: adminProfile.name,
-        organization_id: adminProfile.organization_id
+        name: adminProfile?.name || user.user_metadata?.name || 'Organizer',
+        organization_id: orgId
       }
     }
 
@@ -131,18 +157,31 @@ export const authService = {
       throw new Error('Sign up failed. Please try again.')
     }
 
-    // Handle new organization creation for admins if specified
-    if (role === 'admin' && !organizationId && orgDetails) {
+    // Handle new organization creation & profile linking for admins if specified
+    if (role === 'admin') {
       try {
-        await dbService.createOrganization({
-          name: orgDetails.name,
-          type: orgDetails.type,
-          contact_email: email.trim(),
-          logo_url: null,
-          address: null,
-        })
+        let targetOrgId = organizationId
+        if (!targetOrgId && orgDetails) {
+          const newOrg = await dbService.createOrganization({
+            name: orgDetails.name,
+            type: orgDetails.type,
+            contact_email: email.trim(),
+            logo_url: null,
+            address: null,
+          })
+          targetOrgId = newOrg.id
+        }
+
+        if (targetOrgId) {
+          await dbService.createOrganizationAdminProfile({
+            auth_user_id: data.user.id,
+            organization_id: targetOrgId,
+            name: name.trim(),
+            role: 'admin',
+          })
+        }
       } catch (orgErr) {
-        console.warn('[auth] Organization pre-creation note:', orgErr)
+        console.warn('[auth] Organization creation note:', orgErr)
       }
     }
 
