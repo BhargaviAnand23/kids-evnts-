@@ -149,6 +149,8 @@ export function Header() {
     return () => subscription.unsubscribe();
   }, [loadNotifications]);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const handleLogout = async () => {
     await authService.logout();
     setUser(null);
@@ -161,7 +163,7 @@ export function Header() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 h-20 flex items-center justify-between gap-4">
         {/* Logo and Tagline */}
         <div className="flex flex-col shrink-0">
-          <Link href="/" className="text-section-title font-bold text-purple-600 tracking-tight">
+          <Link href="/" onClick={() => setMobileMenuOpen(false)} className="text-section-title font-bold text-purple-600 tracking-tight">
             Kidspire
           </Link>
           <span className="text-micro uppercase tracking-widest text-slate-500 font-semibold -mt-0.5">
@@ -275,10 +277,136 @@ export function Header() {
         </div>
 
         {/* Mobile menu button */}
-        <button className="lg:hidden text-slate-600 p-2 rounded-lg hover:bg-slate-100">
-          <Menu className="w-6 h-6" />
+        <button
+          onClick={() => setMobileMenuOpen(v => !v)}
+          className="lg:hidden text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-colors focus:outline-none"
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+        >
+          {mobileMenuOpen ? <X className="w-6 h-6 text-purple-600" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden fixed inset-x-0 top-20 bg-white border-b border-slate-200 shadow-2xl z-50 p-6 flex flex-col space-y-5 animate-in slide-in-from-top-2 duration-200 max-h-[calc(100vh-5rem)] overflow-y-auto">
+          {/* Location Selector */}
+          <div className="pb-4 border-b border-slate-100">
+            <LocationSelector />
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex flex-col space-y-3">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              Home
+            </Link>
+            <Link
+              href="/explore"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              Explore
+            </Link>
+            <Link
+              href="/categories"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              Categories
+            </Link>
+            <Link
+              href="/highlights"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-bold text-purple-700 hover:text-purple-800 py-1.5 transition-colors"
+            >
+              Highlights ✨
+            </Link>
+            <Link
+              href="/how-it-works"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/list-your-event"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              List Your Event
+            </Link>
+            <Link
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors"
+            >
+              Contact
+            </Link>
+            <Link
+              href="/dashboard/parent/saved"
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-body-lg font-medium text-slate-800 hover:text-purple-600 py-1.5 transition-colors flex items-center gap-2"
+            >
+              <Heart className="w-4 h-4 text-purple-600" /> Wishlist
+            </Link>
+          </nav>
+
+          {/* User Auth Section */}
+          <div className="pt-4 border-t border-slate-100 flex flex-col space-y-3">
+            {user ? (
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-body font-bold shrink-0">
+                    {getInitials(user.name)}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-slate-900 truncate text-body">{user.name}</p>
+                    <p className="text-caption text-slate-500 truncate">{user.email}</p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 pt-2 border-t border-slate-200">
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      const isSuperAdmin = user.role === 'super_admin' || user.is_super_admin;
+                      router.push(isSuperAdmin ? '/dashboard/super-admin' : user.role === 'admin' ? '/dashboard/admin' : '/dashboard/parent');
+                    }}
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    {user.role === 'super_admin' ? 'Super Admin Dashboard' : user.role === 'admin' ? 'Organizer Dashboard' : 'My Dashboard'}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-red-600 hover:bg-red-50 hover:border-red-200"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Log Out
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <Button size="lg" variant="outline" className="w-full" asChild onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/login">Log In</Link>
+                </Button>
+                <Button size="lg" className="w-full" asChild onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/signup">Sign Up</Link>
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

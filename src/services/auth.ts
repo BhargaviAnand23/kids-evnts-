@@ -29,6 +29,102 @@ export interface SessionUser {
   is_super_admin?: boolean
 }
 
+async function resolveUserFromAuthUser(user: any): Promise<SessionUser> {
+  const userEmail = (user.email || '').toLowerCase().trim();
+  const userId = user.id;
+  const userName = (user.user_metadata?.name as string | undefined) || userEmail.split('@')[0] || 'User';
+  const metaRole = (user.user_metadata?.role as UserRole) || 'parent';
+  const metaOrgName = user.user_metadata?.org_name;
+  const metaOrgType = user.user_metadata?.org_type || 'club';
+
+  const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail);
+
+  // 1. Check if super admin
+  const superAdminProfile = await dbService.getSuperAdminProfile(userId).catch(() => null);
+  if (isAllowlistedAdmin || superAdminProfile) {
+    return {
+      id: userId,
+      email: userEmail,
+      role: 'super_admin',
+      name: superAdminProfile?.name || userName || 'Platform Administrator',
+      is_super_admin: true,
+    };
+  }
+
+  // 2. Check if organization admin
+  let adminProfile = await dbService.getOrganizationAdminProfile(userId).catch(() => null);
+  if (adminProfile || metaRole === 'admin') {
+    let orgId = adminProfile?.organization_id;
+
+    if (!orgId) {
+      const orgs = await dbService.getOrganizations().catch(() => []);
+      let matchedOrg = orgs.find((o) => o.contact_email?.toLowerCase() === userEmail);
+
+      if (!matchedOrg) {
+        try {
+          matchedOrg = await dbService.createOrganization({
+            name: metaOrgName || `${userName}'s Academy`,
+            type: metaOrgType,
+            contact_email: userEmail,
+            logo_url: null,
+            address: null,
+          });
+        } catch (err) {
+          console.warn('[auth] Organization creation fallback note:', err);
+          matchedOrg = {
+            id: `org-${userId.substring(0, 8)}`,
+            name: metaOrgName || `${userName}'s Academy`,
+            type: metaOrgType,
+            contact_email: userEmail,
+            logo_url: null,
+            address: null,
+            verified: false,
+            created_at: new Date().toISOString(),
+          };
+        }
+      }
+
+      orgId = matchedOrg.id;
+
+      try {
+        adminProfile = await dbService.createOrganizationAdminProfile({
+          auth_user_id: userId,
+          organization_id: orgId,
+          name: adminProfile?.name || userName,
+          role: 'admin',
+        });
+      } catch (err) {
+        console.warn('[auth] Organization admin profile fallback note:', err);
+        adminProfile = {
+          id: `admin-${userId.substring(0, 8)}`,
+          auth_user_id: userId,
+          organization_id: orgId,
+          name: userName,
+          role: 'admin',
+          created_at: new Date().toISOString(),
+        };
+      }
+    }
+
+    return {
+      id: userId,
+      email: userEmail,
+      role: 'admin',
+      name: adminProfile?.name || userName || 'Organizer',
+      organization_id: orgId,
+    };
+  }
+
+  // 3. Check if parent
+  const parentProfile = await dbService.getParentProfile(userId).catch(() => null);
+  return {
+    id: userId,
+    email: userEmail,
+    role: 'parent',
+    name: parentProfile?.name || userName,
+  };
+}
+
 export const authService = {
   async getCurrentUser(): Promise<SessionUser | null> {
     if (!isSupabaseConfigured()) return null
@@ -37,77 +133,7 @@ export const authService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return null
 
-    const userEmail = (user.email || '').toLowerCase().trim()
-    const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail)
-
-    // 1. Check if super admin
-    const superAdminProfile = await dbService.getSuperAdminProfile(user.id)
-    if (isAllowlistedAdmin || superAdminProfile) {
-      return {
-        id: user.id,
-        email: user.email || '',
-        role: 'super_admin',
-        name: superAdminProfile?.name || user.user_metadata?.name || 'Platform Administrator',
-        is_super_admin: true
-      }
-    }
-
-    // 2. Check if organization admin
-    let adminProfile = await dbService.getOrganizationAdminProfile(user.id)
-    if (adminProfile || user.user_metadata?.role === 'admin') {
-      let orgId = adminProfile?.organization_id
-
-      if (!orgId) {
-        const orgs = await dbService.getOrganizations()
-        let matchedOrg = orgs.find(o => o.contact_email?.toLowerCase() === userEmail)
-
-        if (!matchedOrg) {
-          matchedOrg = await dbService.createOrganization({
-            name: user.user_metadata?.name ? `${user.user_metadata.name}'s Academy` : 'Partner Organization',
-            type: 'club',
-            contact_email: userEmail,
-            logo_url: null,
-            address: null,
-          })
-        }
-
-        orgId = matchedOrg.id
-
-        adminProfile = await dbService.createOrganizationAdminProfile({
-          auth_user_id: user.id,
-          organization_id: orgId,
-          name: adminProfile?.name || user.user_metadata?.name || userEmail.split('@')[0],
-          role: 'admin',
-        })
-      }
-
-      return {
-        id: user.id,
-        email: user.email || '',
-        role: 'admin',
-        name: adminProfile?.name || user.user_metadata?.name || 'Organizer',
-        organization_id: orgId
-      }
-    }
-
-    // 3. Check if parent
-    const parentProfile = await dbService.getParentProfile(user.id)
-    if (parentProfile) {
-      return {
-        id: user.id,
-        email: user.email || '',
-        role: 'parent',
-        name: parentProfile.name
-      }
-    }
-
-    // 4. Fallback for newly confirmed user before profile trigger query settles
-    return {
-      id: user.id,
-      email: user.email || '',
-      role: (user.user_metadata?.role as UserRole) || 'parent',
-      name: user.user_metadata?.name || (user.email || '').split('@')[0] || 'User'
-    }
+    return resolveUserFromAuthUser(user)
   },
 
   async signUp(
@@ -187,6 +213,11 @@ export const authService = {
       }
     }
 
+    // If session is active (auto-confirmed email), return session user immediately
+    if (data.session) {
+      return resolveUserFromAuthUser(data.user)
+    }
+
     // Return null to require email confirmation — no active session or direct dashboard bypass
     return null
   },
@@ -217,43 +248,7 @@ export const authService = {
       throw new Error('Login failed. Please try again.')
     }
 
-    const userId = data.user.id
-    const userEmail = data.user.email || email
-    const userName: string =
-      (data.user.user_metadata?.name as string | undefined) ||
-      userEmail.split('@')[0]
-
-    const isAllowlistedAdmin = ADMIN_ALLOWLIST.includes(userEmail.toLowerCase().trim())
-    const superAdminProfile = await dbService.getSuperAdminProfile(userId)
-    if (isAllowlistedAdmin || superAdminProfile) {
-      return {
-        id: userId,
-        email: userEmail,
-        role: 'super_admin',
-        name: superAdminProfile?.name || userName || 'Platform Administrator',
-        is_super_admin: true
-      }
-    }
-
-    const adminProfile = await dbService.getOrganizationAdminProfile(userId)
-    if (adminProfile) {
-      return {
-        id: userId,
-        email: userEmail,
-        role: 'admin',
-        name: adminProfile.name,
-        organization_id: adminProfile.organization_id
-      }
-    }
-
-    const parentProfile = await dbService.getParentProfile(userId)
-
-    return {
-      id: userId,
-      email: userEmail,
-      role: 'parent',
-      name: parentProfile?.name || userName
-    }
+    return resolveUserFromAuthUser(data.user)
   },
 
   async logout(): Promise<void> {
