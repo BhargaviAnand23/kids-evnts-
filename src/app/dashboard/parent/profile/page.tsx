@@ -399,8 +399,8 @@ export default function ProfileKidsPage() {
                         <Calendar className="w-4 h-4 text-purple-600" />
                         <span>Joined August 2024</span>
                       </span>
-                      <span className="flex items-center gap-1.5 text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 text-xs">
-                        <ShieldCheck className="w-3.5 h-3.5" /> Verified Parent Account
+                      <span className="flex items-center gap-1.5 text-purple-700 font-semibold bg-purple-50 px-2.5 py-0.5 rounded-full border border-purple-200 text-xs">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" /> Active Parent Account
                       </span>
                     </div>
                   </div>

@@ -134,7 +134,7 @@ export default function HighlightsPage() {
                     {/* Footer / Safety Controls */}
                     <div className="px-6 pb-6 pt-2 border-t border-slate-100 flex items-center justify-between text-caption">
                       <span className="text-slate-400 text-micro">
-                        Posted by Verified {item.posted_by_role === 'parent' ? 'Parent' : 'Academy'}
+                        Posted by {item.posted_by_role === 'parent' ? 'Parent' : 'Verified Academy'}
                       </span>
 
                       {isReported ? (
