@@ -347,12 +347,22 @@ export const dbService = {
     const organizations = await this.getOrganizations()
     let events: Event[] = []
 
+    const SPORTS_CATEGORIES = ['Football', 'Basketball', 'Cricket', 'Swimming', 'Skating', 'Cycling', 'Sports'];
+    const TALENTS_CATEGORIES = ['Music', 'Martial Arts', 'Yoga & Fitness', 'Art & Crafts', 'Drama & Theater', 'Cooking & Baking', 'STEM & Robotics', 'Dance', 'Chess', 'Public Speaking', 'Talents', 'Yoga', 'Arts', 'Crafts', 'Drama', 'Cooking', 'Baking', 'STEM', 'Robotics', 'Speaking'];
+
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       let query = supabase.from('events').select('*')
       
       if (filters?.category && filters.category !== 'All') {
-        query = query.ilike('category', filters.category)
+        const normCat = filters.category.toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (normCat === 'sports' || normCat === 'allsports' || normCat === 'catsports' || normCat === 'sportshub') {
+          query = query.in('category', SPORTS_CATEGORIES);
+        } else if (normCat === 'talents' || normCat === 'alltalents' || normCat === 'cattalents' || normCat.includes('talent')) {
+          query = query.in('category', TALENTS_CATEGORIES);
+        } else {
+          query = query.ilike('category', filters.category);
+        }
       }
       if (filters?.organizerId && filters.organizerId !== 'All') {
         query = query.eq('organizer_id', filters.organizerId)
@@ -397,15 +407,19 @@ export const dbService = {
     // Apply memory filtering for local/fallback data and double-checks
     if (filters?.category && filters.category !== 'All') {
       const catTarget = filters.category.toLowerCase().replace(/[^a-z0-9]/g, '')
-      const SPORTS_SUBCATEGORIES = ['football', 'basketball', 'cricket', 'swimming', 'skating', 'cycling'];
-      const TALENTS_SUBCATEGORIES = ['music', 'martialarts', 'yoga', 'arts', 'crafts', 'drama', 'cooking', 'baking', 'stem', 'robotics', 'dance', 'chess', 'speaking', 'publicspeaking'];
+      const SPORTS_SUBCATEGORIES = ['football', 'basketball', 'cricket', 'swimming', 'skating', 'cycling', 'sports'];
+      const TALENTS_SUBCATEGORIES = [
+        'music', 'martialarts', 'yoga', 'yogafitness', 'arts', 'artscrafts',
+        'crafts', 'drama', 'dramatheater', 'cooking', 'cookingbaking', 'baking',
+        'stem', 'stemrobotics', 'robotics', 'dance', 'chess', 'speaking', 'publicspeaking', 'talents'
+      ];
       allEvents = allEvents.filter(e => {
-        const c = e.category.toLowerCase().replace(/[^a-z0-9]/g, '')
-        if (catTarget === 'sports' || catTarget === 'allsports') {
-          return c === 'sports' || SPORTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc));
+        const c = (e.category || '').toLowerCase().replace(/[^a-z0-9]/g, '')
+        if (catTarget === 'sports' || catTarget === 'allsports' || catTarget === 'catsports' || catTarget === 'sportshub') {
+          return SPORTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc) || sc.includes(c));
         }
-        if (catTarget === 'talents' || catTarget === 'alltalents' || catTarget === 'talentshobbies' || catTarget === 'talentsother') {
-          return c === 'talents' || TALENTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc));
+        if (catTarget === 'talents' || catTarget === 'alltalents' || catTarget === 'cattalents' || catTarget.includes('talent')) {
+          return TALENTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc) || sc.includes(c));
         }
         return c === catTarget || c.includes(catTarget) || catTarget.includes(c)
       })
