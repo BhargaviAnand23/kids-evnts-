@@ -130,7 +130,9 @@ export const authService = {
       options: {
         data: {
           name: name.trim(),
-          role
+          role,
+          org_name: orgDetails?.name,
+          org_type: orgDetails?.type
         }
       }
     })

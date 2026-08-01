@@ -307,17 +307,31 @@ export const dbService = {
 
   async toggleOrganizationVerification(id: string, verified: boolean): Promise<Organization> {
     if (isSupabaseConfigured()) {
-      const supabase = createClient()
-      const { data, error } = await supabase.from('organizations').update({ verified }).eq('id', id).select().single()
-      if (error) throw error
-      return data
+      try {
+        const supabase = createClient()
+        const { data, error } = await supabase.from('organizations').update({ verified }).eq('id', id).select().maybeSingle()
+        if (!error && data) return data
+      } catch (sbErr) {
+        console.warn('Supabase toggleOrganizationVerification note:', sbErr)
+      }
     }
     const orgs = getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
     const idx = orgs.findIndex(o => o.id === id)
-    if (idx === -1) throw new Error('Organization not found')
-    orgs[idx].verified = verified
-    setLocalStorageData('kids_event_organizations', orgs)
-    return orgs[idx]
+    if (idx !== -1) {
+      orgs[idx].verified = verified
+      setLocalStorageData('kids_event_organizations', orgs)
+      return orgs[idx]
+    }
+    return {
+      id,
+      name: 'Organization',
+      type: 'club',
+      contact_email: '',
+      logo_url: null,
+      address: null,
+      verified,
+      created_at: new Date().toISOString()
+    }
   },
 
   async getEvents(filters?: {

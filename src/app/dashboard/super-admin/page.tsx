@@ -152,13 +152,16 @@ function SuperAdminContent() {
     loadAllAdminData();
   };
 
-  // Organization Verification Actions
   const handleToggleOrgVerification = async (orgId: string, currentStatus: boolean) => {
     const nextStatus = !currentStatus;
     const actionText = nextStatus ? 'VERIFY' : 'REVOKE VERIFICATION for';
     if (!confirm(`Are you sure you want to ${actionText} this organization?`)) return;
-    await db.toggleOrganizationVerification(orgId, nextStatus);
-    loadAllAdminData();
+    try {
+      await db.toggleOrganizationVerification(orgId, nextStatus);
+      await loadAllAdminData();
+    } catch (err: any) {
+      alert(err?.message || 'Failed to update organization verification status.');
+    }
   };
 
   // User Actions

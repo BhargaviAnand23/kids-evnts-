@@ -180,9 +180,14 @@ AS $$
 DECLARE
   user_role TEXT;
   user_name TEXT;
+  meta_org_name TEXT;
+  meta_org_type TEXT;
+  created_org_id TEXT;
 BEGIN
   user_role := NEW.raw_user_meta_data ->> 'role';
   user_name := COALESCE(NEW.raw_user_meta_data ->> 'name', split_part(NEW.email, '@', 1));
+  meta_org_name := COALESCE(NEW.raw_user_meta_data ->> 'org_name', user_name || '''s Academy');
+  meta_org_type := COALESCE(NEW.raw_user_meta_data ->> 'org_type', 'club');
 
   IF user_role IS NULL OR user_role = 'parent' THEN
     INSERT INTO public.parents (id, auth_user_id, name, email, phone)
@@ -192,9 +197,18 @@ BEGIN
       email = EXCLUDED.email;
 
   ELSIF user_role = 'admin' THEN
-    INSERT INTO public.organization_admins (id, auth_user_id, name, role)
-    VALUES (gen_random_uuid()::text, NEW.id, user_name, 'admin')
-    ON CONFLICT (auth_user_id) DO NOTHING;
+    created_org_id := gen_random_uuid()::text;
+    
+    -- 1. Create Organization
+    INSERT INTO public.organizations (id, name, type, contact_email, verified)
+    VALUES (created_org_id, meta_org_name, meta_org_type, NEW.email, false);
+
+    -- 2. Link Organization Admin Profile with created_org_id
+    INSERT INTO public.organization_admins (id, auth_user_id, organization_id, name, role)
+    VALUES (gen_random_uuid()::text, NEW.id, created_org_id, user_name, 'admin')
+    ON CONFLICT (auth_user_id) DO UPDATE SET
+      organization_id = COALESCE(organization_admins.organization_id, EXCLUDED.organization_id),
+      name = EXCLUDED.name;
   END IF;
 
   RETURN NEW;
