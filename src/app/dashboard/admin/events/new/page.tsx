@@ -203,21 +203,57 @@ export default function NewEventPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label htmlFor="category" className="text-sm font-medium text-slate-700">Category</label>
-                  <select id="category" name="category" value={formData.category} onChange={handleChange}
-                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500">
-                    <option value="Football">Football</option>
-                    <option value="Basketball">Basketball</option>
-                    <option value="Dance">Dance</option>
-                    <option value="Swimming">Swimming</option>
-                    <option value="Chess">Chess</option>
-                    <option value="Arts & Crafts">Arts &amp; Crafts</option>
+                  <label htmlFor="main_category" className="text-sm font-medium text-slate-700">Category</label>
+                  <select
+                    id="main_category"
+                    name="main_category"
+                    value={formData.category === 'Sports' || ['Football', 'Basketball', 'Cricket', 'Swimming', 'Skating', 'Cycling'].includes(formData.category) ? 'Sports' : formData.category}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === 'Sports') {
+                        setFormData(prev => ({ ...prev, category: 'Football' }));
+                      } else {
+                        setFormData(prev => ({ ...prev, category: val }));
+                      }
+                    }}
+                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                  >
+                    <option value="Sports">Sports (2-Tier Hub)</option>
                     <option value="Music">Music</option>
                     <option value="Martial Arts">Martial Arts</option>
-                    <option value="STEM & Tech">STEM &amp; Tech</option>
-                    <option value="Cycling">Cycling</option>
+                    <option value="Yoga & Fitness">Yoga &amp; Fitness</option>
+                    <option value="Arts & Crafts">Arts &amp; Crafts</option>
+                    <option value="Drama & Theater">Drama &amp; Theater</option>
+                    <option value="Cooking & Baking">Cooking &amp; Baking</option>
+                    <option value="STEM & Tech">STEM &amp; Robotics</option>
+                    <option value="Dance">Dance</option>
+                    <option value="Chess">Chess</option>
+                    <option value="Public Speaking">Public Speaking</option>
                   </select>
                 </div>
+
+                {/* Conditional Sports Subcategory Selector */}
+                {(formData.category === 'Sports' || ['Football', 'Basketball', 'Cricket', 'Swimming', 'Skating', 'Cycling'].includes(formData.category)) && (
+                  <div className="space-y-2">
+                    <label htmlFor="sports_subcategory" className="text-sm font-medium text-slate-700">
+                      Sports Subcategory <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="sports_subcategory"
+                      value={['Football', 'Basketball', 'Cricket', 'Swimming', 'Skating', 'Cycling'].includes(formData.category) ? formData.category : 'Football'}
+                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                      className="flex h-10 w-full rounded-md border border-purple-300 bg-purple-50/50 px-3 py-2 text-sm font-semibold text-purple-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500"
+                    >
+                      <option value="Football">Football</option>
+                      <option value="Basketball">Basketball</option>
+                      <option value="Cricket">Cricket</option>
+                      <option value="Swimming">Swimming</option>
+                      <option value="Skating">Skating</option>
+                      <option value="Cycling">Cycling</option>
+                    </select>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <label htmlFor="age_bracket" className="text-sm font-medium text-slate-700">Age Bracket</label>
                   <select id="age_bracket" name="age_bracket" value={formData.age_bracket} onChange={handleChange}

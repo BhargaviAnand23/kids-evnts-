@@ -201,13 +201,40 @@ function ExploreContent() {
                     </div>
                   </div>
 
-                  {/* Categories */}
+                  {/* Categories Filter (Sports is 2-Tier Parent, others standalone) */}
                   <div>
                     <label className="text-sm font-semibold text-slate-700 mb-3 block">Categories</label>
                     <div className="space-y-2">
-                      {CATEGORIES.map((cat) => {
-                        const catSlug = cat.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-                        const isSelected = categoryFilter.toLowerCase() === cat.toLowerCase();
+                      {[
+                        { name: 'Sports', slug: 'sports', isParent: true },
+                        { name: 'Music', slug: 'music' },
+                        { name: 'Martial Arts', slug: 'martial-arts' },
+                        { name: 'Yoga & Fitness', slug: 'yoga' },
+                        { name: 'Art & Crafts', slug: 'arts' },
+                        { name: 'Drama & Theater', slug: 'drama' },
+                        { name: 'Cooking & Baking', slug: 'cooking' },
+                        { name: 'STEM & Robotics', slug: 'stem' },
+                        { name: 'Dance', slug: 'dance' },
+                        { name: 'Chess', slug: 'chess' },
+                        { name: 'Public Speaking', slug: 'speaking' },
+                      ].map((cat) => {
+                        const sportsSubcats = [
+                          { name: 'All Sports', slug: 'sports' },
+                          { name: 'Football', slug: 'football' },
+                          { name: 'Basketball', slug: 'basketball' },
+                          { name: 'Cricket', slug: 'cricket' },
+                          { name: 'Swimming', slug: 'swimming' },
+                          { name: 'Skating', slug: 'skating' },
+                          { name: 'Cycling', slug: 'cycling' },
+                        ];
+
+                        const isSportsSelected = cat.slug === 'sports' && (
+                          categoryParam === 'sports' ||
+                          sportsSubcats.some(s => s.slug === categoryParam)
+                        );
+
+                        const isSelected = isSportsSelected || categoryParam === cat.slug;
+
                         const buildHref = (newVal?: string) => {
                           const p = new URLSearchParams();
                           if (qParam) p.set('q', qParam);
@@ -216,20 +243,52 @@ function ExploreContent() {
                           if (newVal) p.set('category', newVal);
                           return `/explore?${p.toString()}`;
                         };
+
                         return (
-                          <Link
-                            key={cat}
-                            href={isSelected ? buildHref() : buildHref(catSlug)}
-                            className="flex items-center space-x-3 cursor-pointer group"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              readOnly
-                              className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
-                            />
-                            <span className={`text-sm ${isSelected ? 'font-bold text-purple-700' : 'text-slate-600 group-hover:text-purple-600'}`}>{cat}</span>
-                          </Link>
+                          <div key={cat.slug} className="space-y-1.5">
+                            <Link
+                              href={isSelected && !cat.isParent ? buildHref() : buildHref(cat.slug)}
+                              className="flex items-center justify-between cursor-pointer group py-1"
+                            >
+                              <div className="flex items-center space-x-3">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  readOnly
+                                  className="w-4 h-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                                />
+                                <span className={`text-sm ${isSelected ? 'font-bold text-purple-700' : 'text-slate-600 group-hover:text-purple-600'}`}>
+                                  {cat.name}
+                                </span>
+                              </div>
+                              {cat.isParent && (
+                                <span className="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-full">
+                                  Hub
+                                </span>
+                              )}
+                            </Link>
+
+                            {/* Sports Subcategory Expander */}
+                            {cat.isParent && isSportsSelected && (
+                              <div className="pl-6 space-y-1.5 pt-1 border-l-2 border-purple-200 ml-2 my-1">
+                                {sportsSubcats.map((sub) => {
+                                  const isSubSelected = categoryParam === sub.slug;
+                                  return (
+                                    <Link
+                                      key={sub.slug}
+                                      href={buildHref(sub.slug)}
+                                      className={`flex items-center justify-between text-xs py-1 px-2 rounded-lg transition-colors ${
+                                        isSubSelected ? 'bg-purple-600 text-white font-bold' : 'text-slate-600 hover:bg-purple-50 hover:text-purple-700'
+                                      }`}
+                                    >
+                                      <span>{sub.name}</span>
+                                      {isSubSelected && <span>✓</span>}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

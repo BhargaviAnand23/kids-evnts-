@@ -373,8 +373,12 @@ export const dbService = {
     // Apply memory filtering for local/fallback data and double-checks
     if (filters?.category && filters.category !== 'All') {
       const catTarget = filters.category.toLowerCase().replace(/[^a-z0-9]/g, '')
+      const SPORTS_SUBCATEGORIES = ['football', 'basketball', 'cricket', 'swimming', 'skating', 'cycling'];
       events = events.filter(e => {
         const c = e.category.toLowerCase().replace(/[^a-z0-9]/g, '')
+        if (catTarget === 'sports' || catTarget === 'allsports') {
+          return c === 'sports' || SPORTS_SUBCATEGORIES.some(sc => c === sc || c.includes(sc));
+        }
         return c === catTarget || c.includes(catTarget) || catTarget.includes(c)
       })
     }
@@ -986,7 +990,14 @@ export const dbService = {
       let { data, error } = await supabase.from('bookings').insert([payload]).select().single()
 
       // Fallback: If DB schema is missing tier_id/tier_name columns, retry without tier properties
-      if (error && (error.message?.includes('tier_id') || error.message?.includes('schema cache') || error.code === 'PGRST204')) {
+      if (error && (
+        error.message?.includes('tier_id') ||
+        error.message?.includes('tier_name') ||
+        error.message?.includes('schema cache') ||
+        error.message?.includes('column') ||
+        error.code === 'PGRST204' ||
+        error.code === '42703'
+      )) {
         console.warn('[db] Retrying booking insert without tier_id/tier_name due to DB schema cache:', error.message)
         const fallbackPayload = {
           event_id: bookingData.event_id,

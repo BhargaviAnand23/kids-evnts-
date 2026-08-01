@@ -7,6 +7,15 @@ import { WavyDivider } from '@/components/ui/SectionDividers';
 
 const categories = [
   {
+    name: 'Sports Hub',
+    link: '/explore?category=sports',
+    photo: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=400&auto=format&fit=crop&q=60',
+    overlay: 'bg-emerald-900/70',
+    icon: '⚽',
+    animClass: 'animate-bounce-subtle',
+    badge: 'Hub',
+  },
+  {
     name: 'Football',
     link: '/explore?category=football',
     photo: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60',
