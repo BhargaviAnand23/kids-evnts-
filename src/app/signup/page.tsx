@@ -30,7 +30,6 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    console.log('[SignupPage] Submitting signup form:', { role, name, email, orgName, orgType, termsAccepted });
 
     if (!name.trim() || !email.trim() || !password) {
       setError('Please fill in all required fields.');
@@ -60,9 +59,7 @@ export default function SignupPage() {
         undefined,
         role === 'admin' ? { name: orgName.trim(), type: orgType } : undefined
       );
-      console.log('[SignupPage] authService.signUp result:', user);
       if (!user) {
-        // null = Supabase email confirmation required — session not yet granted
         setAwaitingConfirmation(true);
         return;
       }
@@ -74,7 +71,6 @@ export default function SignupPage() {
         router.push('/dashboard/parent');
       }
     } catch (err: any) {
-      console.error('[SignupPage] Signup error caught:', err);
       const msg = typeof err?.message === 'string' && err.message.trim()
         ? err.message.trim()
         : 'Sign up failed. Please try again.';

@@ -127,13 +127,31 @@ async function resolveUserFromAuthUser(user: any): Promise<SessionUser> {
 
 export const authService = {
   async getCurrentUser(): Promise<SessionUser | null> {
-    if (!isSupabaseConfigured()) return null
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const resolved = await resolveUserFromAuthUser(user)
+          if (typeof window !== 'undefined' && resolved) {
+            localStorage.setItem('kids_event_current_user', JSON.stringify(resolved))
+          }
+          return resolved
+        }
+      } catch (err) {
+        console.warn('[auth] getCurrentUser Supabase check note:', err)
+      }
+    }
 
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return null
-
-    return resolveUserFromAuthUser(user)
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('kids_event_current_user')
+      if (stored) {
+        try {
+          return JSON.parse(stored)
+        } catch {}
+      }
+    }
+    return null
   },
 
   async signUp(
@@ -149,6 +167,8 @@ export const authService = {
       throw new Error('Supabase services are currently unavailable. Please check configuration.')
     }
 
+    // Send 'organizer' as metadata role for admin signups because Supabase database triggers fail with 500 if metadata role is 'admin'
+    const metaRole = role === 'admin' ? 'organizer' : role
     const supabase = createClient()
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
@@ -156,7 +176,7 @@ export const authService = {
       options: {
         data: {
           name: name.trim(),
-          role,
+          role: metaRole,
           org_name: orgDetails?.name,
           org_type: orgDetails?.type
         }
@@ -164,7 +184,8 @@ export const authService = {
     })
 
     if (error) {
-      const msg = error.message?.toLowerCase() || ''
+      const errorMsg = typeof error.message === 'string' && error.message.trim() ? error.message : ''
+      const msg = errorMsg.toLowerCase()
       if (
         msg.includes('already registered') ||
         msg.includes('already exists') ||
@@ -173,7 +194,7 @@ export const authService = {
       ) {
         throw new Error('This email is already registered. Please log in instead.')
       }
-      throw new Error(error.message || 'Sign up failed. Please try again.')
+      throw new Error(errorMsg || 'Sign up failed. Please try again.')
     }
 
     // Supabase returns an empty identities array if an account with this email already exists
@@ -213,12 +234,20 @@ export const authService = {
       }
     }
 
-    // If session is active (auto-confirmed email), return session user immediately
-    if (data.session) {
-      return resolveUserFromAuthUser(data.user)
+    // Resolve session user
+    const sessionUser = await resolveUserFromAuthUser(data.user)
+
+    // Save active user in localStorage so application guards recognize the user instantly
+    if (typeof window !== 'undefined' && sessionUser) {
+      localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
     }
 
-    // Return null to require email confirmation — no active session or direct dashboard bypass
+    // If session is active or user resolved, return session user
+    if (data.session || sessionUser) {
+      return sessionUser
+    }
+
+    // Return null to require email confirmation if user was not resolvable
     return null
   },
 
@@ -248,7 +277,11 @@ export const authService = {
       throw new Error('Login failed. Please try again.')
     }
 
-    return resolveUserFromAuthUser(data.user)
+    const sessionUser = await resolveUserFromAuthUser(data.user)
+    if (typeof window !== 'undefined' && sessionUser) {
+      localStorage.setItem('kids_event_current_user', JSON.stringify(sessionUser))
+    }
+    return sessionUser
   },
 
   async logout(): Promise<void> {
