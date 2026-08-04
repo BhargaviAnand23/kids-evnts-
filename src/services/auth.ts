@@ -33,7 +33,8 @@ async function resolveUserFromAuthUser(user: any): Promise<SessionUser> {
   const userEmail = (user.email || '').toLowerCase().trim();
   const userId = user.id;
   const userName = (user.user_metadata?.name as string | undefined) || userEmail.split('@')[0] || 'User';
-  const metaRole = (user.user_metadata?.role as UserRole) || 'parent';
+  const rawMetaRole = (user.user_metadata?.role as string) || 'parent';
+  const isOrganizerRole = rawMetaRole === 'admin' || rawMetaRole === 'organizer';
   const metaOrgName = user.user_metadata?.org_name;
   const metaOrgType = user.user_metadata?.org_type || 'club';
 
@@ -53,7 +54,7 @@ async function resolveUserFromAuthUser(user: any): Promise<SessionUser> {
 
   // 2. Check if organization admin
   let adminProfile = await dbService.getOrganizationAdminProfile(userId).catch(() => null);
-  if (adminProfile || metaRole === 'admin') {
+  if (adminProfile || isOrganizerRole) {
     let orgId = adminProfile?.organization_id;
 
     if (!orgId) {
