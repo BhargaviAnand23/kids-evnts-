@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
-  ArrowLeft, ShieldCheck, Loader2, AlertCircle,
+  ArrowLeft, ShieldCheck, Loader2, AlertCircle, Calendar,
   Plus, UserRound, Phone, FileText, CheckSquare, Square
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -499,10 +499,19 @@ export default function BookEventPage() {
                 className="sticky top-28 bg-slate-900 text-white border-none shadow-2xl animate-summary-pop overflow-hidden"
               >
                 <CardContent className="p-8">
-                  <h3 className="text-card-title font-bold mb-6">Order Summary</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-card-title font-bold text-white">Order Summary</h3>
+                    {selectedChildIds.length > 0 && (
+                      <span className="text-micro font-extrabold bg-purple-600 text-white px-2.5 py-1 rounded-full shadow-sm">
+                        {selectedChildIds.length} Kid{selectedChildIds.length > 1 ? 's' : ''} Selected
+                      </span>
+                    )}
+                  </div>
+
                   <div className="mb-6">
-                    <h4 className="font-semibold text-slate-200 text-body-lg mb-1">{event.title}</h4>
-                    <p className="text-slate-400 text-caption">
+                    <h4 className="font-bold text-white text-body-lg mb-1 leading-snug">{event.title}</h4>
+                    <p className="text-slate-300 text-caption flex items-center gap-1.5 mt-1">
+                      <Calendar className="w-3.5 h-3.5 text-purple-400 shrink-0" />
                       {new Date(event.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} · {event.event_time}
                     </p>
                     {selectedTier && (
@@ -511,43 +520,68 @@ export default function BookEventPage() {
                       </span>
                     )}
                   </div>
-                  <div className="space-y-3 py-6 border-y border-slate-700 mb-6">
+
+                  {/* Helper prompt when no child is selected */}
+                  {selectedChildIds.length === 0 && (
+                    <div className="bg-purple-950/70 border border-purple-700/50 rounded-xl p-3.5 mb-6 text-caption text-purple-200 flex items-center gap-2">
+                      <UserRound className="w-4 h-4 text-purple-400 shrink-0" />
+                      <span>Select at least 1 child on the left to proceed with payment.</span>
+                    </div>
+                  )}
+
+                  <div className="space-y-3 py-6 border-y border-slate-700/80 mb-6">
                     {/* Line items per selected child */}
                     {children.filter(c => selectedChildIds.includes(c.id)).map(child => (
                       <div key={child.id} className="flex justify-between items-center text-body">
-                        <span className="text-slate-200 font-semibold">{child.name}</span>
+                        <span className="text-slate-100 font-semibold">{child.name}</span>
                         <span className="font-bold text-white">₹{unitPrice.toLocaleString('en-IN')}</span>
                       </div>
                     ))}
 
-                    <div className="flex justify-between text-caption text-slate-400 pt-3 border-t border-slate-800">
+                    <div className="flex justify-between text-caption text-slate-300 pt-2 border-t border-slate-800">
                       <span>Subtotal ({ticketCount} ticket{ticketCount > 1 ? 's' : ''})</span>
-                      <span className="font-semibold text-slate-300">₹{subtotal.toLocaleString('en-IN')}</span>
+                      <span className="font-bold text-white">₹{subtotal.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between text-caption text-slate-400">
+                    <div className="flex justify-between text-caption text-slate-300">
                       <span>Platform Fee</span>
-                      <span className="font-semibold text-slate-300">₹{platformFee}</span>
+                      <span className="font-semibold text-slate-200">₹{platformFee}</span>
                     </div>
-                    <div className="flex justify-between text-caption text-slate-400">
+                    <div className="flex justify-between text-caption text-slate-300">
                       <span>GST (18%)</span>
-                      <span className="font-semibold text-slate-300">₹{gst.toLocaleString('en-IN')}</span>
+                      <span className="font-semibold text-slate-200">₹{gst.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
-                  <div className="flex justify-between items-end mb-8">
-                    <span className="text-slate-300 text-body">Total</span>
-                    <span className="text-section-title font-bold text-white">₹{total.toLocaleString('en-IN')}</span>
+
+                  <div className="flex justify-between items-end mb-6">
+                    <div>
+                      <span className="text-slate-300 text-body font-medium block">Total Payable</span>
+                      <span className="text-micro text-slate-400">Includes taxes &amp; platform fee</span>
+                    </div>
+                    <span className="text-section-title font-extrabold text-white">₹{total.toLocaleString('en-IN')}</span>
                   </div>
+
                   <Button
                     type="submit"
                     size="lg"
-                    className="w-full h-14 bg-purple-600 hover:bg-purple-700 text-white mb-4 font-bold animate-btn-pulse-glow transition-all cursor-pointer"
                     disabled={submitting || selectedChildIds.length === 0}
+                    className={`w-full h-14 font-bold transition-all duration-200 ${
+                      selectedChildIds.length === 0
+                        ? 'bg-purple-950/80 text-purple-300/80 border border-purple-800/60 cursor-not-allowed opacity-90 shadow-none'
+                        : 'bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/30 animate-btn-pulse-glow cursor-pointer'
+                    }`}
                   >
-                    {submitting ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing…</> : `Pay ₹${total.toLocaleString('en-IN')} & Confirm`}
+                    {submitting ? (
+                      <><Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing…</>
+                    ) : selectedChildIds.length === 0 ? (
+                      'Pay & Confirm (Select Child)'
+                    ) : (
+                      `Pay ₹${total.toLocaleString('en-IN')} & Confirm`
+                    )}
                   </Button>
-                  <div className="flex items-center justify-center text-caption text-slate-400">
-                    <ShieldCheck className="w-4 h-4 mr-1 text-green-400" />
-                    Secure 256-bit SSL encryption
+
+                  <div className="flex items-center justify-center text-caption text-slate-400 mt-4">
+                    <ShieldCheck className="w-4 h-4 mr-1.5 text-emerald-400 shrink-0" />
+                    <span>Secure 256-bit SSL encrypted checkout</span>
                   </div>
                 </CardContent>
               </Card>
