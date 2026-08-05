@@ -321,7 +321,10 @@ export const dbService = {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       const { data, error } = await supabase.from('organizations').update(orgData).eq('id', id).select().single()
-      if (error) throw error
+      if (error) {
+        console.error('[db] updateOrganization error:', error)
+        throw error
+      }
       return data
     }
 
@@ -331,6 +334,24 @@ export const dbService = {
     organizations[idx] = { ...organizations[idx], ...orgData }
     setLocalStorageData('kids_event_organizations', organizations)
     return organizations[idx]
+  },
+
+  async toggleOrganizationVerification(id: string, verified: boolean): Promise<Organization> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase.from('organizations').update({ verified }).eq('id', id).select().single()
+      if (error) {
+        console.error('[db] toggleOrganizationVerification error:', error)
+        throw error
+      }
+      return data
+    }
+    const orgs = getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
+    const idx = orgs.findIndex(o => o.id === id)
+    if (idx === -1) throw new Error('Organization not found')
+    orgs[idx].verified = verified
+    setLocalStorageData('kids_event_organizations', orgs)
+    return orgs[idx]
   },
 
   async createOrganization(orgData: Omit<Organization, 'id' | 'created_at' | 'verified'>): Promise<Organization> {
@@ -354,35 +375,6 @@ export const dbService = {
     organizations.push(newOrg)
     setLocalStorageData('kids_event_organizations', organizations)
     return newOrg
-  },
-
-  async toggleOrganizationVerification(id: string, verified: boolean): Promise<Organization> {
-    if (isSupabaseConfigured()) {
-      try {
-        const supabase = createClient()
-        const { data, error } = await supabase.from('organizations').update({ verified }).eq('id', id).select().maybeSingle()
-        if (!error && data) return data
-      } catch (sbErr) {
-        console.warn('Supabase toggleOrganizationVerification note:', sbErr)
-      }
-    }
-    const orgs = getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
-    const idx = orgs.findIndex(o => o.id === id)
-    if (idx !== -1) {
-      orgs[idx].verified = verified
-      setLocalStorageData('kids_event_organizations', orgs)
-      return orgs[idx]
-    }
-    return {
-      id,
-      name: 'Organization',
-      type: 'club',
-      contact_email: '',
-      logo_url: null,
-      address: null,
-      verified,
-      created_at: new Date().toISOString()
-    }
   },
 
   async getEvents(filters?: {
@@ -1352,7 +1344,6 @@ export const dbService = {
 
   // --- BOOKING CANCELLATION & WAITLIST NOTIFY ---
   async cancelBooking(bookingId: string): Promise<void> {
-    const events = await this.getEvents()
     const booking = await this.getBookingById(bookingId)
     if (!booking) throw new Error('Booking not found')
 
@@ -1360,25 +1351,38 @@ export const dbService = {
       const supabase = createClient()
       const { error } = await supabase.from('bookings').update({
         status: 'cancelled',
-        payment_status: 'refunded'
+        payment_status: 'refunded',
+        refund_status: 'pending'
       }).eq('id', bookingId)
-      if (error) throw error
+      if (error) {
+        // Fallback without refund_status if schema cache issue
+        await supabase.from('bookings').update({
+          status: 'cancelled',
+          payment_status: 'refunded'
+        }).eq('id', bookingId)
+      }
 
       const { data: eventData } = await supabase.from('events').select('seats_available').eq('id', booking.event_id).single()
       if (eventData) {
         await supabase.from('events').update({ seats_available: eventData.seats_available + 1 }).eq('id', booking.event_id)
       }
 
-      const { data: wl, error: wlError } = await supabase.from('waitlist').select('*').eq('event_id', booking.event_id).order('created_at', { ascending: true })
+      const { data: wl, error: wlError } = await supabase.from('waitlist').select('*, parent:parents(*), child:children(*)').eq('event_id', booking.event_id).order('created_at', { ascending: true })
       if (!wlError && wl && wl.length > 0) {
         const nextInLine = wl[0]
-        await supabase.from('notifications').insert([{
-          parent_id: nextInLine.parent_id,
-          title: 'Waitlist Slot Open! 🌟',
-          message: `Good news! A seat has opened up for "${booking.event?.title || 'the event'}". You can now complete your booking.`,
-          type: 'success',
-          read: false
-        }])
+        fetch('/api/notify/waitlist-slot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parentId: nextInLine.parent_id,
+            parentEmail: nextInLine.parent?.email || booking.parent?.email,
+            parentName: nextInLine.parent?.name || 'Parent',
+            eventTitle: booking.event?.title || 'Activity',
+            eventId: booking.event_id,
+            childName: nextInLine.child?.name,
+          })
+        }).catch(() => {})
+
         await supabase.from('waitlist').delete().eq('id', nextInLine.id)
       }
       return
@@ -1389,6 +1393,7 @@ export const dbService = {
     if (idx !== -1) {
       bookings[idx].status = 'cancelled'
       bookings[idx].payment_status = 'refunded'
+      bookings[idx].refund_status = 'pending'
       setLocalStorageData('kids_event_bookings', bookings)
 
       const localEvents = getLocalStorageData<Event[]>('kids_event_events', SEED_EVENTS)
@@ -1403,22 +1408,70 @@ export const dbService = {
       
       if (eventWl.length > 0) {
         const nextInLine = eventWl[0]
-        const notifs = getLocalStorageData<any[]>('kids_event_notifications', [])
-        notifs.push({
-          id: crypto.randomUUID(),
-          parent_id: nextInLine.parent_id,
-          title: 'Waitlist Slot Open! 🌟',
-          message: `Good news! A seat has opened up for "${booking.event?.title || 'the event'}". You can now complete your booking.`,
-          type: 'success',
-          read: false,
-          created_at: new Date().toISOString()
-        })
-        setLocalStorageData('kids_event_notifications', notifs)
+        fetch('/api/notify/waitlist-slot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            parentId: nextInLine.parent_id,
+            parentEmail: booking.parent?.email || 'parent@example.com',
+            parentName: 'Parent',
+            eventTitle: booking.event?.title || 'Activity',
+            eventId: booking.event_id,
+            childName: nextInLine.child?.name,
+          })
+        }).catch(() => {})
 
         const updatedWl = waitlist.filter(w => w.id !== nextInLine.id)
         setLocalStorageData('kids_event_waitlist', updatedWl)
       }
     }
+  },
+
+  async updateBookingRefundStatus(bookingId: string, refundStatus: 'pending' | 'approved' | 'rejected'): Promise<Booking> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      try {
+        const { data, error } = await supabase.from('bookings').update({ refund_status: refundStatus }).eq('id', bookingId).select().single()
+        if (!error && data) return data
+      } catch (sbErr) {
+        console.warn('[db] Supabase updateBookingRefundStatus error:', sbErr)
+      }
+    }
+
+    const bookings = getLocalStorageData<Booking[]>('kids_event_bookings', [])
+    const idx = bookings.findIndex(b => b.id === bookingId)
+    if (idx === -1) throw new Error('Booking not found')
+    bookings[idx].refund_status = refundStatus
+    setLocalStorageData('kids_event_bookings', bookings)
+    return bookings[idx]
+  },
+
+  async getAllBookingsAdmin(): Promise<Booking[]> {
+    const events = await this.getEvents()
+    let parents: Parent[] = []
+    let children: Child[] = []
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data: bData, error } = await supabase.from('bookings').select(`
+        *,
+        event:events(*),
+        child:children(*),
+        parent:parents(*)
+      `).order('created_at', { ascending: false })
+      if (!error && bData) return bData
+    }
+
+    const bookings = getLocalStorageData<Booking[]>('kids_event_bookings', [])
+    parents = getLocalStorageData<Parent[]>('kids_event_parents', [])
+    children = getLocalStorageData<Child[]>('kids_event_children', [])
+
+    return bookings.map(b => ({
+      ...b,
+      event: events.find(e => e.id === b.event_id),
+      child: children.find(c => c.id === b.child_id),
+      parent: parents.find(p => p.id === b.parent_id)
+    })).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   },
 
   async getReviews(): Promise<Review[]> {

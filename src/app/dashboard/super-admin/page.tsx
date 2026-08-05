@@ -73,6 +73,8 @@ function SuperAdminContent() {
   const [userRoleFilter, setUserRoleFilter] = useState('all');
   const [orgFilter, setOrgFilter] = useState<'all' | 'pending' | 'verified'>('all');
   const [orgSearch, setOrgSearch] = useState('');
+  const [bookingFilter, setBookingFilter] = useState<'all' | 'cancelled' | 'confirmed'>('all');
+  const [bookingSearch, setBookingSearch] = useState('');
 
   // Category Modal State
   const [newCatName, setNewCatName] = useState('');
@@ -84,6 +86,15 @@ function SuperAdminContent() {
     loadAllAdminData();
   }, []);
 
+  const handleUpdateRefundStatus = async (id: string, status: 'pending' | 'approved' | 'rejected') => {
+    try {
+      await db.updateBookingRefundStatus(id, status);
+      loadAllAdminData();
+    } catch (e: any) {
+      alert(e.message || 'Failed to update refund status');
+    }
+  };
+
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
@@ -91,7 +102,7 @@ function SuperAdminContent() {
         db.getEvents({ status: 'all' }),
         db.getAllUsersAdmin(),
         db.getCategoriesAdmin(),
-        db.getBookingsByParent('parent-1').catch(() => []),
+        db.getAllBookingsAdmin().catch(() => []),
         db.getOrganizations(),
         db.getAchievements(),
       ]);
@@ -884,6 +895,140 @@ function SuperAdminContent() {
                         </td>
                       </tr>
                     ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── TAB 5: BOOKINGS & REFUND MANAGEMENT ────────────────────────── */}
+        {activeTab === 'bookings' && (
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 justify-between bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search bookings by ref, parent, child, or event title…"
+                  value={bookingSearch}
+                  onChange={e => setBookingSearch(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-caption text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                {[
+                  { id: 'all', label: `All Bookings (${bookings.length})` },
+                  { id: 'cancelled', label: `Cancelled / Refunds (${bookings.filter(b => b.status === 'cancelled').length})` },
+                  { id: 'confirmed', label: `Confirmed (${bookings.filter(b => b.status === 'confirmed').length})` },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setBookingFilter(tab.id as any)}
+                    className={`px-3.5 py-2 rounded-xl text-caption font-semibold transition-all cursor-pointer ${
+                      bookingFilter === tab.id
+                        ? 'bg-purple-600 text-white shadow-sm'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-caption text-slate-700">
+                  <thead className="bg-slate-100/70 text-slate-600 font-bold uppercase tracking-wider text-micro border-b border-slate-200">
+                    <tr>
+                      <th className="p-4">Ref # &amp; Date</th>
+                      <th className="p-4">Event</th>
+                      <th className="p-4">Parent &amp; Child</th>
+                      <th className="p-4">Amount</th>
+                      <th className="p-4">Booking Status</th>
+                      <th className="p-4">Refund Status</th>
+                      <th className="p-4 text-right">Update Refund Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {bookings
+                      .filter(b => {
+                        if (bookingFilter === 'cancelled') return b.status === 'cancelled';
+                        if (bookingFilter === 'confirmed') return b.status === 'confirmed';
+                        return true;
+                      })
+                      .filter(b => {
+                        if (!bookingSearch) return true;
+                        const s = bookingSearch.toLowerCase();
+                        return (
+                          b.booking_reference.toLowerCase().includes(s) ||
+                          (b.event?.title || '').toLowerCase().includes(s) ||
+                          (b.parent?.name || '').toLowerCase().includes(s) ||
+                          (b.child?.name || '').toLowerCase().includes(s)
+                        );
+                      })
+                      .map(b => (
+                        <tr key={b.id} className="hover:bg-purple-50/30 transition-colors">
+                          <td className="p-4 font-mono font-bold text-slate-900">
+                            {b.booking_reference}
+                            <p className="text-micro font-normal text-slate-500 font-sans">
+                              {b.created_at ? new Date(b.created_at).toLocaleDateString() : ''}
+                            </p>
+                          </td>
+                          <td className="p-4 font-semibold text-slate-900 max-w-[180px] truncate">
+                            {b.event?.title || 'Event'}
+                            {b.tier_name && <p className="text-micro text-purple-600 font-normal">Tier: {b.tier_name}</p>}
+                          </td>
+                          <td className="p-4 text-slate-800">
+                            <p className="font-bold">{b.parent?.name || 'Parent'}</p>
+                            <p className="text-micro text-slate-500">Child: {b.child?.name || 'Child'}</p>
+                          </td>
+                          <td className="p-4 font-bold text-slate-900">
+                            ₹{b.event?.price || 0}
+                          </td>
+                          <td className="p-4">
+                            <span className={`px-2.5 py-1 rounded-full text-micro font-bold ${
+                              b.status === 'confirmed' ? 'bg-green-100 text-green-800 border border-green-200' :
+                              b.status === 'cancelled' ? 'bg-slate-100 text-slate-700 border border-slate-200' :
+                              'bg-amber-100 text-amber-800 border border-amber-200'
+                            }`}>
+                              {b.status.toUpperCase()}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            {b.status === 'cancelled' ? (
+                              <span className={`px-2.5 py-1 rounded-full text-micro font-extrabold ${
+                                b.refund_status === 'approved' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                b.refund_status === 'rejected' ? 'bg-rose-100 text-rose-800 border border-rose-200' :
+                                'bg-amber-100 text-amber-800 border border-amber-200'
+                              }`}>
+                                {b.refund_status === 'approved' ? 'Refund Approved ✓' :
+                                 b.refund_status === 'rejected' ? 'Refund Rejected ❌' :
+                                 'Refund Pending'}
+                              </span>
+                            ) : (
+                              <span className="text-slate-400 text-micro">—</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            {b.status === 'cancelled' ? (
+                              <select
+                                value={b.refund_status || 'pending'}
+                                onChange={e => handleUpdateRefundStatus(b.id, e.target.value as any)}
+                                className="bg-slate-50 border border-slate-200 text-micro font-extrabold text-slate-800 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                              >
+                                <option value="pending">Refund Pending</option>
+                                <option value="approved">Approve Refund ✓</option>
+                                <option value="rejected">Reject Refund ❌</option>
+                              </select>
+                            ) : (
+                              <span className="text-micro text-slate-400">N/A (Active)</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>

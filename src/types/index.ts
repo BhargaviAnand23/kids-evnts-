@@ -118,6 +118,8 @@ export interface Event {
   seating_tiers?: SeatingTier[]
 }
 
+export type RefundStatus = 'pending' | 'approved' | 'rejected';
+
 export interface Booking {
   id: string
   event_id: string
@@ -125,6 +127,7 @@ export interface Booking {
   parent_id: string
   status: 'pending' | 'confirmed' | 'cancelled'
   payment_status: 'pending' | 'paid' | 'refunded'
+  refund_status?: RefundStatus | null
   tier_id?: string | null
   tier_name?: string | null
   booking_reference: string

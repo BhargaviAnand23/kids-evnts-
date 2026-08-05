@@ -260,11 +260,31 @@ CREATE POLICY "Parents can view their own child achievements"
         )
     );
 
--- Super admins have full access to manage all achievements
-DROP POLICY IF EXISTS "Super admins can manage all achievements" ON public.achievements;
-CREATE POLICY "Super admins can manage all achievements"
-    ON public.achievements FOR ALL
-    USING (
+-- -----------------------------------------------------------------------------
+-- 6. ORGANIZATIONS SUPER ADMIN VERIFICATION RLS POLICY (NEW)
+-- Allows Super Admins to UPDATE verified status on any organization row
+-- -----------------------------------------------------------------------------
+
+ALTER TABLE public.organizations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access to organizations" ON public.organizations;
+CREATE POLICY "Allow public read access to organizations" 
+    ON public.organizations FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Organization admins can update own organization" ON public.organizations;
+CREATE POLICY "Organization admins can update own organization" 
+    ON public.organizations FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.organization_admins oa 
+            WHERE oa.organization_id = public.organizations.id AND oa.auth_user_id = auth.uid()
+        )
+    );
+
+DROP POLICY IF EXISTS "Super admins can manage all organizations" ON public.organizations;
+CREATE POLICY "Super admins can manage all organizations" 
+    ON public.organizations FOR ALL USING (
+        EXISTS (SELECT 1 FROM public.super_admins sa WHERE sa.auth_user_id = auth.uid())
+    ) WITH CHECK (
         EXISTS (SELECT 1 FROM public.super_admins sa WHERE sa.auth_user_id = auth.uid())
     );
 

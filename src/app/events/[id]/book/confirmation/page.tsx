@@ -290,25 +290,78 @@ export default function BookingConfirmationPage() {
           <Button variant="outline" size="lg" className="w-full sm:w-auto h-14 font-semibold" onClick={handleDownload}>
             <Download className="w-5 h-5 mr-2" /> Download Ticket{bookings.length > 1 ? 's' : ''}
           </Button>
+
           {eventObj && (
-            <Button
-              variant="outline"
-              size="lg"
-              className="w-full sm:w-auto h-14 border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold"
-              onClick={() => {
-                const title = encodeURIComponent(eventObj.title);
-                const details = encodeURIComponent(`Kidspire Booking Ref: ${primaryBooking?.booking_reference}. Children: ${childrenNames}`);
-                const loc = encodeURIComponent(eventObj.location || 'Online');
-                const dateObj = new Date(eventObj.event_date);
-                const yyyy = dateObj.getFullYear();
-                const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-                const dd = String(dateObj.getDate()).padStart(2, '0');
-                const dates = `${yyyy}${mm}${dd}T090000Z/${yyyy}${mm}${dd}T110000Z`;
-                window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${loc}`, '_blank');
-              }}
-            >
-              <Calendar className="w-5 h-5 mr-2 text-purple-600" /> Add to Calendar
-            </Button>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 sm:flex-none h-14 border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold"
+                onClick={() => {
+                  const title = eventObj.title;
+                  const dateStr = eventObj.event_date;
+                  const timeStr = eventObj.event_time;
+                  const location = eventObj.location || 'Online';
+                  const description = `Kidspire Admission Pass. Children: ${childrenNames}. Ref: ${primaryBooking?.booking_reference || ''}`;
+                  
+                  const dateObj = dateStr ? new Date(dateStr) : new Date();
+                  const yyyy = dateObj.getUTCFullYear();
+                  const mm = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+                  const dd = String(dateObj.getUTCDate()).padStart(2, '0');
+                  const startStamp = `${yyyy}${mm}${dd}T090000Z`;
+                  const endStamp = `${yyyy}${mm}${dd}T110000Z`;
+                  const nowStamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+                  const icsContent = [
+                    'BEGIN:VCALENDAR',
+                    'VERSION:2.0',
+                    'PRODID:-//Kidspire Events//EN',
+                    'CALSCALE:GREGORIAN',
+                    'METHOD:PUBLISH',
+                    'BEGIN:VEVENT',
+                    `UID:kidspire-${Date.now()}@kidspire.com`,
+                    `DTSTAMP:${nowStamp}`,
+                    `DTSTART:${startStamp}`,
+                    `DTEND:${endStamp}`,
+                    `SUMMARY:${title.replace(/,/g, '\\,')}`,
+                    `DESCRIPTION:${description.replace(/\n/g, '\\n')}`,
+                    `LOCATION:${location.replace(/,/g, '\\,')}`,
+                    'STATUS:CONFIRMED',
+                    'END:VEVENT',
+                    'END:VCALENDAR'
+                  ].join('\r\n');
+
+                  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+                  const link = document.createElement('a');
+                  link.href = window.URL.createObjectURL(blob);
+                  link.setAttribute('download', `${title.replace(/[^a-zA-Z0-9]/g, '_')}_event.ics`);
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                <Calendar className="w-5 h-5 mr-2 text-purple-600" /> Download .ics
+              </Button>
+
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 sm:flex-none h-14 border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold"
+                onClick={() => {
+                  const title = encodeURIComponent(eventObj.title);
+                  const details = encodeURIComponent(`Kidspire Booking Ref: ${primaryBooking?.booking_reference}. Children: ${childrenNames}`);
+                  const loc = encodeURIComponent(eventObj.location || 'Online');
+                  const dateObj = new Date(eventObj.event_date);
+                  const yyyy = dateObj.getFullYear();
+                  const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+                  const dd = String(dateObj.getDate()).padStart(2, '0');
+                  const dates = `${yyyy}${mm}${dd}T090000Z/${yyyy}${mm}${dd}T110000Z`;
+                  window.open(`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${details}&location=${loc}`, '_blank');
+                }}
+              >
+                Google Cal ↗
+              </Button>
+            </div>
           )}
           <Button size="lg" className="w-full sm:w-auto h-14 font-semibold bg-purple-600 hover:bg-purple-700" asChild>
             <Link href="/explore">

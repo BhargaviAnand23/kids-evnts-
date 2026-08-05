@@ -675,9 +675,19 @@ export default function ParentDashboard() {
                                     {booking.status === 'cancelled' ? 'Cancelled' : 'Completed'}
                                   </Badge>
                                   {booking.status === 'cancelled' && (
-                                    <Badge className="bg-amber-50 text-amber-800 border border-amber-200 font-medium">
-                                      {booking.payment_status === 'refunded' ? 'Refund Processed ✓' : 'Refund Pending (5-7 Days)'}
-                                    </Badge>
+                                    booking.refund_status === 'approved' ? (
+                                      <Badge className="bg-emerald-50 text-emerald-800 border border-emerald-200 font-semibold">
+                                        Refund Approved ✓
+                                      </Badge>
+                                    ) : booking.refund_status === 'rejected' ? (
+                                      <Badge className="bg-rose-50 text-rose-800 border border-rose-200 font-semibold">
+                                        Refund Rejected ❌
+                                      </Badge>
+                                    ) : (
+                                      <Badge className="bg-amber-50 text-amber-800 border border-amber-200 font-semibold">
+                                        Refund Pending (5-7 Days)
+                                      </Badge>
+                                    )
                                   )}
                                 </div>
                                 {/* Leave Review button for completed (non-cancelled) past events */}
