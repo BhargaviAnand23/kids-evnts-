@@ -80,6 +80,15 @@ export async function POST(req: NextRequest) {
                 Great news — your spot has been confirmed. Here are your booking details:
               </p>
 
+              <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); border-radius: 20px; padding: 24px; margin-bottom: 28px; text-align: center; color: white; box-shadow: 0 4px 16px rgba(49, 46, 129, 0.2);">
+                <p style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #a5b4fc; margin: 0 0 12px;">Official Admission Ticket</p>
+                <div style="background: white; padding: 12px; border-radius: 14px; display: inline-block; margin-bottom: 12px;">
+                  <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(bookingReference)}" alt="Ticket QR Code" style="width: 140px; height: 140px; display: block;" />
+                </div>
+                <p style="font-family: monospace; font-size: 16px; font-weight: 900; letter-spacing: 0.05em; color: #ffffff; margin: 0 0 4px;">REF: ${bookingReference}</p>
+                <p style="font-size: 12px; color: #c7d2fe; margin: 0;">Scan at venue entry for instant check-in</p>
+              </div>
+
               <div style="background: #f8fafc; border-radius: 16px; padding: 24px; margin-bottom: 32px; border: 1px solid #e2e8f0;">
                 <table style="width: 100%; border-collapse: collapse;">
                   <tr><td style="padding: 8px 0; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; width: 130px;">Event</td><td style="padding: 8px 0; color: #1e293b; font-weight: 700; font-size: 16px;">${eventTitle}</td></tr>

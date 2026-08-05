@@ -209,7 +209,7 @@ export default function BookEventPage() {
         const perChildGst = Math.round(unitPrice * 0.18);
         const childTotal = unitPrice + perChildFee + perChildGst;
 
-        fetch('/api/notify/booking-confirmation', {
+        await fetch('/api/notify/booking-confirmation', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -224,7 +224,7 @@ export default function BookEventPage() {
             bookingReference: booking.booking_reference,
             paidAmount: event.price > 0 ? childTotal : null,
           }),
-        }).catch(() => {});
+        }).catch((e) => console.warn('[book] notification dispatch error:', e));
       }
 
       router.push(`/events/${event.id}/book/confirmation?booking=${createdBookingIds.join(',')}`);

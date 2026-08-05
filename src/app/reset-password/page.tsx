@@ -16,6 +16,24 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [recoveryReady, setRecoveryReady] = useState(false);
+
+  React.useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getSession().then((res: any) => {
+      if (res?.data?.session) setRecoveryReady(true);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
+      if (event === 'PASSWORD_RECOVERY' || session) {
+        setRecoveryReady(true);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,11 +53,16 @@ export default function ResetPasswordPage() {
       const supabase = createClient();
       const { error: supabaseError } = await supabase.auth.updateUser({ password: newPassword });
       if (supabaseError) throw supabaseError;
+      
+      // Clear cached localStorage user so fresh login works cleanly
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('kids_event_current_user');
+      }
+
       setSuccess(true);
-      // Auto redirect after 2s
-      setTimeout(() => router.push('/login'), 2000);
+      setTimeout(() => router.push('/login'), 2500);
     } catch (err: any) {
-      setError(err.message || 'Failed to reset password. Your reset link may have expired.');
+      setError(err.message || 'Failed to reset password. Your reset link may have expired or is invalid.');
     } finally {
       setLoading(false);
     }
