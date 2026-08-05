@@ -184,6 +184,11 @@ export default function BookEventPage() {
       return;
     }
 
+    if (selectedTier && selectedChildIds.length > selectedTier.tier_seats_available) {
+      setError(`Only ${selectedTier.tier_seats_available} seat(s) remaining for the ${selectedTier.tier_name} tier.`);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const createdBookingIds: string[] = [];
@@ -222,7 +227,7 @@ export default function BookEventPage() {
         }).catch(() => {});
       }
 
-      router.push(`/events/${event.id}/book/confirmation?booking=${createdBookingIds[0]}`);
+      router.push(`/events/${event.id}/book/confirmation?booking=${createdBookingIds.join(',')}`);
     } catch (err: any) {
       const msg = err?.message || err?.error_description || '';
       if (msg.toLowerCase().includes('seats') || msg.toLowerCase().includes('available') || msg.toLowerCase().includes('sold out')) {
@@ -507,17 +512,25 @@ export default function BookEventPage() {
                     )}
                   </div>
                   <div className="space-y-3 py-6 border-y border-slate-700 mb-6">
-                    <div className="flex justify-between text-body">
-                      <span className="text-slate-300">{ticketCount}x Ticket(s)</span>
-                      <span className="font-semibold">₹{subtotal.toLocaleString('en-IN')}</span>
+                    {/* Line items per selected child */}
+                    {children.filter(c => selectedChildIds.includes(c.id)).map(child => (
+                      <div key={child.id} className="flex justify-between items-center text-body">
+                        <span className="text-slate-200 font-semibold">{child.name}</span>
+                        <span className="font-bold text-white">₹{unitPrice.toLocaleString('en-IN')}</span>
+                      </div>
+                    ))}
+
+                    <div className="flex justify-between text-caption text-slate-400 pt-3 border-t border-slate-800">
+                      <span>Subtotal ({ticketCount} ticket{ticketCount > 1 ? 's' : ''})</span>
+                      <span className="font-semibold text-slate-300">₹{subtotal.toLocaleString('en-IN')}</span>
                     </div>
-                    <div className="flex justify-between text-body">
-                      <span className="text-slate-300">Platform Fee</span>
-                      <span className="font-semibold">₹{platformFee}</span>
+                    <div className="flex justify-between text-caption text-slate-400">
+                      <span>Platform Fee</span>
+                      <span className="font-semibold text-slate-300">₹{platformFee}</span>
                     </div>
-                    <div className="flex justify-between text-body">
-                      <span className="text-slate-300">GST (18%)</span>
-                      <span className="font-semibold">₹{gst}</span>
+                    <div className="flex justify-between text-caption text-slate-400">
+                      <span>GST (18%)</span>
+                      <span className="font-semibold text-slate-300">₹{gst.toLocaleString('en-IN')}</span>
                     </div>
                   </div>
                   <div className="flex justify-between items-end mb-8">

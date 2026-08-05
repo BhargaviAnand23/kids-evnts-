@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   Settings, LayoutDashboard, Calendar, Ticket, IndianRupee,
-  Building2, Mail, MapPin, Loader2, ShieldAlert, CheckCircle2, AlertCircle, Pencil
+  Building2, Mail, Phone, Globe, MapPin, Loader2, ShieldAlert,
+  CheckCircle2, AlertCircle, Pencil, ExternalLink, Image as ImageIcon
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -44,7 +45,12 @@ export default function AdminSettingsPage() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'club' as OrganizationType,
+    logo_url: '',
+    bio: '',
+    description: '',
     contact_email: '',
+    phone: '',
+    website: '',
     address: '',
   });
 
@@ -62,7 +68,12 @@ export default function AdminSettingsPage() {
         setFormData({
           name: organization.name,
           type: organization.type,
-          contact_email: organization.contact_email,
+          logo_url: organization.logo_url || '',
+          bio: organization.bio || '',
+          description: organization.description || '',
+          contact_email: organization.contact_email || '',
+          phone: organization.phone || '',
+          website: organization.website || '',
           address: organization.address || '',
         });
       }
@@ -88,7 +99,7 @@ export default function AdminSettingsPage() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -115,6 +126,13 @@ export default function AdminSettingsPage() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Partner Settings</h1>
+          {org && (
+            <Button variant="outline" asChild className="border-purple-200 text-purple-700 hover:bg-purple-50">
+              <Link href={`/organizers/${org.id}`} target="_blank">
+                <ExternalLink className="w-4 h-4 mr-2" /> View Public Profile
+              </Link>
+            </Button>
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -147,7 +165,7 @@ export default function AdminSettingsPage() {
                 </CardTitle>
                 {!editing && (
                   <Button variant="outline" size="sm" onClick={() => { setEditing(true); setMsg(null); }}>
-                    <Pencil className="w-4 h-4 mr-2" /> Edit
+                    <Pencil className="w-4 h-4 mr-2" /> Edit Profile
                   </Button>
                 )}
               </CardHeader>
@@ -160,30 +178,69 @@ export default function AdminSettingsPage() {
                 )}
 
                 {editing ? (
-                  <form onSubmit={handleSave} className="space-y-4 max-w-lg">
-                    <div>
-                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Organization Name</label>
-                      <Input name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Metro Youth Sports Club" />
+                  <form onSubmit={handleSave} className="space-y-4 max-w-xl">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Organization Name</label>
+                        <Input name="name" value={formData.name} onChange={handleChange} required placeholder="e.g. Metro Youth Sports Club" />
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Organization Type</label>
+                        <select name="type" value={formData.type} onChange={handleChange}
+                          className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                          {Object.entries(ORG_TYPE_LABELS).map(([val, label]) => (
+                            <option key={val} value={val}>{label}</option>
+                          ))}
+                        </select>
+                      </div>
                     </div>
+
                     <div>
-                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Type</label>
-                      <select name="type" value={formData.type} onChange={handleChange}
-                        className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                        {Object.entries(ORG_TYPE_LABELS).map(([val, label]) => (
-                          <option key={val} value={val}>{label}</option>
-                        ))}
-                      </select>
+                      <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Logo URL</label>
+                      <Input name="logo_url" value={formData.logo_url} onChange={handleChange} icon={<ImageIcon className="w-4 h-4" />} placeholder="https://example.com/logo.png" />
                     </div>
+
                     <div>
-                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Contact Email</label>
-                      <Input name="contact_email" type="email" value={formData.contact_email} onChange={handleChange} icon={<Mail className="w-4 h-4" />} />
+                      <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Short Tagline / Bio</label>
+                      <Input name="bio" value={formData.bio} onChange={handleChange} placeholder="Empowering children through grassroots sports & athletics." />
                     </div>
+
                     <div>
-                      <label className="text-sm font-semibold text-slate-700 mb-2 block">Address / Location</label>
-                      <Input name="address" value={formData.address} onChange={handleChange} icon={<MapPin className="w-4 h-4" />} placeholder="e.g. 123 Stadium Way, Chennai" />
+                      <label className="text-sm font-semibold text-slate-700 mb-1.5 block">About / Detailed Description</label>
+                      <textarea
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        rows={4}
+                        className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        placeholder="Tell parents more about your organization history, mission, programs, and team..."
+                      />
                     </div>
-                    <div className="flex gap-3 pt-2">
-                      <Button type="submit" disabled={saving}>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Contact Email</label>
+                        <Input name="contact_email" type="email" value={formData.contact_email} onChange={handleChange} required icon={<Mail className="w-4 h-4" />} />
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Phone Number (Optional)</label>
+                        <Input name="phone" value={formData.phone} onChange={handleChange} icon={<Phone className="w-4 h-4" />} placeholder="+1 (555) 000-0000" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Website URL (Optional)</label>
+                        <Input name="website" value={formData.website} onChange={handleChange} icon={<Globe className="w-4 h-4" />} placeholder="https://example.com" />
+                      </div>
+                      <div>
+                        <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Address / Location</label>
+                        <Input name="address" value={formData.address} onChange={handleChange} icon={<MapPin className="w-4 h-4" />} placeholder="e.g. 123 Stadium Way, Seattle, WA" />
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button type="submit" disabled={saving} className="bg-purple-600 hover:bg-purple-700 font-bold">
                         {saving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                         Save Changes
                       </Button>
@@ -193,29 +250,56 @@ export default function AdminSettingsPage() {
                 ) : !org ? (
                   <p className="text-slate-500">Organization not found.</p>
                 ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-2xl shrink-0">
-                        {org.name.charAt(0)}
+                  <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <div className="w-20 h-20 rounded-2xl bg-purple-100 border border-purple-200 overflow-hidden flex items-center justify-center text-purple-700 font-bold text-3xl shrink-0">
+                        {org.logo_url ? (
+                          <img src={org.logo_url} alt={org.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <span>{org.name.charAt(0)}</span>
+                        )}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900 text-lg">{org.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="pill" className="bg-purple-50 text-purple-700 text-xs">{ORG_TYPE_LABELS[org.type] || org.type}</Badge>
+                        <h2 className="font-bold text-slate-900 text-xl">{org.name}</h2>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Badge className="bg-purple-100 text-purple-800 text-xs font-semibold">{ORG_TYPE_LABELS[org.type] || org.type}</Badge>
                           {org.verified && (
-                            <Badge variant="success" className="bg-green-50 text-green-700 text-xs">✓ Verified</Badge>
+                            <Badge variant="success" className="bg-emerald-50 text-emerald-700 text-xs font-semibold">✓ Verified Partner</Badge>
                           )}
                         </div>
+                        {org.bio && <p className="text-slate-600 text-sm mt-2">{org.bio}</p>}
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                      <div className="flex items-center gap-2 text-sm text-slate-600">
-                        <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+
+                    {org.description && (
+                      <div className="bg-slate-50 rounded-xl p-4 border border-slate-200/70">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">About</p>
+                        <p className="text-slate-700 text-sm leading-relaxed">{org.description}</p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+                      <div className="flex items-center gap-2.5 text-sm text-slate-600">
+                        <Mail className="w-4 h-4 text-purple-600 shrink-0" />
                         <span>{org.contact_email}</span>
                       </div>
+                      {org.phone && (
+                        <div className="flex items-center gap-2.5 text-sm text-slate-600">
+                          <Phone className="w-4 h-4 text-purple-600 shrink-0" />
+                          <span>{org.phone}</span>
+                        </div>
+                      )}
+                      {org.website && (
+                        <div className="flex items-center gap-2.5 text-sm text-slate-600">
+                          <Globe className="w-4 h-4 text-purple-600 shrink-0" />
+                          <a href={org.website} target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 underline">
+                            {org.website}
+                          </a>
+                        </div>
+                      )}
                       {org.address && (
-                        <div className="flex items-center gap-2 text-sm text-slate-600">
-                          <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                        <div className="flex items-center gap-2.5 text-sm text-slate-600">
+                          <MapPin className="w-4 h-4 text-purple-600 shrink-0" />
                           <span>{org.address}</span>
                         </div>
                       )}
@@ -232,11 +316,11 @@ export default function AdminSettingsPage() {
               </CardHeader>
               <CardContent>
                 {org?.verified ? (
-                  <div className="flex items-start gap-4 p-4 bg-green-50 border border-green-200 rounded-2xl">
-                    <CheckCircle2 className="w-6 h-6 text-green-600 shrink-0 mt-0.5" />
+                  <div className="flex items-start gap-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                    <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
                     <div>
-                      <p className="font-bold text-green-900">Your organization is verified</p>
-                      <p className="text-green-700 text-sm mt-1">Your events are eligible to be published on Kidspire after admin review.</p>
+                      <p className="font-bold text-emerald-900">Your organization is verified</p>
+                      <p className="text-emerald-700 text-sm mt-1">Your events are eligible to be published on Kidspire after admin review.</p>
                     </div>
                   </div>
                 ) : (

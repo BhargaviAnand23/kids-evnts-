@@ -305,7 +305,21 @@ export function EventCard({ event }: { event: Event }) {
           </h3>
 
           {/* Organizer */}
-          <p className="text-caption text-slate-500 mb-3 font-medium line-clamp-1">{event.organizer?.name}</p>
+          {event.organizer?.name ? (
+            <span
+              onClick={(e) => {
+                const orgId = event.organizer_id || event.organizer?.id;
+                if (orgId) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.location.href = `/organizers/${orgId}`;
+                }
+              }}
+              className="text-caption text-slate-500 hover:text-purple-600 mb-3 font-medium line-clamp-1 cursor-pointer transition-colors inline-block"
+            >
+              {event.organizer.name}
+            </span>
+          ) : null}
 
           {/* Date */}
           <div className="flex items-center text-caption text-slate-600 mb-1.5">

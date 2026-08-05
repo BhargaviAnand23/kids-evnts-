@@ -90,20 +90,45 @@ export default async function EventDetailPage({ params }: { params: { id: string
             <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
             
             <div className="flex items-center text-slate-600 mb-8 border-b border-slate-200 pb-8">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-card-title mr-4">
-                CS
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900 text-body">Organized by {event.organizer}</p>
-                <div className="flex items-center text-caption">
-                  <Star className="w-4 h-4 text-orange-400 mr-1 fill-current" />
-                  <span className="font-bold text-slate-800 mr-1">{event.rating}</span>
-                  <span>({event.reviews} reviews)</span>
-                  <span className="mx-2">&bull;</span>
-                  <Shield className="w-4 h-4 text-green-500 mr-1" />
-                  <span className="text-green-600 font-medium">Verified Partner</span>
+              {eventData.organizer_id ? (
+                <Link href={`/organizers/${eventData.organizer_id}`} className="group flex items-center hover:opacity-90 transition-opacity">
+                  <div className="w-12 h-12 rounded-full bg-purple-100 border border-purple-200 overflow-hidden flex items-center justify-center text-purple-700 font-bold text-card-title mr-4 shrink-0 shadow-sm">
+                    {eventData.organizer?.logo_url ? (
+                      <img src={eventData.organizer.logo_url} alt={event.organizer} className="w-full h-full object-cover" />
+                    ) : (
+                      event.organizer.charAt(0)
+                    )}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-body group-hover:text-purple-600 transition-colors">Organized by {event.organizer}</p>
+                    <div className="flex items-center text-caption">
+                      <Star className="w-4 h-4 text-orange-400 mr-1 fill-current" />
+                      <span className="font-bold text-slate-800 mr-1">{event.rating}</span>
+                      <span>({event.reviews} reviews)</span>
+                      <span className="mx-2">&bull;</span>
+                      <Shield className="w-4 h-4 text-green-500 mr-1" />
+                      <span className="text-green-600 font-medium">Verified Partner</span>
+                    </div>
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex items-center">
+                  <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-card-title mr-4">
+                    {event.organizer.charAt(0)}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-body">Organized by {event.organizer}</p>
+                    <div className="flex items-center text-caption">
+                      <Star className="w-4 h-4 text-orange-400 mr-1 fill-current" />
+                      <span className="font-bold text-slate-800 mr-1">{event.rating}</span>
+                      <span>({event.reviews} reviews)</span>
+                      <span className="mx-2">&bull;</span>
+                      <Shield className="w-4 h-4 text-green-500 mr-1" />
+                      <span className="text-green-600 font-medium">Verified Partner</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className="mb-8">

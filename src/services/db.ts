@@ -31,6 +31,10 @@ const SEED_ORGANIZATIONS: Organization[] = [
     type: 'club',
     logo_url: 'https://images.unsplash.com/photo-1518605368461-1ee7c5320746?w=100&auto=format&fit=crop&q=60',
     contact_email: 'coach@metroyouth.org',
+    phone: '+1 (555) 234-5678',
+    website: 'https://metroyouthsports.example.com',
+    bio: 'Empowering children through grassroots sports, team building, and athletic excellence.',
+    description: 'Metropolitan Youth Sports Club has been serving families since 2012. We offer structured coaching in soccer, basketball, swimming, and track for children aged 4-16.',
     address: '789 Stadium Way, Seattle, WA',
     verified: true,
     created_at: new Date().toISOString()
@@ -41,6 +45,10 @@ const SEED_ORGANIZATIONS: Organization[] = [
     type: 'independent',
     logo_url: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=100&auto=format&fit=crop&q=60',
     contact_email: 'hello@rhythmdance.com',
+    phone: '+1 (555) 876-5432',
+    website: 'https://rhythmdanceacademy.example.com',
+    bio: 'Inspiring young dancers with expressive rhythm, movement, and creative performing arts.',
+    description: 'Rhythm Dance Academy specializes in hip hop, ballet, contemporary, and jazz classes designed for young learners of all skill levels.',
     address: 'Studio 5, Creative Arts Center',
     verified: true,
     created_at: new Date().toISOString()
@@ -51,6 +59,10 @@ const SEED_ORGANIZATIONS: Organization[] = [
     type: 'club',
     logo_url: 'https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?w=100&auto=format&fit=crop&q=60',
     contact_email: 'info@bluewave.org',
+    phone: '+1 (555) 345-6789',
+    website: 'https://bluewaveaquatics.example.com',
+    bio: 'Premier swimming instruction, water safety training, and competitive youth aquatic teams.',
+    description: 'Blue Wave Aquatics provides certified swim coaching and water safety workshops for toddlers, kids, and teens.',
     address: 'Community Pool, Northgate',
     verified: true,
     created_at: new Date().toISOString()
@@ -61,6 +73,10 @@ const SEED_ORGANIZATIONS: Organization[] = [
     type: 'independent',
     logo_url: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=100&auto=format&fit=crop&q=60',
     contact_email: 'sensei@dragondojo.com',
+    phone: '+1 (555) 987-6543',
+    website: 'https://dragondojo.example.com',
+    bio: 'Building discipline, self-defense, confidence, and respect through traditional martial arts.',
+    description: 'Dragon Dojo teaches Karate, Taekwondo, and youth fitness with certified black-belt senseis focused on character building and focus.',
     address: 'Downtown Fitness Center',
     verified: true,
     created_at: new Date().toISOString()
@@ -264,6 +280,41 @@ export const dbService = {
     }
     const organizations = await this.getOrganizations()
     return organizations.find(o => o.id === id) || null
+  },
+
+  async getOrganizationStats(id: string): Promise<{ totalEventsHosted: number; averageRating: number; approvedEvents: Event[] }> {
+    const events = await this.getEvents({ organizerId: id, status: 'approved' })
+    let reviews: Review[] = []
+    if (isSupabaseConfigured()) {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase.from('reviews').select('*')
+        if (data) reviews = data
+      } catch (e) {}
+    } else {
+      reviews = getLocalStorageData<Review[]>('kids_event_reviews', SEED_REVIEWS)
+    }
+
+    const orgEventIds = events.map(e => e.id)
+    const orgReviews = reviews.filter(r => orgEventIds.includes(r.event_id))
+
+    let avgRating = 4.8
+    if (orgReviews.length > 0) {
+      const sum = orgReviews.reduce((acc, r) => acc + r.rating, 0)
+      avgRating = Number((sum / orgReviews.length).toFixed(1))
+    } else if (events.length > 0) {
+      const ratedEvents = events.filter(e => typeof e.rating === 'number' && e.rating > 0)
+      if (ratedEvents.length > 0) {
+        const sum = ratedEvents.reduce((acc, e) => acc + (e.rating || 0), 0)
+        avgRating = Number((sum / ratedEvents.length).toFixed(1))
+      }
+    }
+
+    return {
+      totalEventsHosted: events.length,
+      averageRating: avgRating,
+      approvedEvents: events
+    }
   },
 
   async updateOrganization(id: string, orgData: Partial<Organization>): Promise<Organization> {

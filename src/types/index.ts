@@ -14,6 +14,10 @@ export interface Organization {
   type: OrganizationType
   logo_url: string | null
   contact_email: string
+  phone?: string | null
+  website?: string | null
+  bio?: string | null
+  description?: string | null
   address: string | null
   verified: boolean
   created_at: string
