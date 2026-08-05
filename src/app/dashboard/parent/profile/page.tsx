@@ -227,8 +227,8 @@ export default function ProfileKidsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Sidebar Navigation */}
-          <div className="w-full lg:w-64 shrink-0">
-            <Card className="rounded-3xl border border-slate-100 shadow-sm sticky top-24">
+          <div className="w-full lg:w-64 shrink-0 space-y-6 sticky top-24 self-start">
+            <Card className="rounded-3xl border border-slate-100 shadow-sm bg-white">
               <CardContent className="p-4 space-y-1.5">
                 {NAV_LINKS.map(({ href, label, icon: Icon }) => {
                   const active = pathname === href;
@@ -254,7 +254,7 @@ export default function ProfileKidsPage() {
             </Card>
 
             {/* Quick Rewards Box */}
-            <Card className="mt-6 rounded-3xl border border-purple-100 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-800 text-white p-6 shadow-xl relative overflow-hidden">
+            <Card className="rounded-3xl border border-purple-100 bg-gradient-to-br from-purple-600 via-indigo-600 to-purple-800 text-white p-6 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 transform translate-x-4 -translate-y-4 opacity-10">
                 <Sparkles className="w-32 h-32 text-white" />
               </div>
@@ -269,7 +269,7 @@ export default function ProfileKidsPage() {
                 <p className="text-xs text-purple-100 mb-4">Earn 50 bonus points on every booked activity!</p>
                 <button
                   onClick={copyReferralCode}
-                  className="w-full flex items-center justify-center gap-2 bg-white text-purple-700 font-bold py-2.5 px-4 rounded-xl text-xs shadow-md hover:bg-slate-100 transition-colors"
+                  className="w-full flex items-center justify-center gap-2 bg-white text-purple-700 font-bold py-2.5 px-4 rounded-xl text-xs shadow-md hover:bg-slate-100 transition-colors cursor-pointer"
                 >
                   {copiedCode ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4 text-purple-600" />}
                   <span>{copiedCode ? 'Code Copied!' : 'Copy Referral Code'}</span>
