@@ -14,14 +14,17 @@ import {
   DollarSign, 
   Building2,
   FileText,
-  Phone
+  Phone,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent } from '@/components/ui/Card';
+import { checkClientRateLimit } from '@/utils/rateLimiter';
 
 export default function ListYourEventPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     organizerName: '',
     contactName: '',
@@ -42,8 +45,31 @@ export default function ListYourEventPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    // 1. Client-side rate limit check (5 submissions per hour)
+    const rateCheck = checkClientRateLimit('list_your_event_form', 5, 60 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      setError(rateCheck.message || 'Too many submissions, please try again later.');
+      return;
+    }
+
+    try {
+      // 2. Call server API endpoint
+      const res = await fetch('/api/list-your-event', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 429 || !res.ok) {
+        setError(data.error || 'Too many submissions, please try again later.');
+        return;
+      }
+    } catch (err) {}
     
     // Construct pre-filled mailto URL
     const subject = encodeURIComponent(`Event Submission: ${formData.eventTitle || 'New Activity'}`);
@@ -180,6 +206,13 @@ export default function ListYourEventPage() {
               Fill out your activity details below. Clicking send will open your email client pre-populated with your event information sent directly to <strong className="text-purple-600">partner@kidspire.com</strong>.
             </p>
           </div>
+
+          {error && (
+            <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-2xl flex items-center gap-3 font-medium">
+              <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
           {submitted && (
             <div className="mb-8 p-4 bg-green-50 border border-green-200 text-green-800 rounded-2xl flex items-center gap-3">

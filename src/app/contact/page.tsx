@@ -1,9 +1,64 @@
-import React from 'react';
-import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+'use client';
+
+import React, { useState } from 'react';
+import { Mail, Phone, MapPin, Clock, Send, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { checkClientRateLimit } from '@/utils/rateLimiter';
 
 export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    // 1. Client-side rate limit check (5 submissions per hour)
+    const rateCheck = checkClientRateLimit('contact_form', 5, 60 * 60 * 1000);
+    if (!rateCheck.allowed) {
+      setError(rateCheck.message || 'Too many submissions, please try again later.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      // 2. Call server API endpoint (which also enforces IP-based rate limiting)
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (res.status === 429 || !res.ok) {
+        setError(data.error || 'Too many submissions, please try again later.');
+        return;
+      }
+
+      setSuccess('Thank you! Your message has been sent successfully. We will get back to you within 24 hours.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+    } catch (err: any) {
+      setError(err?.message || 'Failed to send message. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen py-10 sm:py-14 md:py-16 px-6 md:px-16 lg:px-24">
       <div className="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-sm border border-slate-100">
@@ -68,29 +123,70 @@ export default function ContactPage() {
           {/* Contact Form */}
           <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
             <h3 className="text-lg font-bold text-slate-900 mb-4">Send Us a Message</h3>
-            <form className="space-y-4">
+
+            {error && (
+              <div className="mb-4 flex items-center gap-2 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div className="mb-4 flex items-center gap-2 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl font-medium">
+                <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{success}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="text-xs font-semibold text-slate-700 mb-1 block">Your Name</label>
-                <Input placeholder="Parent or Partner Name" />
+                <Input
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Parent or Partner Name"
+                />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-700 mb-1 block">Email Address</label>
-                <Input type="email" placeholder="name@example.com" />
+                <Input
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="name@example.com"
+                />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-700 mb-1 block">Subject</label>
-                <Input placeholder="Booking query, partnership, feedback..." />
+                <Input
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="Booking query, partnership, feedback..."
+                />
               </div>
               <div>
                 <label className="text-xs font-semibold text-slate-700 mb-1 block">Message</label>
                 <textarea 
+                  name="message"
+                  required
                   rows={4} 
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full rounded-xl border border-slate-200 p-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" 
                   placeholder="Tell us how we can help..."
                 ></textarea>
               </div>
-              <Button type="submit" className="w-full">
-                <Send className="w-4 h-4 mr-2" /> Send Message
+              <Button type="submit" disabled={submitting} className="w-full">
+                {submitting ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...</>
+                ) : (
+                  <><Send className="w-4 h-4 mr-2" /> Send Message</>
+                )}
               </Button>
             </form>
           </div>

@@ -285,6 +285,33 @@ export const authService = {
     return sessionUser
   },
 
+  async signInWithGoogle(): Promise<{ error?: string }> {
+    if (!isSupabaseConfigured()) {
+      return { error: 'Supabase is not configured with environment variables.' }
+    }
+
+    const supabase = createClient()
+    const getRedirectUrl = () => {
+      let baseUrl =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        (typeof window !== 'undefined' ? window.location.origin : 'https://school-evnts.vercel.app')
+      baseUrl = baseUrl.includes('http') ? baseUrl : `https://${baseUrl}`
+      return baseUrl.endsWith('/') ? `${baseUrl}dashboard/parent` : `${baseUrl}/dashboard/parent`
+    }
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: getRedirectUrl(),
+      },
+    })
+
+    if (error) {
+      return { error: error.message }
+    }
+    return {}
+  },
+
   async logout(): Promise<void> {
     if (isSupabaseConfigured()) {
       const supabase = createClient()

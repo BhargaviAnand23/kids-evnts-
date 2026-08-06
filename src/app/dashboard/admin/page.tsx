@@ -39,6 +39,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [orgId, setOrgId] = useState<string | null>(null);
   const [orgName, setOrgName] = useState('');
+  const [commissionPercent, setCommissionPercent] = useState<number>(15);
   const [events, setEvents] = useState<Event[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +64,12 @@ export default function AdminDashboard() {
           dbService.getBookingsByOrganization(id),
         ]);
 
-        if (org) setOrgName(org.name);
+        if (org) {
+          setOrgName(org.name);
+          if (typeof (org as any).commission_percent === 'number') {
+            setCommissionPercent((org as any).commission_percent);
+          }
+        }
         setEvents(evts);
         setBookings(bkgs);
       } catch (err) {
@@ -80,6 +86,8 @@ export default function AdminDashboard() {
     totalEventsCreated,
     bookingsThisMonth,
     revenueThisMonth,
+    platformFee,
+    netPayout,
     avgRating,
     topEventsByBookings,
     last30DaysTrend,
@@ -106,6 +114,9 @@ export default function AdminDashboard() {
         const price = b.event?.price || 0;
         return sum + price;
       }, 0);
+
+    const platformFee = Math.round(revenueThisMonth * (commissionPercent / 100));
+    const netPayout = revenueThisMonth - platformFee;
 
     // 3. Average rating
     const ratedEvents = events.filter(e => typeof e.rating === 'number' && e.rating > 0);
@@ -151,12 +162,14 @@ export default function AdminDashboard() {
       totalEventsCreated,
       bookingsThisMonth,
       revenueThisMonth,
+      platformFee,
+      netPayout,
       avgRating,
       topEventsByBookings,
       last30DaysTrend: days,
       recentBookings
     };
-  }, [events, bookings]);
+  }, [events, bookings, commissionPercent]);
 
   if (loading) {
     return (
@@ -268,18 +281,31 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Stat 3: Total Revenue This Month */}
+              {/* Stat 3: Total Revenue & Payout Breakdown */}
               <Card className="border-slate-200 bg-white shadow-sm hover:border-purple-200 transition-colors">
                 <CardContent className="p-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Revenue (This Month)</span>
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-caption font-semibold text-slate-500 uppercase tracking-wide">Revenue & Payout</span>
                     <div className="p-2.5 bg-emerald-100 text-emerald-700 rounded-xl">
                       <IndianRupee className="w-5 h-5" />
                     </div>
                   </div>
-                  <div className="text-3xl font-extrabold text-slate-900 mb-1">₹{revenueThisMonth.toLocaleString('en-IN')}</div>
-                  <div className="flex items-center text-caption text-emerald-600 font-semibold">
-                    <TrendingUp className="w-3.5 h-3.5 mr-1" /> Gross monthly sales
+                  <div className="text-3xl font-extrabold text-slate-900 mb-2">₹{revenueThisMonth.toLocaleString('en-IN')}</div>
+                  
+                  {/* Breakdown callout */}
+                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-xs space-y-1.5 mt-2">
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span>Gross Revenue:</span>
+                      <span className="font-semibold text-slate-900">₹{revenueThisMonth.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-slate-600">
+                      <span>Platform Fee ({commissionPercent}%):</span>
+                      <span className="font-semibold text-rose-600">-₹{platformFee.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="flex justify-between items-center font-bold text-slate-900 pt-1.5 border-t border-slate-200/80">
+                      <span>Your Net Payout:</span>
+                      <span className="text-emerald-700">₹{netPayout.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

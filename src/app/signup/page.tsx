@@ -80,6 +80,21 @@ export default function SignupPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await authService.signInWithGoogle();
+      if (res?.error) {
+        setError(res.error);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Google sign-up failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ── Email confirmation pending screen ────────────────────────────────────────
   if (awaitingConfirmation) {
     return (
@@ -140,16 +155,15 @@ export default function SignupPage() {
               </button>
             </div>
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <FormError message={error} />
 
               <div>
-                <label htmlFor="signup-name" className="text-sm font-semibold text-slate-700 mb-2 block">Full Name</label>
+                <label className="text-caption font-medium text-slate-700 mb-1 block">Full Name</label>
                 <Input
-                  id="signup-name"
                   type="text"
                   icon={<User className="w-4 h-4" />}
-                  placeholder="John Doe"
+                  placeholder={role === 'admin' ? 'Coach Sarah Jenkins' : 'Sarah Jenkins'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={loading}
@@ -258,7 +272,13 @@ export default function SignupPage() {
             <div className="mt-8 pt-6 border-t border-slate-100 text-center">
               <p className="text-sm text-slate-500 mb-4">Or sign up with</p>
               <div className="flex gap-4">
-                <Button variant="outline" className="w-full font-medium" type="button">
+                <Button
+                  variant="outline"
+                  className="w-full font-medium"
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 mr-2" /> Google
                 </Button>
               </div>

@@ -47,6 +47,21 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await authService.signInWithGoogle();
+      if (res?.error) {
+        setError(res.error);
+      }
+    } catch (err: any) {
+      setError(err?.message || 'Google login failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen flex items-center justify-center py-8 sm:py-12 md:py-16 px-6 md:px-16 lg:px-24 relative overflow-hidden">
       {/* Decorative bg */}
@@ -58,49 +73,57 @@ export default function LoginPage() {
             Kidspire
           </Link>
           <h1 className="text-page-title font-bold text-slate-900">Welcome back</h1>
-          <p className="text-slate-500 text-body">Log in to manage your bookings and saved events</p>
+          <p className="text-slate-600 text-body mt-1">Sign in to your account</p>
         </div>
 
-        <Card className="border-none shadow-2xl shadow-purple-900/10 mb-6">
-          <CardContent className="p-8">
-            <form className="space-y-6" onSubmit={handleSubmit}>
-              <FormError message={error} />
+        <Card>
+          <CardContent className="p-6 md:p-8">
+            <FormError message={error} />
+
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="login-email" className="text-sm font-semibold text-slate-700 mb-2 block">Email address</label>
-                <Input
-                  id="login-email"
-                  type="email"
-                  icon={<Mail className="w-4 h-4" />}
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                  required
-                />
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <label htmlFor="login-password" className="text-sm font-semibold text-slate-700">Password</label>
-                  <Link href="/forgot-password" className="text-xs font-semibold text-purple-600 hover:text-purple-700">
-                    Forgot password?
-                  </Link>
+                <label className="text-caption font-medium text-slate-700 mb-1 block">Email</label>
+                <div className="relative">
+                  <Mail className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="name@example.com"
+                    className="pl-10"
+                  />
                 </div>
-                <Input
-                  id="login-password"
-                  type="password"
-                  icon={<Lock className="w-4 h-4" />}
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                  required
-                />
               </div>
-              <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+
+              <div>
+                <label className="text-caption font-medium text-slate-700 mb-1 block">Password</label>
+                <div className="relative">
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="••••••••"
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-caption font-semibold text-purple-600 hover:text-purple-700"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Logging in…
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Signing in...
                   </>
                 ) : (
                   <>
@@ -113,7 +136,13 @@ export default function LoginPage() {
             <div className="mt-8 pt-6 border-t border-slate-100 text-center">
               <p className="text-sm text-slate-500 mb-4">Or continue with</p>
               <div className="flex gap-4">
-                <Button variant="outline" className="w-full font-medium" type="button">
+                <Button
+                  variant="outline"
+                  className="w-full font-medium"
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 mr-2" /> Google
                 </Button>
               </div>
