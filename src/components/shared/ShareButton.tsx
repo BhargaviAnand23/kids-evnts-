@@ -9,9 +9,17 @@ interface ShareButtonProps {
   url?: string;
   className?: string;
   iconOnly?: boolean;
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export function ShareButton({ title, text, url, className = '', iconOnly = true }: ShareButtonProps) {
+export function ShareButton({
+  title,
+  text,
+  url,
+  className = '',
+  iconOnly = true,
+  size = 'md',
+}: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async (e: React.MouseEvent) => {
@@ -48,16 +56,27 @@ export function ShareButton({ title, text, url, className = '', iconOnly = true 
     }
   };
 
+  const iconSizes = {
+    sm: 'w-4.5 h-4.5',   // ~18px
+    md: 'w-5.5 h-5.5',   // ~22px
+    lg: 'w-6.5 h-6.5'    // ~26px
+  }[size];
+
   if (iconOnly) {
     return (
       <div className="relative inline-flex items-center">
         <button
+          type="button"
           onClick={handleShare}
-          className={`p-2 text-slate-400 hover:text-purple-600 rounded-full hover:bg-slate-50 transition-colors flex items-center justify-center cursor-pointer ${className}`}
+          className={`p-2 text-[#6B7280] hover:text-[#7C3AED] hover:bg-purple-50 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer bg-transparent border-0 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${className}`}
           title="Share Event"
           aria-label="Share Event"
         >
-          {copied ? <Check className="w-5 h-5 text-emerald-600 animate-in zoom-in-50" /> : <Share2 className="w-5 h-5" />}
+          {copied ? (
+            <Check className={`${iconSizes} text-emerald-600 animate-in zoom-in-50`} />
+          ) : (
+            <Share2 className={`${iconSizes} transition-colors`} />
+          )}
         </button>
         {copied && (
           <div className="absolute right-0 top-full mt-1.5 px-3 py-1 bg-slate-900 text-white text-micro font-medium rounded-lg shadow-lg whitespace-nowrap z-50 animate-in fade-in slide-in-from-top-1">
@@ -71,10 +90,15 @@ export function ShareButton({ title, text, url, className = '', iconOnly = true 
   return (
     <div className="relative inline-flex items-center">
       <button
+        type="button"
         onClick={handleShare}
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-caption font-semibold bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 transition-colors cursor-pointer ${className}`}
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-caption font-semibold bg-transparent hover:bg-purple-50 text-[#6B7280] hover:text-[#7C3AED] transition-all duration-200 cursor-pointer ${className}`}
       >
-        {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4 text-purple-600" />}
+        {copied ? (
+          <Check className="w-4.5 h-4.5 text-emerald-600" />
+        ) : (
+          <Share2 className="w-4.5 h-4.5 text-current" />
+        )}
         <span>{copied ? 'Link Copied!' : 'Share'}</span>
       </button>
       {copied && (

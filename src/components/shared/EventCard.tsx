@@ -268,7 +268,6 @@ export function EventCard({ event }: { event: Event }) {
               title={event.title}
               text={`Check out ${event.title} on Kidspire!`}
               url={`/events/${event.id}`}
-              className="bg-white/90 backdrop-blur-md shadow-md hover:bg-white text-slate-600 hover:text-purple-600"
             />
             <WishlistHeart eventId={event.id} />
           </div>

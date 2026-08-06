@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Calendar, MapPin, Users, Star, Clock, Shield, Share2, Heart, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Users, Star, Clock, Shield, Heart, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card, CardContent } from '@/components/ui/Card';
