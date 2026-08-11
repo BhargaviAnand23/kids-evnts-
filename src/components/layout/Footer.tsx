@@ -3,6 +3,9 @@ import Link from 'next/link';
 import { Shield, Award, Users, CheckCircle } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { FadeContent } from '../animations/FadeContent';
+import { SOCIAL_LINKS } from '@/config/social';
+import { InstagramIcon, FacebookIcon } from '@/components/ui/SocialIcons';
+
 
 export function Footer() {
   return (
@@ -101,9 +104,31 @@ export function Footer() {
               <Users className="w-4 h-4 text-blue-500 mr-2" />
               10k+ Families
             </span>
+            <div className="flex items-center space-x-3 border-l border-slate-800 pl-6">
+              <a
+                href={SOCIAL_LINKS.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow Kidspire on Instagram"
+                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-purple-600 hover:text-white transition-all shadow-sm"
+              >
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+              <a
+                href={SOCIAL_LINKS.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow Kidspire on Facebook"
+                className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:bg-purple-600 hover:text-white transition-all shadow-sm"
+              >
+                <FacebookIcon className="w-4 h-4" />
+              </a>
+
+            </div>
           </div>
         </div>
       </div>
     </footer>
   );
 }
+

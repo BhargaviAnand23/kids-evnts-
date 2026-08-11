@@ -63,6 +63,17 @@ export type AgeBracket = 'early_years' | 'kids' | 'teens';
 
 export type ListingType = 'event' | 'competition' | 'course' | 'webinar';
 
+export interface EventMedia {
+  id: string
+  event_id: string
+  media_url: string
+  media_type: 'image' | 'video'
+  caption?: string | null
+  display_order: number
+  uploaded_by?: string | null
+  created_at: string
+}
+
 export interface SeatingTier {
   id: string
   event_id: string
@@ -98,6 +109,9 @@ export interface Event {
   
   // New listing type specific fields
   listing_type?: ListingType
+
+  // Photos & Videos Gallery
+  media?: EventMedia[]
   
   // Competitions
   registration_deadline?: string | null

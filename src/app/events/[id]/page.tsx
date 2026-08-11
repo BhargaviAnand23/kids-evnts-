@@ -12,6 +12,7 @@ import { WishlistHeart } from '@/components/shared/EventCard';
 import { BookOrWaitlistButton } from '@/components/shared/BookOrWaitlistButton';
 import { EventDetailSidebar } from '@/components/events/EventDetailSidebar';
 import { ShareButton } from '@/components/shared/ShareButton';
+import { EventGallery } from '@/components/events/EventGallery';
 
 export default async function EventDetailPage({ params }: { params: { id: string } }) {
   const eventData = await db.getEventById(params.id);
@@ -41,6 +42,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
     ],
     seats_total: eventData.seats_total,
     seats_available: eventData.seats_available,
+    media: eventData.media || []
   };
 
   return (
@@ -63,12 +65,15 @@ export default async function EventDetailPage({ params }: { params: { id: string
           
           {/* Main Content */}
           <div className="w-full lg:w-2/3">
-            <div className="w-full h-[320px] sm:h-[400px] md:h-[480px] lg:h-[540px] xl:h-[600px] rounded-[32px] overflow-hidden mb-8 shadow-sm relative">
+            <div className="w-full h-[320px] sm:h-[400px] md:h-[480px] lg:h-[540px] xl:h-[600px] rounded-[32px] overflow-hidden mb-6 shadow-sm relative">
               <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
               <div className="absolute top-5 right-5 z-10">
                 <WishlistHeart eventId={event.id} size="lg" />
               </div>
             </div>
+
+            {/* Photo / Video Gallery Strip */}
+            <EventGallery media={event.media} eventTitle={event.title} />
 
             <div className="flex items-center gap-2 mb-4 flex-wrap">
               {eventData.is_sponsored && (

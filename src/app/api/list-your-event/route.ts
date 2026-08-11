@@ -7,7 +7,9 @@ import { checkRateLimit } from '@/utils/rateLimiter';
  */
 export async function POST(req: NextRequest) {
   try {
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1';
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const realIp = req.headers.get('x-real-ip');
+    const ip = forwardedFor?.split(',')[0].trim() || realIp || '127.0.0.1';
     const rateCheck = checkRateLimit(`list_event_${ip}`, 5, 60 * 60 * 1000);
 
     if (!rateCheck.allowed) {
@@ -39,3 +41,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

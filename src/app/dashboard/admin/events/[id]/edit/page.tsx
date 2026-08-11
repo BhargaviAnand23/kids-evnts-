@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { ArrowLeft, Loader2, ShieldAlert, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import type { AgeBracket, Event } from '@/types';
+import { EventMediaManager, ManagedMediaItem } from '@/components/events/EventMediaManager';
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function EditEventPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [seatingTiers, setSeatingTiers] = useState<{ tier_name: string; tier_price: number; tier_seats_total: number }[]>([]);
+  const [mediaItems, setMediaItems] = useState<ManagedMediaItem[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -90,6 +92,16 @@ export default function EditEventPage() {
           tier_name: t.tier_name,
           tier_price: t.tier_price,
           tier_seats_total: t.tier_seats_total
+        })));
+      }
+
+      if (event.media && event.media.length > 0) {
+        setMediaItems(event.media.map(m => ({
+          id: m.id,
+          media_url: m.media_url,
+          media_type: m.media_type,
+          caption: m.caption || undefined,
+          display_order: m.display_order
         })));
       }
 
@@ -179,6 +191,7 @@ export default function EditEventPage() {
 
     try {
       await dbService.updateEvent(eventId, payload);
+      await dbService.saveEventMedia(eventId, mediaItems);
       setSaved(true);
       setTimeout(() => router.push('/dashboard/admin'), 1500);
     } catch (err: any) {
@@ -538,12 +551,16 @@ export default function EditEventPage() {
                 </div>
               )}
 
+              <div className="border-t border-slate-100 pt-6">
+                <EventMediaManager mediaItems={mediaItems} onChange={setMediaItems} />
+              </div>
+
               <div className="space-y-2 border-t border-slate-100 pt-4">
-                <label htmlFor="image_url" className="text-sm font-medium text-slate-700">Listing Image URL</label>
+                <label htmlFor="image_url" className="text-sm font-medium text-slate-700">Cover Image URL</label>
                 <Input id="image_url" name="image_url" value={formData.image_url} onChange={handleChange} placeholder="https://..." />
               </div>
               <div className="flex gap-4">
-                <Button type="submit" className="flex-1" disabled={loading}>
+                <Button type="submit" className="flex-1 bg-purple-600 hover:bg-purple-700 text-white" disabled={loading}>
                   {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving…</> : 'Save Changes'}
                 </Button>
                 <Button type="button" variant="outline" asChild>

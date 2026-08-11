@@ -2,6 +2,9 @@ import React from 'react';
 import Link from 'next/link';
 import { Shield, Users, Heart, Award, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { SOCIAL_LINKS } from '@/config/social';
+import { InstagramIcon, FacebookIcon } from '@/components/ui/SocialIcons';
+
 
 export default function AboutPage() {
   return (
@@ -66,7 +69,7 @@ export default function AboutPage() {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center bg-slate-900 text-white rounded-2xl p-8">
+        <div className="text-center bg-slate-900 text-white rounded-2xl p-8 mb-10">
           <h3 className="text-xl font-bold mb-2">Ready to Explore Activities?</h3>
           <p className="text-slate-300 text-sm mb-6">Browse upcoming weekend camps, sports clinics, and creative workshops near you.</p>
           <Button size="lg" className="bg-purple-600 hover:bg-purple-700" asChild>
@@ -76,7 +79,35 @@ export default function AboutPage() {
           </Button>
         </div>
 
+        {/* Follow Us Section */}
+        <div className="border-t border-slate-100 pt-8 text-center">
+          <h3 className="text-base font-bold text-slate-900 mb-1">Follow Kidspire</h3>
+          <p className="text-xs text-slate-500 mb-4">Stay updated on new weekend activities, youth sports tournaments, and parent tips.</p>
+          <div className="flex items-center justify-center space-x-4">
+            <a
+              href={SOCIAL_LINKS.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Kidspire on Instagram"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-600 hover:text-white transition-all font-semibold text-xs border border-purple-200/80 shadow-sm"
+            >
+              <InstagramIcon className="w-4 h-4" /> Instagram
+            </a>
+            <a
+              href={SOCIAL_LINKS.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow Kidspire on Facebook"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-600 hover:text-white transition-all font-semibold text-xs border border-purple-200/80 shadow-sm"
+            >
+              <FacebookIcon className="w-4 h-4" /> Facebook
+            </a>
+
+          </div>
+        </div>
+
       </div>
     </div>
   );
 }
+

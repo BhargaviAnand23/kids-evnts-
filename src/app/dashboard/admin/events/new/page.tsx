@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input';
 import { ArrowLeft, Loader2, ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 import type { AgeBracket } from '@/types';
+import { EventMediaManager, ManagedMediaItem } from '@/components/events/EventMediaManager';
 
 export default function NewEventPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function NewEventPage() {
   const [authLoading, setAuthLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
   const [seatingTiers, setSeatingTiers] = useState<{ tier_name: string; tier_price: number; tier_seats_total: number }[]>([]);
+  const [mediaItems, setMediaItems] = useState<ManagedMediaItem[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -111,7 +113,10 @@ export default function NewEventPage() {
     };
 
     try {
-      await dbService.createEvent(payload);
+      const createdEvent = await dbService.createEvent(payload);
+      if (createdEvent && mediaItems.length > 0) {
+        await dbService.saveEventMedia(createdEvent.id, mediaItems);
+      }
       router.push('/dashboard/admin?success=submitted');
     } catch (error) {
       console.error(error);
@@ -450,11 +455,15 @@ export default function NewEventPage() {
                 </div>
               )}
 
+              <div className="border-t border-slate-100 pt-6">
+                <EventMediaManager mediaItems={mediaItems} onChange={setMediaItems} />
+              </div>
+
               <div className="space-y-2 border-t border-slate-100 pt-4">
-                <label htmlFor="image_url" className="text-sm font-medium text-slate-700">Listing Image URL (optional)</label>
+                <label htmlFor="image_url" className="text-sm font-medium text-slate-700">Cover Image URL (optional)</label>
                 <Input id="image_url" name="image_url" value={formData.image_url} onChange={handleChange} placeholder="https://..." />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700 text-white" disabled={loading}>
                 {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Submitting…</> : 'Submit for Review'}
               </Button>
             </form>

@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier, Achievement, AchievementVisibility } from '@/types'
+import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier, Achievement, AchievementVisibility, EventMedia } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -221,6 +221,90 @@ const SEED_REVIEWS: Review[] = [
     created_at: new Date().toISOString(),
     parent: { name: 'Emily Watson' },
     event: { title: 'Intro to Karate' }
+  }
+]
+
+export const SEED_EVENT_MEDIA: EventMedia[] = [
+  {
+    id: 'med-1',
+    event_id: 'evt-1',
+    media_url: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Dribbling & ball control drills with coach Alex',
+    display_order: 1,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-2',
+    event_id: 'evt-1',
+    media_url: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'End of session mini-tournament match',
+    display_order: 2,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-3',
+    event_id: 'evt-1',
+    media_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    media_type: 'video',
+    caption: 'Kids Soccer Camp Highlight Reel',
+    display_order: 3,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-4',
+    event_id: 'evt-1',
+    media_url: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Agility ladder and endurance warmup',
+    display_order: 4,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-5',
+    event_id: 'evt-2',
+    media_url: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Studio A Hip Hop warm-up',
+    display_order: 1,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-6',
+    event_id: 'evt-2',
+    media_url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Group sync practice before parents showcase',
+    display_order: 2,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-7',
+    event_id: 'evt-2',
+    media_url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+    media_type: 'video',
+    caption: 'Sample Choreography Demonstration Video',
+    display_order: 3,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-8',
+    event_id: 'evt-4',
+    media_url: 'https://images.unsplash.com/photo-1555597673-b21d5c935865?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Kata presentation in the Dojo',
+    display_order: 1,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'med-9',
+    event_id: 'evt-4',
+    media_url: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=1200&auto=format&fit=crop&q=80',
+    media_type: 'image',
+    caption: 'Medal & certificate presentation',
+    display_order: 2,
+    created_at: new Date().toISOString()
   }
 ]
 
@@ -535,6 +619,57 @@ export const dbService = {
     })
   },
 
+  async getEventMedia(eventId: string): Promise<EventMedia[]> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('event_media')
+        .select('*')
+        .eq('event_id', eventId)
+        .order('display_order', { ascending: true })
+      if (!error && data) return data
+    }
+    const allMedia = getLocalStorageData<EventMedia[]>('kids_event_media', SEED_EVENT_MEDIA)
+    return allMedia
+      .filter(m => m.event_id === eventId || m.event_id === `evt-${eventId}` || m.event_id.replace('evt-', '') === eventId)
+      .sort((a, b) => a.display_order - b.display_order)
+  },
+
+  async saveEventMedia(
+    eventId: string,
+    items: Array<{ media_url: string; media_type: 'image' | 'video'; caption?: string | null; display_order?: number; uploaded_by?: string | null }>
+  ): Promise<EventMedia[]> {
+    const formattedItems = items.map((item, idx) => ({
+      event_id: eventId,
+      media_url: item.media_url,
+      media_type: item.media_type,
+      caption: item.caption || null,
+      display_order: item.display_order !== undefined ? item.display_order : idx + 1,
+      uploaded_by: item.uploaded_by || null
+    }));
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient()
+      await supabase.from('event_media').delete().eq('event_id', eventId)
+      if (formattedItems.length > 0) {
+        const { data, error } = await supabase.from('event_media').insert(formattedItems).select()
+        if (!error && data) return data
+      }
+      return []
+    }
+
+    const allMedia = getLocalStorageData<EventMedia[]>('kids_event_media', SEED_EVENT_MEDIA)
+    const remaining = allMedia.filter(m => m.event_id !== eventId && m.event_id !== `evt-${eventId}`)
+    const newRecords: EventMedia[] = formattedItems.map(f => ({
+      ...f,
+      id: crypto.randomUUID(),
+      created_at: new Date().toISOString()
+    }))
+    const updated = [...remaining, ...newRecords]
+    setLocalStorageData('kids_event_media', updated)
+    return newRecords
+  },
+
   async getEventById(id: string): Promise<Event | null> {
     const organizations = await this.getOrganizations()
     const sanitizeImageUrl = (url?: string | null) => {
@@ -553,9 +688,11 @@ export const dbService = {
           const { data: tiers } = await supabase.from('event_seating_tiers').select('*').eq('event_id', data.id);
           if (tiers && tiers.length > 0) seating_tiers = tiers;
         }
+        const media = await this.getEventMedia(data.id);
         return {
           ...data,
           seating_tiers,
+          media,
           image_url: sanitizeImageUrl(data.image_url),
           organizer: organizations.find(o => o.id === data.organizer_id) || null
         }
@@ -568,9 +705,11 @@ export const dbService = {
       const seating_tiers = (event.listing_type || 'event') === 'event' 
         ? allTiers.filter(t => t.event_id === event.id) 
         : []
+      const media = await this.getEventMedia(event.id);
       return {
         ...event,
         seating_tiers,
+        media,
         image_url: sanitizeImageUrl(event.image_url),
         organizer: organizations.find(o => o.id === event.organizer_id) || null
       }
@@ -1034,39 +1173,18 @@ export const dbService = {
         }
       }
 
-      // Check overall seat availability & perform atomic seat decrement (RPC with fallback)
-      let rpcSuccess = false
-      try {
-        const { data: rpcRes, error: rpcErr } = await supabase.rpc('book_seat', { event_id_param: bookingData.event_id })
-        if (!rpcErr && typeof rpcRes === 'boolean') {
-          if (!rpcRes) {
-            throw new Error('Sorry, this event is sold out! Please join the waitlist.')
-          }
-          rpcSuccess = true
-        }
-      } catch (e: any) {
-        if (e?.message?.includes('sold out')) throw e
-        console.warn('[db] RPC book_seat unavailable, using standard check:', e?.message)
+      // Check overall seat availability & perform atomic seat reservation via Supabase RPC
+      const { data: rpcRes, error: rpcErr } = await supabase.rpc('book_seat', { event_id_param: bookingData.event_id })
+      
+      if (rpcErr) {
+        console.error('[db] RPC book_seat error:', rpcErr)
+        throw new Error('Unable to reserve seat, please try again')
       }
 
-      if (!rpcSuccess) {
-        // Fallback: Read-then-write seat check
-        const { data: event, error: eventErr } = await supabase
-          .from('events')
-          .select('seats_available')
-          .eq('id', bookingData.event_id)
-          .single()
-        
-        if (eventErr || !event) throw new Error('Event not found')
-        if (event.seats_available <= 0) {
-          throw new Error('Sorry, this event is sold out! Please join the waitlist.')
-        }
-
-        await supabase
-          .from('events')
-          .update({ seats_available: Math.max(0, event.seats_available - 1) })
-          .eq('id', bookingData.event_id)
+      if (typeof rpcRes === 'boolean' && !rpcRes) {
+        throw new Error('Sorry, this event is sold out! Please join the waitlist.')
       }
+
 
       const payload: Record<string, any> = {
         event_id: bookingData.event_id,
