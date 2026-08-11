@@ -171,7 +171,7 @@ export default async function OrganizerProfilePage({ params }: { params: { id: s
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 xxs:grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 xxs:gap-3 sm:gap-6 lg:gap-8">
               {approvedEvents.map(event => (
                 <EventCard key={event.id} event={event} />
               ))}
