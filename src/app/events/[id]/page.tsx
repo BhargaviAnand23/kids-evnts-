@@ -53,9 +53,9 @@ export default async function EventDetailPage({ params }: { params: { id: string
           <Link href="/explore" className="text-slate-500 hover:text-purple-600 flex items-center text-sm font-medium transition-colors">
             <ArrowLeft className="w-4 h-4 mr-2" /> Back to Explore
           </Link>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-1">
             <ShareButton title={event.title} text={`Check out ${event.title} on Kidspire!`} />
-            <WishlistHeart eventId={event.id} />
+            <WishlistHeart eventId={event.id} variant="header" />
           </div>
         </div>
       </div>

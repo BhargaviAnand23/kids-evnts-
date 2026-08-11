@@ -34,11 +34,13 @@ import { dbService } from '@/services/db';
 export function WishlistHeart({
   eventId,
   className = '',
-  size = 'md'
+  size = 'md',
+  variant = 'overlay',
 }: {
   eventId: string;
   className?: string;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'overlay' | 'header';
 }) {
   const router = useRouter();
   const [liked, setLiked] = useState(false);
@@ -98,30 +100,35 @@ export function WishlistHeart({
   };
 
   const iconSizes = {
-    sm: 'w-4.5 h-4.5',   // ~18px
-    md: 'w-5.5 h-5.5',   // ~22px
-    lg: 'w-6.5 h-6.5'    // ~26px
+    sm: 'w-4 h-4',       // ~16px
+    md: 'w-5 h-5',       // ~20px
+    lg: 'w-5.5 h-5.5'    // ~22px
   }[size];
+
+  const buttonClass = variant === 'header'
+    ? `p-2.5 text-[#6B7280] hover:text-[#7C3AED] hover:bg-purple-50 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer bg-transparent border-0 outline-none shadow-none ${isAnimate ? 'animate-heart-pop' : ''} ${className}`
+    : `relative inline-flex items-center justify-center p-1 bg-transparent border-0 outline-none cursor-pointer transition-all duration-300 ease-out transform active:scale-90 hover:scale-125 focus:outline-none ${isAnimate ? 'animate-heart-pop' : ''} ${className}`;
+
+  const heartClass = variant === 'header'
+    ? liked
+      ? 'fill-purple-600 text-purple-600 stroke-purple-600'
+      : 'fill-transparent text-[#6B7280] hover:text-[#7C3AED] stroke-[2] transition-colors'
+    : liked
+      ? 'fill-purple-600 text-purple-600 stroke-purple-600 drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]'
+      : 'fill-transparent text-white stroke-white stroke-[2.3] drop-shadow-[0_2px_5px_rgba(0,0,0,0.65)] hover:stroke-purple-200';
 
   return (
     <button
       type="button"
       aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
       onClick={handleClick}
-      className={`relative inline-flex items-center justify-center p-1 bg-transparent border-0 outline-none cursor-pointer transition-all duration-300 ease-out transform active:scale-90 hover:scale-125 focus:outline-none ${
-        isAnimate ? 'animate-heart-pop' : ''
-      } ${className}`}
+      className={buttonClass}
     >
-      <Heart
-        className={`${iconSizes} transition-all duration-300 ${
-          liked
-            ? 'fill-purple-600 text-purple-600 stroke-purple-600 drop-shadow-[0_2px_6px_rgba(0,0,0,0.5)]'
-            : 'fill-transparent text-white stroke-white stroke-[2.3] drop-shadow-[0_2px_5px_rgba(0,0,0,0.65)] hover:stroke-purple-200'
-        }`}
-      />
+      <Heart className={`${iconSizes} ${heartClass}`} />
     </button>
   );
 }
+
 
 // ── Game Meter Progress Bar Component ──
 export function SeatsGameMeter({
@@ -268,6 +275,7 @@ export function EventCard({ event }: { event: Event }) {
               title={event.title}
               text={`Check out ${event.title} on Kidspire!`}
               url={`/events/${event.id}`}
+              variant="overlay"
             />
             <WishlistHeart eventId={event.id} />
           </div>

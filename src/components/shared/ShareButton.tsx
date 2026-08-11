@@ -10,6 +10,7 @@ interface ShareButtonProps {
   className?: string;
   iconOnly?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'overlay';
 }
 
 export function ShareButton({
@@ -19,6 +20,7 @@ export function ShareButton({
   className = '',
   iconOnly = true,
   size = 'md',
+  variant = 'default',
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
@@ -39,12 +41,10 @@ export function ShareButton({
         });
         return;
       } catch (err) {
-        // User cancelled native share sheet or share failed — fall back to clipboard
         if ((err as Error)?.name === 'AbortError') return;
       }
     }
 
-    // Fallback: Copy link to clipboard
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(shareUrl);
@@ -57,10 +57,14 @@ export function ShareButton({
   };
 
   const iconSizes = {
-    sm: 'w-4.5 h-4.5',   // ~18px
-    md: 'w-5.5 h-5.5',   // ~22px
-    lg: 'w-6.5 h-6.5'    // ~26px
+    sm: 'w-4 h-4',       // ~16px
+    md: 'w-5 h-5',       // ~20px
+    lg: 'w-5.5 h-5.5'    // ~22px
   }[size];
+
+  const buttonStyle = variant === 'overlay'
+    ? `p-2 text-white hover:text-white hover:bg-black/40 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer bg-black/25 backdrop-blur-sm border-0 outline-none shadow-none`
+    : `p-2.5 text-[#6B7280] hover:text-[#7C3AED] hover:bg-purple-50 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer bg-transparent border-0 outline-none shadow-none focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50`;
 
   if (iconOnly) {
     return (
@@ -68,9 +72,9 @@ export function ShareButton({
         <button
           type="button"
           onClick={handleShare}
-          className={`p-2 text-[#6B7280] hover:text-[#7C3AED] hover:bg-purple-50 rounded-full transition-all duration-200 flex items-center justify-center cursor-pointer bg-transparent border-0 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/50 ${className}`}
-          title="Share Event"
-          aria-label="Share Event"
+          className={`${buttonStyle} ${className}`}
+          title="Share Activity"
+          aria-label="Share Activity"
         >
           {copied ? (
             <Check className={`${iconSizes} text-emerald-600 animate-in zoom-in-50`} />
@@ -79,7 +83,7 @@ export function ShareButton({
           )}
         </button>
         {copied && (
-          <div className="absolute right-0 top-full mt-1.5 px-3 py-1 bg-slate-900 text-white text-micro font-medium rounded-lg shadow-lg whitespace-nowrap z-50 animate-in fade-in slide-in-from-top-1">
+          <div className="absolute right-0 top-full mt-2 px-3 py-1.5 bg-slate-900/90 text-white text-xs font-semibold rounded-xl shadow-xl whitespace-nowrap z-50 animate-in fade-in slide-in-from-top-1">
             Link copied to clipboard!
           </div>
         )}
@@ -92,20 +96,22 @@ export function ShareButton({
       <button
         type="button"
         onClick={handleShare}
-        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-caption font-semibold bg-transparent hover:bg-purple-50 text-[#6B7280] hover:text-[#7C3AED] transition-all duration-200 cursor-pointer ${className}`}
+        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold text-[#6B7280] hover:text-[#7C3AED] hover:bg-purple-50 transition-all duration-200 cursor-pointer bg-transparent border-0 shadow-none ${className}`}
+        aria-label="Share Activity"
       >
         {copied ? (
-          <Check className="w-4.5 h-4.5 text-emerald-600" />
+          <Check className={`${iconSizes} text-emerald-600`} />
         ) : (
-          <Share2 className="w-4.5 h-4.5 text-current" />
+          <Share2 className={`${iconSizes} text-current`} />
         )}
         <span>{copied ? 'Link Copied!' : 'Share'}</span>
       </button>
       {copied && (
-        <div className="absolute right-0 top-full mt-1.5 px-3 py-1 bg-slate-900 text-white text-micro font-medium rounded-lg shadow-lg whitespace-nowrap z-50 animate-in fade-in slide-in-from-top-1">
+        <div className="absolute right-0 top-full mt-2 px-3 py-1.5 bg-slate-900/90 text-white text-xs font-semibold rounded-xl shadow-xl whitespace-nowrap z-50 animate-in fade-in slide-in-from-top-1">
           Link copied to clipboard!
         </div>
       )}
     </div>
   );
 }
+
