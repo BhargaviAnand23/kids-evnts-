@@ -118,10 +118,10 @@ export function TrendingEvents() {
     count === 1
       ? 'grid-cols-1 max-w-md mx-auto'
       : count === 2
-      ? 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+      ? 'grid-cols-1 xs:grid-cols-2 md:grid-cols-2 max-w-3xl mx-auto'
       : count === 3
-      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto'
-      : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4';
+      ? 'grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto'
+      : 'grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">
@@ -169,7 +169,7 @@ export function TrendingEvents() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
-            className={`grid gap-6 md:gap-8 ${gridColsClass}`}
+            className={`grid gap-4 sm:gap-6 lg:gap-8 ${gridColsClass}`}
           >
             {events.filter(e => e && e.id).map(event => (
               <motion.div key={event.id} variants={cardVariants}>

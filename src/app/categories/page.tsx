@@ -86,7 +86,7 @@ export default function CategoriesPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {activityTypes.map((type) => {
               const isSelected = selectedType === type.val;
               return (
@@ -176,7 +176,7 @@ export default function CategoriesPage() {
           </div>
 
           {showSportsSubmenu && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 pt-2">
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 pt-2">
               {sportsSubcategories.map((subcat) => (
                 <Link
                   key={subcat.slug}
@@ -245,7 +245,7 @@ export default function CategoriesPage() {
           </div>
 
           {showTalentsSubmenu && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 pt-2">
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 pt-2">
               {talentsSubcategories.map((subcat) => (
                 <Link
                   key={subcat.slug}
