@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { FadeContent } from '../animations/FadeContent';
 import { SOCIAL_LINKS } from '@/config/social';
 import { InstagramIcon, FacebookIcon } from '@/components/ui/SocialIcons';
+import { ReplayTourButton } from '@/components/shared/OnboardingWalkthrough';
 
 
 export function Footer() {
@@ -61,7 +62,6 @@ export function Footer() {
               </div>
             </div>
           </div>
-          
           <div>
             <h4 className="text-white font-semibold text-card-title mb-6">Discover</h4>
             <ul className="space-y-4 text-slate-400 text-body">
@@ -69,6 +69,7 @@ export function Footer() {
               <li><Link href="/categories" className="hover:text-purple-400 transition-colors">Categories</Link></li>
               <li><Link href="/how-it-works" className="hover:text-purple-400 transition-colors">How It Works</Link></li>
               <li><Link href="/about" className="hover:text-purple-400 transition-colors">About Us</Link></li>
+              <li><ReplayTourButton /></li>
             </ul>
           </div>
 
