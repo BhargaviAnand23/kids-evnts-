@@ -89,7 +89,7 @@ export default function HighlightsPage() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xxs:grid-cols-2 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2.5 xxs:gap-3 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {achievements.map(item => {
               const firstName = getSafeFirstName(item.child?.name);
               const ageLabel = item.child?.age ? `Age ${item.child.age}` : 'Junior';

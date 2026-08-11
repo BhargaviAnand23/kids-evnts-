@@ -254,7 +254,7 @@ export function EventCard({ event }: { event: Event }) {
       >
 
         {/* Image */}
-        <div className="relative h-36 xxs:h-40 sm:h-52 lg:h-56 xl:h-60 overflow-hidden shrink-0">
+        <div className="relative h-48 sm:h-52 lg:h-56 xl:h-60 overflow-hidden shrink-0">
           <img
             src={event.image_url || 'https://images.unsplash.com/photo-1574629810360-7efbb192569a?w=600&auto=format&fit=crop&q=60'}
             alt={event.title}
@@ -262,15 +262,15 @@ export function EventCard({ event }: { event: Event }) {
           />
 
           {/* Status badge — top left */}
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold shadow-md ${bg} ${text}`}>
-              <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
+          <div className="absolute top-3 left-3">
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-md ${bg} ${text}`}>
+              <Icon className="w-3 h-3" />
               {label}
             </span>
           </div>
 
           {/* Top right actions: Wishlist + Share */}
-          <div className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 flex items-center gap-1">
+          <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
             <ShareButton
               title={event.title}
               text={`Check out ${event.title} on Kidspire!`}
@@ -282,25 +282,25 @@ export function EventCard({ event }: { event: Event }) {
 
           {/* Sponsored tag */}
           {event.is_sponsored && (
-            <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-micro font-bold bg-purple-600 text-white shadow">
-                <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> Sponsored
+            <div className="absolute bottom-3 left-3">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-micro font-bold bg-purple-600 text-white shadow">
+                <Sparkles className="w-3 h-3" /> Sponsored
               </span>
             </div>
           )}
         </div>
 
         {/* Body */}
-        <div className="p-3 xxs:p-3.5 sm:p-5 lg:p-6 flex flex-col flex-1">
+        <div className="p-4 sm:p-5 lg:p-6 flex flex-col flex-1">
           {/* Type Badge + Category pill + age */}
-          <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <span className={`text-micro font-bold px-2 py-0.5 rounded border ${getTypeBadgeStyle(event.listing_type)}`}>
+          <div className="flex items-center gap-2 mb-3 flex-wrap">
+            <span className={`text-micro font-bold px-2 py-0.5 rounded border shrink-0 ${getTypeBadgeStyle(event.listing_type)}`}>
               {getListingTypeDisplayName(event.listing_type)}
             </span>
-            <span className="text-micro font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">
+            <span className="text-micro font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full shrink-0">
               {event.category}
             </span>
-            <span className={`flex items-center text-caption ml-auto ${ageBadgeStyle}`}>
+            <span className={`flex items-center text-caption ml-auto shrink-0 ${ageBadgeStyle}`}>
               <Users className="w-3.5 h-3.5 mr-1 text-slate-400" />
               {ageBracketNames[event.age_bracket] || 'All ages'}
             </span>
