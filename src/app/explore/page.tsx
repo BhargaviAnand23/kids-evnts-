@@ -415,7 +415,7 @@ function ExploreContent() {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                   <div key={i} className="bg-white rounded-3xl overflow-hidden animate-pulse border border-slate-100">
                     <div className="h-48 bg-slate-200" />
@@ -439,7 +439,7 @@ function ExploreContent() {
                 </p>
               </div>
             ) : (
-              <AnimatedList className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+              <AnimatedList className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
                 {events.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
