@@ -182,3 +182,19 @@ export interface Achievement {
   event?: Event | null
   organization?: Organization | null
 }
+
+export type PayoutStatus = 'pending' | 'paid'
+
+export interface Payout {
+  id: string
+  organization_id: string
+  amount: number
+  period_start: string
+  period_end: string
+  status: PayoutStatus
+  paid_at?: string | null
+  notes?: string | null
+  created_at: string
+  organization?: Organization | null
+}
+

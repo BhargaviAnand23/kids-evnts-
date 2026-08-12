@@ -1,5 +1,5 @@
 import { createClient } from '@/utils/supabase/client'
-import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier, Achievement, AchievementVisibility, EventMedia } from '@/types'
+import { School, Event, Parent, Child, Booking, Organization, OrganizationAdmin, SuperAdmin, Review, SeatingTier, Achievement, AchievementVisibility, EventMedia, Payout } from '@/types'
 
 const isSupabaseConfigured = (): boolean => {
   return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -1909,6 +1909,97 @@ export const dbService = {
     const items = await this.getAchievements();
     const updated = items.filter(a => a.id !== id);
     setLocalStorageData('kids_event_achievements', updated);
+  },
+
+  // --- PAYOUTS ---
+  async getPayouts(organizationId?: string): Promise<Payout[]> {
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      let query = supabase
+        .from('payouts')
+        .select(`
+          *,
+          organization:organizations(*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (organizationId) {
+        query = query.eq('organization_id', organizationId);
+      }
+
+      const { data, error } = await query;
+      if (!error && data) return data as Payout[];
+    }
+
+    const DEFAULT_PAYOUTS: Payout[] = [
+      {
+        id: 'payout-seed-1',
+        organization_id: 'org-youth-soccer',
+        amount: 1500.00,
+        period_start: '2026-07-01',
+        period_end: '2026-07-31',
+        status: 'paid',
+        paid_at: '2026-08-01T10:00:00Z',
+        notes: 'Paid via Bank Transfer - Ref #TXN987612',
+        created_at: '2026-08-01T10:00:00Z',
+      }
+    ];
+
+    const items = getLocalStorageData<Payout[]>('kids_event_payouts', DEFAULT_PAYOUTS);
+    if (organizationId) {
+      return items.filter(p => p.organization_id === organizationId);
+    }
+    return items;
+  },
+
+  async createPayout(payoutData: Omit<Payout, 'id' | 'created_at'>): Promise<Payout> {
+    const newPayout: Payout = {
+      ...payoutData,
+      id: 'payout-' + Date.now(),
+      created_at: new Date().toISOString(),
+    };
+
+    if (isSupabaseConfigured()) {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('payouts')
+        .insert([{
+          organization_id: payoutData.organization_id,
+          amount: payoutData.amount,
+          period_start: payoutData.period_start,
+          period_end: payoutData.period_end,
+          status: payoutData.status,
+          paid_at: payoutData.paid_at || new Date().toISOString(),
+          notes: payoutData.notes || null,
+        }])
+        .select(`
+          *,
+          organization:organizations(*)
+        `)
+        .single();
+
+      if (!error && data) return data as Payout;
+    }
+
+    const DEFAULT_PAYOUTS: Payout[] = [
+      {
+        id: 'payout-seed-1',
+        organization_id: 'org-youth-soccer',
+        amount: 1500.00,
+        period_start: '2026-07-01',
+        period_end: '2026-07-31',
+        status: 'paid',
+        paid_at: '2026-08-01T10:00:00Z',
+        notes: 'Paid via Bank Transfer - Ref #TXN987612',
+        created_at: '2026-08-01T10:00:00Z',
+      }
+    ];
+
+    const items = getLocalStorageData<Payout[]>('kids_event_payouts', DEFAULT_PAYOUTS);
+    items.unshift(newPayout);
+    setLocalStorageData('kids_event_payouts', items);
+    return newPayout;
   }
 }
+
 

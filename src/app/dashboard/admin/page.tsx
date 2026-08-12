@@ -6,14 +6,14 @@ import { useRouter } from 'next/navigation';
 import {
   Users, IndianRupee, Calendar, TrendingUp, Settings,
   LayoutDashboard, Ticket, AlertCircle, Loader2, ShieldAlert,
-  Star, BarChart3, LineChart, ChevronRight
+  Star, BarChart3, LineChart, ChevronRight, Receipt, CheckCircle2, History
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { dbService } from '@/services/db';
 import { authService } from '@/services/auth';
-import type { Event, Booking } from '@/types';
+import type { Event, Booking, Payout } from '@/types';
 import { motion } from 'framer-motion';
 import {
   ResponsiveContainer,
@@ -31,7 +31,7 @@ const SIDEBAR = [
   { href: '/dashboard/admin', label: 'Overview', icon: LayoutDashboard },
   { href: '/dashboard/admin/events/new', label: 'Create Event', icon: Calendar },
   { href: '#', label: 'Bookings', icon: Ticket },
-  { href: '#', label: 'Payouts', icon: IndianRupee },
+  { href: '#payouts', label: 'Payouts', icon: IndianRupee },
   { href: '/dashboard/admin/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -42,6 +42,7 @@ export default function AdminDashboard() {
   const [commissionPercent, setCommissionPercent] = useState<number>(15);
   const [events, setEvents] = useState<Event[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
   const [unauthorized, setUnauthorized] = useState(false);
 
@@ -58,10 +59,11 @@ export default function AdminDashboard() {
         const id = currentUser.organization_id;
         setOrgId(id);
 
-        const [org, evts, bkgs] = await Promise.all([
+        const [org, evts, bkgs, pyts] = await Promise.all([
           dbService.getOrganizationById(id),
           dbService.getEvents({ organizerId: id, status: 'all' }),
           dbService.getBookingsByOrganization(id),
+          dbService.getPayouts(id).catch(() => []),
         ]);
 
         if (org) {
@@ -72,6 +74,7 @@ export default function AdminDashboard() {
         }
         setEvents(evts);
         setBookings(bkgs);
+        setPayouts(pyts);
       } catch (err) {
         console.error('Error loading admin dashboard:', err);
       } finally {
@@ -80,6 +83,7 @@ export default function AdminDashboard() {
     };
     load();
   }, []);
+
 
   // Calculate Real Stats
   const {
@@ -516,6 +520,118 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Payout History & Settlement Status (Read-Only) */}
+            {(() => {
+              const paidPayouts = payouts.filter(p => p.status === 'paid');
+              const pendingBookings = bookings.filter(b => {
+                if (b.payment_status !== 'paid' || b.status === 'cancelled') return false;
+                const bDateStr = b.created_at ? b.created_at.split('T')[0] : '';
+                if (!bDateStr) return false;
+                return !paidPayouts.some(p => p.period_start <= bDateStr && bDateStr <= p.period_end);
+              });
+
+              const grossPending = pendingBookings.reduce((sum, b) => sum + (b.event?.price || 0), 0);
+              const pendingNetPayout = Math.round(grossPending * (1 - commissionPercent / 100));
+              const totalPaidOut = paidPayouts.reduce((sum, p) => sum + Number(p.amount), 0);
+
+              return (
+                <Card id="payouts" className="border-slate-200 bg-white shadow-sm scroll-mt-6">
+                  <CardHeader className="border-b border-slate-100 pb-4">
+                    <CardTitle className="text-card-title flex items-center justify-between">
+                      <span className="flex items-center gap-2">
+                        <IndianRupee className="w-5 h-5 text-purple-600" />
+                        Payout History & Settlement Status
+                      </span>
+                      <Badge variant="outline" className="text-micro font-semibold">Read-Only History</Badge>
+                    </CardTitle>
+                    <p className="text-caption text-slate-500 mt-1">
+                      Track your past payouts and current pending payout balance calculated from completed event bookings.
+                    </p>
+                  </CardHeader>
+                  <CardContent className="p-6 space-y-6">
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className="bg-purple-50/50 border border-purple-100 rounded-2xl p-4">
+                        <div className="text-micro font-bold text-purple-700 uppercase tracking-wider">Calculated Pending Payout</div>
+                        <div className="text-2xl font-black text-emerald-700 mt-1">₹{pendingNetPayout.toLocaleString('en-IN')}</div>
+                        <p className="text-micro text-slate-500 mt-1">{pendingBookings.length} un-settled booking(s)</p>
+                      </div>
+
+                      <div className="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-4">
+                        <div className="text-micro font-bold text-emerald-700 uppercase tracking-wider">Total Received to Date</div>
+                        <div className="text-2xl font-black text-slate-900 mt-1">₹{totalPaidOut.toLocaleString('en-IN')}</div>
+                        <p className="text-micro text-slate-500 mt-1">{paidPayouts.length} past payout record(s)</p>
+                      </div>
+
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4">
+                        <div className="text-micro font-bold text-slate-500 uppercase tracking-wider">Platform Commission Fee</div>
+                        <div className="text-2xl font-black text-slate-900 mt-1">{commissionPercent}%</div>
+                        <p className="text-micro text-slate-500 mt-1">Deducted automatically from gross</p>
+                      </div>
+                    </div>
+
+                    {/* Payout History Table */}
+                    <div>
+                      <h4 className="text-caption font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                        <History className="w-4 h-4 text-purple-600" />
+                        Payout Settlements List
+                      </h4>
+
+                      {payouts.length === 0 ? (
+                        <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-100">
+                          <Receipt className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                          <p className="text-body font-semibold text-slate-600">No payout records yet</p>
+                          <p className="text-caption text-slate-400 max-w-sm mx-auto mt-1">
+                            When platform admins process manual payouts via bank transfer or UPI, settlement details will be listed here.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+                          <table className="w-full text-left text-caption">
+                            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold text-micro uppercase">
+                              <tr>
+                                <th className="p-4">Settlement Period</th>
+                                <th className="p-4">Payout Amount</th>
+                                <th className="p-4">Status</th>
+                                <th className="p-4">Paid Date</th>
+                                <th className="p-4">Payment Notes / Ref</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {payouts.map(p => (
+                                <tr key={p.id} className="hover:bg-slate-50/50">
+                                  <td className="p-4 font-semibold text-slate-900">
+                                    {p.period_start} to {p.period_end}
+                                  </td>
+                                  <td className="p-4 font-black text-emerald-700 text-body">
+                                    ₹{Number(p.amount).toLocaleString('en-IN')}
+                                  </td>
+                                  <td className="p-4">
+                                    <span className={`px-2.5 py-1 rounded-full text-micro font-bold uppercase ${
+                                      p.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                    }`}>
+                                      {p.status === 'paid' ? 'Paid ✓' : p.status}
+                                    </span>
+                                  </td>
+                                  <td className="p-4 text-slate-600 text-micro">
+                                    {p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                  </td>
+                                  <td className="p-4 text-slate-600 text-micro italic">
+                                    {p.notes || '—'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
 
           </div>
         </div>

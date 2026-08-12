@@ -23,15 +23,23 @@ import {
   BarChart3,
   LineChart as LineChartIcon,
   Trophy,
-  Flag
+  Flag,
+  IndianRupee,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  History,
+  Receipt
 } from 'lucide-react';
 import Link from 'next/link';
 import { AdminGuard } from '@/components/admin/AdminGuard';
 import { dbService as db } from '@/services/db';
-import { Event, Booking, Organization, Achievement } from '@/types';
+import { Event, Booking, Organization, Achievement, Payout } from '@/types';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { motion } from 'framer-motion';
+
 import {
   ResponsiveContainer,
   BarChart,
@@ -44,7 +52,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 
-type AdminTab = 'overview' | 'events' | 'organizations' | 'achievements' | 'users' | 'categories' | 'bookings' | 'settings';
+type AdminTab = 'overview' | 'events' | 'organizations' | 'achievements' | 'users' | 'categories' | 'bookings' | 'payouts' | 'settings';
+
 
 export default function SuperAdminPage() {
   return (
@@ -64,7 +73,13 @@ function SuperAdminContent() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
+  const [payouts, setPayouts] = useState<Payout[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Payout States
+  const [payoutNotes, setPayoutNotes] = useState<Record<string, string>>({});
+  const [expandedOrgId, setExpandedOrgId] = useState<string | null>(null);
+  const [payoutSearch, setPayoutSearch] = useState('');
 
   // Search & Filter States
   const [eventSearch, setEventSearch] = useState('');
@@ -98,13 +113,14 @@ function SuperAdminContent() {
   const loadAllAdminData = async () => {
     setLoading(true);
     try {
-      const [allEvents, allUsers, allCats, allBookings, allOrgs, allAch] = await Promise.all([
+      const [allEvents, allUsers, allCats, allBookings, allOrgs, allAch, allPayouts] = await Promise.all([
         db.getEvents({ status: 'all' }),
         db.getAllUsersAdmin(),
         db.getCategoriesAdmin(),
         db.getAllBookingsAdmin().catch(() => []),
         db.getOrganizations(),
         db.getAchievements(),
+        db.getPayouts().catch(() => []),
       ]);
       setEvents(allEvents);
       setUsers(allUsers);
@@ -112,12 +128,48 @@ function SuperAdminContent() {
       setBookings(allBookings);
       setOrganizations(allOrgs);
       setAchievements(allAch);
+      setPayouts(allPayouts);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
+
+  const handleMarkAsPaid = async (
+    orgId: string,
+    orgName: string,
+    amount: number,
+    periodStart: string,
+    periodEnd: string
+  ) => {
+    if (amount <= 0) {
+      alert('There is no pending payout amount for this organization.');
+      return;
+    }
+    const notes = payoutNotes[orgId] || '';
+    const confirmText = `Confirm manual payout for ${orgName}:\nAmount: ₹${amount.toLocaleString('en-IN')}\nPeriod: ${periodStart} to ${periodEnd}${notes ? `\nNotes: ${notes}` : ''}`;
+    if (!confirm(confirmText)) return;
+
+    try {
+      await db.createPayout({
+        organization_id: orgId,
+        amount,
+        period_start: periodStart,
+        period_end: periodEnd,
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+        notes: notes.trim() || null,
+      });
+
+      setPayoutNotes(prev => ({ ...prev, [orgId]: '' }));
+      await loadAllAdminData();
+      alert(`Payout of ₹${amount.toLocaleString('en-IN')} marked as PAID for ${orgName}!`);
+    } catch (err: any) {
+      alert(err?.message || 'Failed to mark payout as paid.');
+    }
+  };
+
 
   const handleApproveAchievement = async (id: string) => {
     await db.updateAchievementStatus(id, 'public_approved');
@@ -292,7 +344,9 @@ function SuperAdminContent() {
               { id: 'users', label: 'User Directory', icon: Users, badge: null },
               { id: 'categories', label: 'Categories', icon: Tag, badge: null },
               { id: 'bookings', label: 'Bookings & Revenue', icon: CreditCard, badge: null },
+              { id: 'payouts', label: 'Organizer Payouts', icon: IndianRupee, badge: null },
               { id: 'settings', label: 'Platform Settings', icon: Settings, badge: null },
+
             ].map(item => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -1035,6 +1089,271 @@ function SuperAdminContent() {
             </div>
           </div>
         )}
+
+        {activeTab === 'payouts' && (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-black text-slate-900 flex items-center gap-2">
+                <IndianRupee className="w-7 h-7 text-purple-600" />
+                Organizer Payout Management
+              </h1>
+              <p className="text-slate-600 text-body mt-1">
+                Manual payout tracking system. Calculate pending net payouts from confirmed bookings and mark them as paid after offline transfers (Bank / UPI).
+              </p>
+            </div>
+
+            {/* Summary Metrics */}
+            {(() => {
+              let totalPendingAmount = 0;
+              let orgsWithPendingCount = 0;
+
+              organizations.forEach(org => {
+                const orgEvts = events.filter(e => e.organizer_id === org.id);
+                const orgBkgs = bookings.filter(b => orgEvts.some(e => e.id === b.event_id) && b.payment_status === 'paid' && b.status !== 'cancelled');
+                const orgPaidPayouts = payouts.filter(p => p.organization_id === org.id && p.status === 'paid');
+
+                const pendingBkgs = orgBkgs.filter(b => {
+                  const bDateStr = b.created_at ? b.created_at.split('T')[0] : '';
+                  if (!bDateStr) return false;
+                  return !orgPaidPayouts.some(p => p.period_start <= bDateStr && bDateStr <= p.period_end);
+                });
+
+                const commRate = (org as any).commission_percent || 15;
+                const grossPending = pendingBkgs.reduce((sum, b) => sum + (b.event?.price || 0), 0);
+                const netPending = Math.round(grossPending * (1 - commRate / 100));
+
+                if (netPending > 0) {
+                  totalPendingAmount += netPending;
+                  orgsWithPendingCount++;
+                }
+              });
+
+              const totalPaidAmount = payouts
+                .filter(p => p.status === 'paid')
+                .reduce((sum, p) => sum + Number(p.amount), 0);
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <Card className="border border-purple-100 bg-gradient-to-br from-white to-purple-50/40">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-caption font-semibold text-purple-700 uppercase tracking-wider">
+                        Total Pending Payouts
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-black text-slate-900">
+                        ₹{totalPendingAmount.toLocaleString('en-IN')}
+                      </div>
+                      <p className="text-micro text-slate-500 mt-1">Across {orgsWithPendingCount} organization(s)</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/40">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-caption font-semibold text-emerald-700 uppercase tracking-wider">
+                        Total Paid Out
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-black text-slate-900">
+                        ₹{totalPaidAmount.toLocaleString('en-IN')}
+                      </div>
+                      <p className="text-micro text-slate-500 mt-1">Total recorded offline payments</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border border-amber-100 bg-gradient-to-br from-white to-amber-50/40">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-caption font-semibold text-amber-700 uppercase tracking-wider">
+                        Pending Actions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-3xl font-black text-amber-600">
+                        {orgsWithPendingCount} Orgs
+                      </div>
+                      <p className="text-micro text-slate-500 mt-1">Awaiting manual payout</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
+
+            {/* Filter Search */}
+            <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search organization by name or contact email..."
+                  value={payoutSearch}
+                  onChange={e => setPayoutSearch(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-caption font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+
+            {/* Organizations Payout List */}
+            <div className="space-y-4">
+              {organizations
+                .filter(o =>
+                  o.name.toLowerCase().includes(payoutSearch.toLowerCase()) ||
+                  o.contact_email.toLowerCase().includes(payoutSearch.toLowerCase())
+                )
+                .map(org => {
+                  const orgEvts = events.filter(e => e.organizer_id === org.id);
+                  const orgBkgs = bookings.filter(b => orgEvts.some(e => e.id === b.event_id) && b.payment_status === 'paid' && b.status !== 'cancelled');
+                  const orgPayoutRecords = payouts.filter(p => p.organization_id === org.id);
+                  const paidPayoutRecords = orgPayoutRecords.filter(p => p.status === 'paid');
+
+                  const pendingBkgs = orgBkgs.filter(b => {
+                    const bDateStr = b.created_at ? b.created_at.split('T')[0] : '';
+                    if (!bDateStr) return false;
+                    return !paidPayoutRecords.some(p => p.period_start <= bDateStr && bDateStr <= p.period_end);
+                  });
+
+                  const commRate = (org as any).commission_percent || 15;
+                  const grossPending = pendingBkgs.reduce((sum, b) => sum + (b.event?.price || 0), 0);
+                  const pendingNetPayout = Math.round(grossPending * (1 - commRate / 100));
+
+                  // Calculate period dates
+                  let periodStart = '2026-08-01';
+                  if (pendingBkgs.length > 0) {
+                    const dates = pendingBkgs.map(b => b.created_at ? b.created_at.split('T')[0] : '').filter(Boolean).sort();
+                    if (dates.length > 0) periodStart = dates[0];
+                  } else if (paidPayoutRecords.length > 0) {
+                    const sortedEnds = paidPayoutRecords.map(p => p.period_end).sort();
+                    periodStart = sortedEnds[sortedEnds.length - 1];
+                  }
+                  const periodEnd = new Date().toISOString().split('T')[0];
+
+                  const isExpanded = expandedOrgId === org.id;
+
+                  return (
+                    <div key={org.id} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+                      <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                        <div className="space-y-1 max-w-sm">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-bold text-slate-900 text-body">{org.name}</h3>
+                            <Badge variant={org.verified ? 'default' : 'secondary'} className="text-micro">
+                              {org.type}
+                            </Badge>
+                          </div>
+                          <p className="text-micro text-slate-500">{org.contact_email}</p>
+                          <div className="flex items-center gap-3 text-micro text-slate-600 pt-1">
+                            <span>{orgBkgs.length} Paid Booking(s)</span>
+                            <span>•</span>
+                            <span>Fee: {commRate}%</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 min-w-[200px]">
+                          <div className="text-micro font-semibold text-slate-500 uppercase tracking-wide">Pending Payout</div>
+                          <div className="text-2xl font-black text-emerald-700 mt-0.5">
+                            ₹{pendingNetPayout.toLocaleString('en-IN')}
+                          </div>
+                          <div className="text-micro text-slate-500 mt-1">
+                            Period: {periodStart} – {periodEnd}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                          <input
+                            type="text"
+                            placeholder="Optional notes (ref #, bank info)"
+                            value={payoutNotes[org.id] || ''}
+                            onChange={e => setPayoutNotes({ ...payoutNotes, [org.id]: e.target.value })}
+                            className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-caption focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          />
+                          <Button
+                            onClick={() => handleMarkAsPaid(org.id, org.name, pendingNetPayout, periodStart, periodEnd)}
+                            disabled={pendingNetPayout <= 0}
+                            className={`whitespace-nowrap font-bold text-caption ${
+                              pendingNetPayout > 0
+                                ? 'bg-purple-600 hover:bg-purple-700 text-white shadow-sm'
+                                : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                            }`}
+                          >
+                            <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                            {pendingNetPayout > 0 ? 'Mark as Paid' : 'No Pending Balance'}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Expand History Footer */}
+                      <div className="bg-slate-50/70 px-5 py-2.5 border-t border-slate-100 flex items-center justify-between">
+                        <button
+                          onClick={() => setExpandedOrgId(isExpanded ? null : org.id)}
+                          className="flex items-center gap-1.5 text-caption font-bold text-purple-700 hover:text-purple-900 transition-colors"
+                        >
+                          <History className="w-4 h-4" />
+                          <span>Payout History ({orgPayoutRecords.length})</span>
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
+                        <span className="text-micro text-slate-400 font-medium">
+                          {paidPayoutRecords.length} paid payout(s) recorded
+                        </span>
+                      </div>
+
+                      {/* History Table */}
+                      {isExpanded && (
+                        <div className="p-5 border-t border-slate-200 bg-slate-50/30">
+                          <h4 className="text-caption font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                            <Receipt className="w-4 h-4 text-purple-600" />
+                            Payout History Records for {org.name}
+                          </h4>
+
+                          {orgPayoutRecords.length === 0 ? (
+                            <p className="text-caption text-slate-500 py-3 italic">No payout records found for this organization yet.</p>
+                          ) : (
+                            <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                              <table className="w-full text-left text-caption">
+                                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold text-micro uppercase">
+                                  <tr>
+                                    <th className="p-3">Period</th>
+                                    <th className="p-3">Amount</th>
+                                    <th className="p-3">Status</th>
+                                    <th className="p-3">Paid Date</th>
+                                    <th className="p-3">Notes / Ref</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100">
+                                  {orgPayoutRecords.map(p => (
+                                    <tr key={p.id} className="hover:bg-slate-50/50">
+                                      <td className="p-3 font-semibold text-slate-800">
+                                        {p.period_start} to {p.period_end}
+                                      </td>
+                                      <td className="p-3 font-black text-emerald-700">
+                                        ₹{Number(p.amount).toLocaleString('en-IN')}
+                                      </td>
+                                      <td className="p-3">
+                                        <span className={`px-2.5 py-0.5 rounded-full text-micro font-bold uppercase ${
+                                          p.status === 'paid' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
+                                        }`}>
+                                          {p.status === 'paid' ? 'Paid ✓' : p.status}
+                                        </span>
+                                      </td>
+                                      <td className="p-3 text-slate-600 text-micro">
+                                        {p.paid_at ? new Date(p.paid_at).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                                      </td>
+                                      <td className="p-3 text-slate-600 text-micro italic">
+                                        {p.notes || '—'}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
 
       </main>
     </div>
