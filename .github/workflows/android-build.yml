@@ -40,10 +40,21 @@ jobs:
       - name: Make Gradlew Executable
         run: chmod +x android/gradlew
 
+      - name: Decode Android Release Keystore
+        if: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/kidspire-release-key.jks
+
       - name: Build Android App with Gradle (Debug APK & Release AAB)
+        env:
+          ANDROID_KEYSTORE_PATH: kidspire-release-key.jks
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
           cd android
           ./gradlew assembleDebug bundleRelease --stacktrace
+
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
