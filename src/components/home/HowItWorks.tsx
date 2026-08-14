@@ -1,62 +1,90 @@
 import React from 'react';
-import { Search, CalendarCheck, Smile, CheckCircle } from 'lucide-react';
+import { Search, Compass, CalendarCheck, Sparkles, CheckCircle2 } from 'lucide-react';
 
 const steps = [
   {
+    stepNumber: '01',
     icon: Search,
     title: 'Discover Activities',
-    description: 'Browse through hundreds of curated sports, arts, and hobby activities in your area using our smart filters.',
+    description: 'Explore curated sports, arts, STEM, and music programs tailored by age, skill level, and location.',
     color: 'bg-purple-100 text-purple-600',
-    borderColor: 'border-purple-200'
+    badge: 'Smart Filters',
   },
   {
+    stepNumber: '02',
+    icon: Compass,
+    title: 'Choose the Right Fit',
+    description: 'Compare age brackets, growth outcome tracks, parent ratings, and verified coach certifications.',
+    color: 'bg-blue-100 text-blue-600',
+    badge: '100% Verified',
+  },
+  {
+    stepNumber: '03',
     icon: CalendarCheck,
-    title: 'Book Seamlessly',
-    description: 'Check availability, read reviews, and book instantly with our secure payment gateway in just a few clicks.',
-    color: 'bg-orange-100 text-orange-600',
-    borderColor: 'border-orange-200'
+    title: 'Book Instantly',
+    description: 'Reserve seats in seconds with instant digital confirmation, e-tickets, and automated calendar sync.',
+    color: 'bg-amber-100 text-amber-600',
+    badge: 'Instant E-Tickets',
   },
   {
-    icon: Smile,
-    title: 'Enjoy & Grow',
-    description: 'Watch your child learn new skills, make friends, and have fun in a safe, verified environment.',
-    color: 'bg-green-100 text-green-600',
-    borderColor: 'border-green-200'
-  }
+    stepNumber: '04',
+    icon: Sparkles,
+    title: 'Let the Adventure Begin 🎉',
+    description: 'Watch your child gain confidence, develop skills, and create lifelong memories with new friends!',
+    color: 'bg-emerald-100 text-emerald-600',
+    badge: 'Parent Guaranteed',
+  },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-white relative overflow-hidden">
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50/50 -skew-x-12 transform origin-top-right -z-10"></div>
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
-          <h2 className="text-section-title font-bold text-slate-900 mb-3 sm:mb-4 tracking-tight">How Kidspire Works</h2>
-          <p className="text-slate-600 text-body">We make it incredibly simple for parents to find and manage the best extracurricular activities for their children.</p>
+    <section className="py-16 md:py-20 bg-white relative overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
+        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+          <span className="px-3.5 py-1.5 rounded-full bg-purple-100 text-purple-700 text-micro font-bold uppercase tracking-wider inline-block mb-3">
+            Simple 4-Step Process
+          </span>
+          <h2 className="text-section-title font-extrabold text-slate-900 tracking-tight">How Kidspire Works for Parents</h2>
+          <p className="text-slate-600 text-body mt-2">Finding and booking unforgettable extracurricular experiences for your children is quick and stress-free.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
-          {/* Connecting Line (desktop only) */}
-          <div className="hidden md:block absolute top-12 left-[15%] w-[70%] h-[2px] bg-slate-100 -z-10"></div>
-          
-          {steps.map((step, index) => {
+        {/* 4 Steps Grid (4 Columns Desktop) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 relative">
+          {steps.map((step) => {
             const Icon = step.icon;
             return (
-              <div key={index} className="flex flex-col items-center text-center relative group">
-                <div className={`w-24 h-24 rounded-full ${step.color} flex items-center justify-center mb-8 border-8 border-white shadow-xl relative transition-transform duration-300 group-hover:scale-110`}>
-                  <Icon className="w-10 h-10" />
-                  <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center text-caption shadow-md">
-                    {index + 1}
+              <div
+                key={step.stepNumber}
+                className="bg-slate-50 border border-slate-100 rounded-3xl p-6 sm:p-7 flex flex-col justify-between hover:bg-purple-50/40 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group relative"
+              >
+                <div>
+                  {/* Step Header with Number & Icon */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className={`w-14 h-14 rounded-2xl ${step.color} flex items-center justify-center font-bold text-xl shadow-xs group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="w-7 h-7" />
+                    </div>
+                    <span className="text-3xl font-extrabold text-slate-300 group-hover:text-purple-400 transition-colors">
+                      {step.stepNumber}
+                    </span>
                   </div>
+
+                  <span className="text-micro font-extrabold text-purple-700 bg-purple-100/80 px-2.5 py-0.5 rounded-full inline-block mb-2">
+                    {step.badge}
+                  </span>
+
+                  <h3 className="font-extrabold text-xl text-slate-900 mb-3 group-hover:text-purple-700 transition-colors">
+                    {step.title}
+                  </h3>
+
+                  <p className="text-slate-600 text-caption leading-relaxed font-medium">
+                    {step.description}
+                  </p>
                 </div>
-                <h3 className="text-card-title font-bold text-slate-900 mb-4">{step.title}</h3>
-                <p className="text-slate-600 text-body leading-relaxed">{step.description}</p>
-                
-                <ul className="mt-6 space-y-2 text-caption text-slate-500 text-left w-full max-w-[200px] mx-auto">
-                  <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Verified Organizers</li>
-                  <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Instant Confirmation</li>
-                  <li className="flex items-center"><CheckCircle className="w-4 h-4 mr-2 text-green-500 shrink-0" /> Easy Rescheduling</li>
-                </ul>
+
+                <div className="mt-6 pt-4 border-t border-slate-200/60 flex items-center gap-1.5 text-micro font-semibold text-emerald-700">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>Hassle-Free Booking</span>
+                </div>
               </div>
             );
           })}
@@ -65,3 +93,4 @@ export function HowItWorks() {
     </section>
   );
 }
+

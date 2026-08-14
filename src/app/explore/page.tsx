@@ -93,8 +93,8 @@ function ExploreContent() {
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-page-title font-bold text-slate-900 mb-3 tracking-tight">Explore Activities</h1>
-            <p className="text-slate-600 text-body max-w-2xl">Find the perfect class or event for your child. Filter by category, age group, or search by keyword.</p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-2 tracking-tight leading-tight">Explore Activities</h1>
+            <p className="text-slate-600 text-base md:text-lg max-w-2xl font-medium leading-relaxed">Find the perfect class or event for your child. Filter by category, age group, or search by keyword.</p>
           </div>
           <button
             onClick={handleSurpriseMe}

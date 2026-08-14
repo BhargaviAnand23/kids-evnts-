@@ -16,8 +16,8 @@ export default function AboutPage() {
           <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             Our Story & Mission
           </span>
-          <h1 className="text-page-title font-bold text-slate-900 mb-4">About Kidspire</h1>
-          <p className="text-slate-600 text-body">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-3 tracking-tight leading-tight">About Kidspire</h1>
+          <p className="text-slate-600 text-base md:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
             Empowering parents to discover, book, and manage verified extracurricular sports, arts, and hobby activities for kids and teens.
           </p>
         </div>

@@ -1,186 +1,79 @@
 "use client";
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Trophy, Palette } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { WavyDivider } from '@/components/ui/SectionDividers';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
-const parentCategoryHubs = [
-  {
-    name: 'Sports Hub',
-    subtitle: '6 Activity Subcategories',
-    description: 'Football, Basketball, Cricket, Swimming, Skating & Cycling',
-    link: '/explore?category=sports',
-    photo: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=800&auto=format&fit=crop&q=60',
-    overlay: 'bg-gradient-to-t from-emerald-950/90 via-emerald-900/60 to-emerald-900/20',
-    icon: '⚽',
-    animClass: 'animate-bounce-subtle',
-    badge: 'Parent Hub 1',
-    badgeColor: 'bg-emerald-400 text-emerald-950',
-    borderColor: 'border-emerald-300 hover:border-emerald-500',
-  },
-  {
-    name: 'Talents & Hobbies Hub',
-    subtitle: '10 Activity Subcategories',
-    description: 'Music, Art & Crafts, Dance, Martial Arts, STEM & Robotics, Drama, Chess, Cooking & Public Speaking',
-    link: '/explore?category=talents',
-    photo: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop&q=60',
-    overlay: 'bg-gradient-to-t from-purple-950/90 via-purple-900/60 to-purple-900/20',
-    icon: '🎨',
-    animClass: 'animate-float-subtle',
-    badge: 'Parent Hub 2',
-    badgeColor: 'bg-purple-400 text-purple-950',
-    borderColor: 'border-purple-300 hover:border-purple-500',
-  },
+const CATEGORIES = [
+  { name: 'Football', icon: '⚽', desc: 'Soccer camps & tournaments', count: '14+ Events', bg: 'bg-emerald-50 text-emerald-900 border-emerald-100 hover:border-emerald-300' },
+  { name: 'Basketball', icon: '🏀', desc: 'Court drills & 3v3 leagues', count: '10+ Events', bg: 'bg-amber-50 text-amber-900 border-amber-100 hover:border-amber-300' },
+  { name: 'Cricket', icon: '🏏', desc: 'Bowling & batting coaching', count: '12+ Events', bg: 'bg-indigo-50 text-indigo-900 border-indigo-100 hover:border-indigo-300' },
+  { name: 'Swimming', icon: '🏊', desc: 'Water safety & stroke mastery', count: '16+ Events', bg: 'bg-cyan-50 text-cyan-900 border-cyan-100 hover:border-cyan-300' },
+  { name: 'Skating', icon: '⛸️', desc: 'Roller & ice skating classes', count: '8+ Events', bg: 'bg-sky-50 text-sky-900 border-sky-100 hover:border-sky-300' },
+  { name: 'Cycling', icon: '🚴', desc: 'Trail rides & balance training', count: '6+ Events', bg: 'bg-teal-50 text-teal-900 border-teal-100 hover:border-teal-300' },
+  { name: 'Music', icon: '🎵', desc: 'Vocal, guitar, piano & drums', count: '18+ Events', bg: 'bg-purple-50 text-purple-900 border-purple-100 hover:border-purple-300' },
+  { name: 'Dance', icon: '💃', desc: 'Hip Hop, Ballet & Bollywood', count: '20+ Events', bg: 'bg-pink-50 text-pink-900 border-pink-100 hover:border-pink-300' },
+  { name: 'Chess', icon: '♟️', desc: 'Tactics, opening & endgame', count: '15+ Events', bg: 'bg-slate-100 text-slate-900 border-slate-200 hover:border-slate-400' },
+  { name: 'Art & Crafts', icon: '🎨', desc: 'Pottery, sketching & painting', count: '22+ Events', bg: 'bg-rose-50 text-rose-900 border-rose-100 hover:border-rose-300' },
+  { name: 'Drama', icon: '🎭', desc: 'Theatre & stage performance', count: '9+ Events', bg: 'bg-violet-50 text-violet-900 border-violet-100 hover:border-violet-300' },
+  { name: 'Cooking', icon: '👨‍🍳', desc: 'Junior baking & culinary fun', count: '7+ Events', bg: 'bg-orange-50 text-orange-900 border-orange-100 hover:border-orange-300' },
+  { name: 'STEM', icon: '🔬', desc: 'Robotics, AI & science labs', count: '14+ Events', bg: 'bg-blue-50 text-blue-900 border-blue-100 hover:border-blue-300' },
+  { name: 'Martial Arts', icon: '🥋', desc: 'Karate, Taekwondo & Judo', count: '11+ Events', bg: 'bg-red-50 text-red-900 border-red-100 hover:border-red-300' },
+  { name: 'Yoga', icon: '🧘', desc: 'Mindfulness & flexibility', count: '5+ Events', bg: 'bg-emerald-50 text-emerald-900 border-emerald-100 hover:border-emerald-300' },
+  { name: 'Public Speaking', icon: '🎤', desc: 'Debate, declamation & poise', count: '13+ Events', bg: 'bg-fuchsia-50 text-fuchsia-900 border-fuchsia-100 hover:border-fuchsia-300' },
 ];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 24, scale: 0.96 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.45, ease: 'easeOut' as const }
-  },
-};
 
 export function Categories() {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-white">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-purple-50/40 via-white to-slate-50/50 relative">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
           <div>
-            <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Explore by Category</h2>
-            <p className="text-slate-600 text-body">Choose from our two primary activity hubs — high-energy Sports or creative Talents &amp; Hobbies.</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100/80 text-purple-700 text-micro font-bold uppercase tracking-wider mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              Discover By Interest
+            </div>
+            <h2 className="text-section-title font-extrabold text-slate-900 tracking-tight">
+              Explore 16+ Activity Categories
+            </h2>
+            <p className="text-slate-600 text-body mt-1">
+              From high-energy outdoor sports to creative performing arts and robotics workshops.
+            </p>
           </div>
-          <Link href="/categories" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-body">
-            View All Categories 
-            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+          <Link
+            href="/categories"
+            className="mt-4 md:mt-0 inline-flex items-center text-purple-600 font-bold hover:text-purple-800 group text-caption shrink-0"
+          >
+            View All Categories
+            <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
-        {/* 2 Main Parent Hub Tiles */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
-        >
-          {parentCategoryHubs.map((category) => (
-            <motion.div key={category.name} variants={itemVariants}>
-              <Link
-                href={category.link}
-                className={`group relative block h-64 sm:h-72 lg:h-80 rounded-[32px] overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-400 border-2 ${category.borderColor}`}
-              >
-                {/* Background photo */}
-                <img
-                  src={category.photo}
-                  alt={category.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-                {/* Gradient overlay */}
-                <div className={`absolute inset-0 ${category.overlay} transition-opacity duration-300`} />
-
-                {/* Floating Hub Badge */}
-                <div className="absolute top-4 left-4 z-10">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-micro font-extrabold shadow-md ${category.badgeColor}`}>
-                    <span>{category.icon}</span>
-                    <span>{category.badge}</span>
-                  </span>
-                </div>
-
-                {/* Bottom content info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col justify-end">
-                  <span className="text-caption font-semibold text-white/80 uppercase tracking-widest mb-1">
-                    {category.subtitle}
-                  </span>
-                  <h3 className="font-extrabold text-2xl sm:text-3xl text-white drop-shadow-md leading-tight mb-2 group-hover:text-purple-200 transition-colors">
-                    {category.name}
-                  </h3>
-                  <p className="text-caption text-white/90 line-clamp-2 leading-relaxed mb-4">
-                    {category.description}
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-micro font-bold text-white bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full w-fit group-hover:bg-white group-hover:text-slate-900 transition-all">
-                    Explore Hub Subcategories <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-
-        {/* Wavy Section Divider */}
-        <WavyDivider className="my-12 text-purple-200/50" />
-
-        {/* Browse by Type */}
-        <div className="mb-8 sm:mb-12">
-          <h2 className="text-section-title font-bold text-slate-900 mb-4 tracking-tight">Browse by Activity Type</h2>
-          <p className="text-slate-600 text-body">Select from these four listing types to find matching opportunities for your child.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              name: 'Events',
-              description: 'Single-day programs, camps, and local school events.',
-              link: '/explore?type=event',
-              colorClass: 'from-purple-500 to-indigo-600 shadow-purple-500/20',
-              icon: '🎉',
-            },
-            {
-              name: 'Competitions',
-              description: 'Tournaments, sports meets, championships, and talent shows.',
-              link: '/explore?type=competition',
-              colorClass: 'from-amber-500 to-orange-600 shadow-amber-500/20',
-              icon: '🏆',
-            },
-            {
-              name: 'Courses',
-              description: 'Multi-week programs, structured classes, and masterclasses.',
-              link: '/explore?type=course',
-              colorClass: 'from-emerald-500 to-teal-600 shadow-emerald-500/20',
-              icon: '📚',
-            },
-            {
-              name: 'Webinars',
-              description: 'Online learning sessions, parent talks, and virtual seminars.',
-              link: '/explore?type=webinar',
-              colorClass: 'from-blue-500 to-sky-600 shadow-blue-500/20',
-              icon: '💻',
-            },
-          ].map((type) => (
+        {/* 16 Category Cards - 4 Columns on Large Screen */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-5">
+          {CATEGORIES.map((cat) => (
             <Link
-              key={type.name}
-              href={type.link}
-              className="group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              key={cat.name}
+              href={`/explore?category=${encodeURIComponent(cat.name)}`}
+              className={`group block p-4 sm:p-5 rounded-2xl border transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg ${cat.bg} flex flex-col justify-between h-full`}
             >
-              <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
-              
               <div>
-                <div className="text-3xl mb-4">{type.icon}</div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">
-                  {type.name}
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-3xl sm:text-4xl group-hover:scale-110 transition-transform duration-300">{cat.icon}</span>
+                  <span className="text-micro font-bold bg-white/80 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-2xs text-slate-700">
+                    {cat.count}
+                  </span>
+                </div>
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg mb-1 leading-snug group-hover:text-purple-700 transition-colors">
+                  {cat.name}
                 </h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                  {type.description}
+                <p className="text-micro sm:text-caption text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                  {cat.desc}
                 </p>
               </div>
 
-              <span className="text-xs font-semibold text-purple-600 flex items-center gap-1.5 group-hover:underline">
-                Explore Listings
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </span>
+              <div className="mt-4 pt-2 flex items-center text-micro font-bold text-purple-700 group-hover:underline">
+                Browse Programs <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
             </Link>
           ))}
         </div>
@@ -188,3 +81,4 @@ export function Categories() {
     </section>
   );
 }
+
