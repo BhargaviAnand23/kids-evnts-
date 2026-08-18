@@ -21,10 +21,10 @@ export function getEventBadge(event: Event): BadgeType {
 }
 
 const BADGE_CONFIG: Record<BadgeType, { label: string; bg: string; text: string; Icon: React.ElementType }> = {
-  hot:      { label: 'Hot',      bg: 'bg-gradient-to-r from-orange-500 to-amber-500 shadow-sm', text: 'text-white font-black', Icon: Flame      },
-  popular:  { label: 'Popular',  bg: 'bg-gradient-to-r from-amber-400 to-yellow-500 shadow-sm', text: 'text-amber-950 font-black', Icon: Star       },
-  new:      { label: 'New',      bg: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-sm', text: 'text-white font-black', Icon: Leaf       },
-  trending: { label: 'Trending', bg: 'bg-gradient-to-r from-purple-600 to-indigo-600 shadow-sm', text: 'text-white font-black', Icon: TrendingUp },
+  hot:      { label: 'Hot',      bg: 'bg-fuchsia-600', text: 'text-white',     Icon: Flame      },
+  popular:  { label: 'Popular',  bg: 'bg-amber-400',   text: 'text-amber-950', Icon: Star       },
+  new:      { label: 'New',      bg: 'bg-emerald-600', text: 'text-white',     Icon: Leaf       },
+  trending: { label: 'Trending', bg: 'bg-indigo-600',  text: 'text-white',     Icon: TrendingUp },
 };
 
 import { useRouter } from 'next/navigation';
@@ -254,17 +254,17 @@ export function EventCard({ event }: { event: Event }) {
       >
 
         {/* Image */}
-        <div className="relative h-52 sm:h-56 lg:h-60 xl:h-64 overflow-hidden shrink-0">
+        <div className="relative h-48 sm:h-52 lg:h-56 xl:h-60 overflow-hidden shrink-0">
           <img
             src={event.image_url || 'https://images.unsplash.com/photo-1574629810360-7efbb192569a?w=600&auto=format&fit=crop&q=60'}
             alt={event.title}
-            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
 
           {/* Status badge — top left */}
           <div className="absolute top-3 left-3">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black shadow-md ${bg} ${text}`}>
-              <Icon className="w-3.5 h-3.5" />
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-md ${bg} ${text}`}>
+              <Icon className="w-3 h-3" />
               {label}
             </span>
           </div>
@@ -283,8 +283,8 @@ export function EventCard({ event }: { event: Event }) {
           {/* Sponsored tag */}
           {event.is_sponsored && (
             <div className="absolute bottom-3 left-3">
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-micro font-black bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md">
-                <Sparkles className="w-3.5 h-3.5" /> Sponsored
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-micro font-bold bg-purple-600 text-white shadow">
+                <Sparkles className="w-3 h-3" /> Sponsored
               </span>
             </div>
           )}
@@ -311,46 +311,36 @@ export function EventCard({ event }: { event: Event }) {
             {event.title}
           </h3>
 
-          {/* Organizer with Verified Checkmark */}
+          {/* Organizer */}
           {event.organizer?.name ? (
-            <div className="flex items-center gap-1.5 mb-2.5">
-              <span
-                onClick={(e) => {
-                  const orgId = event.organizer_id || event.organizer?.id;
-                  if (orgId) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    window.location.href = `/organizers/${orgId}`;
-                  }
-                }}
-                className="text-caption text-slate-500 hover:text-purple-600 font-medium line-clamp-1 cursor-pointer transition-colors"
-              >
-                {event.organizer.name}
-              </span>
-              <span className="inline-flex items-center text-emerald-600 shrink-0" title="Verified Host">
-                ✓
-              </span>
-            </div>
+            <span
+              onClick={(e) => {
+                const orgId = event.organizer_id || event.organizer?.id;
+                if (orgId) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.location.href = `/organizers/${orgId}`;
+                }
+              }}
+              className="text-caption text-slate-500 hover:text-purple-600 mb-3 font-medium line-clamp-1 cursor-pointer transition-colors inline-block"
+            >
+              {event.organizer.name}
+            </span>
           ) : null}
 
           {/* Date */}
-          <div className="flex items-center text-caption text-slate-600 mb-1.5 font-medium">
-            <Calendar className="w-3.5 h-3.5 mr-2 text-slate-400 shrink-0" />
+          <div className="flex items-center text-caption text-slate-600 mb-1.5">
+            <Calendar className="w-4 h-4 mr-2 text-slate-400 shrink-0" />
             {new Date(event.event_date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
             {event.event_time ? ` · ${event.event_time.slice(0, 5)}` : ''}
           </div>
 
           {/* Location */}
-          <div className="flex items-center text-caption text-slate-600 mb-3 font-medium">
-            <MapPin className="w-3.5 h-3.5 mr-2 text-slate-400 shrink-0" />
+          <div className="flex items-center text-caption text-slate-600 mb-3">
+            <MapPin className="w-4 h-4 mr-2 text-slate-400 shrink-0" />
             <span className="truncate">
               {event.is_online ? 'Online Webinar' : (event.location || 'Online')}
             </span>
-          </div>
-
-          {/* Seats Game Meter */}
-          <div className="mb-3">
-            <SeatsGameMeter seatsTotal={20} seatsAvailable={event.seats_available ?? 12} compact />
           </div>
 
           {/* Type-Specific Extras */}
@@ -375,19 +365,16 @@ export function EventCard({ event }: { event: Event }) {
           {/* Price + Book Now */}
           <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
             <div>
-              <span className="font-extrabold text-section-title text-slate-900">
-                {event.price > 0 ? `₹${event.price}` : 'FREE'}
-              </span>
-              {event.price > 0 && <span className="text-caption text-slate-400 ml-1 font-medium">/ seat</span>}
+              <span className="font-bold text-section-title text-slate-900">₹{event.price}</span>
+              <span className="text-caption text-slate-400 ml-1">/ child</span>
             </div>
             <button
               onClick={e => e.stopPropagation()}
-              className="px-4 sm:px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-amber-500 hover:to-rose-500 active:scale-95 text-white text-caption font-extrabold rounded-full transition-all duration-300 shadow-md shadow-purple-500/20 hover:shadow-lg hover:shadow-orange-500/30 shrink-0"
+              className="px-3.5 sm:px-4 lg:px-5 py-2 bg-purple-600 hover:bg-purple-700 active:scale-95 text-white text-caption font-semibold rounded-full transition-all duration-150 shadow-sm shadow-purple-500/30 shrink-0"
             >
               {event.listing_type === 'webinar' ? 'Join Online' : 'Book Now'}
             </button>
           </div>
-
         </div>
       </div>
     </Link>

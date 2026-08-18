@@ -68,8 +68,8 @@ export default function ContactPage() {
           <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             We're Here to Help
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-3 tracking-tight leading-tight">Contact Us</h1>
-          <p className="text-slate-600 text-base md:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+          <h1 className="text-page-title font-bold text-slate-900 mb-4">Contact Us</h1>
+          <p className="text-slate-600 text-body">
             Have questions about an activity booking, partner registration, or safety guidelines? Get in touch with our team.
           </p>
         </div>

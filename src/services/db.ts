@@ -24,7 +24,7 @@ const SEED_SCHOOLS: School[] = [
 ]
 
 // Mock organizations for event hosting
-export const SEED_ORGANIZATIONS: Organization[] = [
+const SEED_ORGANIZATIONS: Organization[] = [
   {
     id: 'org-youth-soccer',
     name: 'Metropolitan Youth Sports Club',
@@ -347,20 +347,13 @@ export const dbService = {
   },
 
   // --- ORGANIZATIONS ---
-  async getOrganizations(filters?: { status?: string }): Promise<Organization[]> {
-    let orgs: Organization[] = []
+  async getOrganizations(): Promise<Organization[]> {
     if (isSupabaseConfigured()) {
       const supabase = createClient()
       const { data, error } = await supabase.from('organizations').select('*').order('name')
-      if (!error && data) orgs = data
-    } else {
-      orgs = getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
+      if (!error && data) return data
     }
-    if (filters?.status) {
-      const filtered = orgs.filter(o => (o as any).status === filters.status || o.verified)
-      return filtered.length > 0 ? filtered : orgs
-    }
-    return orgs
+    return getLocalStorageData<Organization[]>('kids_event_organizations', SEED_ORGANIZATIONS)
   },
 
   async getOrganizationById(id: string): Promise<Organization | null> {

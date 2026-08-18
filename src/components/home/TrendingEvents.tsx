@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { EventCard } from '@/components/shared/EventCard';
-import { HorizontalCarousel } from '@/components/ui/HorizontalCarousel';
 import { dbService as db, SEED_EVENTS } from '@/services/db';
 import { Event } from '@/types';
 
@@ -93,42 +92,50 @@ export function TrendingEvents() {
           }
         }
 
-        // For 'All' tab, fill up to 8 events from validApproved
-        if (activeTab === 'All' && validEvents.length < 8) {
+        // For 'All' tab, if we have fewer than 4 events, fill up to 4 from validApproved
+        if (activeTab === 'All' && validEvents.length < 4) {
           for (const item of validApproved) {
             if (item && item.id && !seenIds.has(item.id)) {
               seenIds.add(item.id);
               validEvents.push(item);
             }
-            if (validEvents.length >= 8) break;
+            if (validEvents.length >= 4) break;
           }
         }
 
-        setEvents(validEvents.slice(0, 8));
+        setEvents(validEvents.slice(0, 4));
       } catch (err) {
         console.error('Error loading trending events:', err);
-        setEvents(SEED_EVENTS.filter(e => e && e.id).slice(0, 8));
+        setEvents(SEED_EVENTS.filter(e => e && e.id).slice(0, 4));
       }
     }
     loadEvents();
   }, [activeTab, selectedCity]);
 
+  // Dynamic grid column class based on actual valid cards count
+  const count = events.length;
+  const gridColsClass =
+    count === 1
+      ? 'grid-cols-1 max-w-md mx-auto'
+      : count === 2
+      ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 max-w-3xl mx-auto'
+      : count === 3
+      ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto'
+      : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
+
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-white via-slate-50 to-purple-50/30 relative">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+    <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 mb-10">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
           <div>
-            <span className="px-3.5 py-1 rounded-full bg-rose-100 text-rose-700 text-micro font-extrabold uppercase tracking-wider inline-block mb-2 shadow-xs">
-              🔥 Hot Right Now
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-2 tracking-tight">Trending Activities</h2>
-            <p className="text-slate-600 text-body font-medium">Discover the most popular events, courses, and workshops near you.</p>
+            <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Trending Activities</h2>
+            <p className="text-slate-600 text-body">Discover the most popular events and classes happening around you.</p>
           </div>
-          <Link href="/explore" className="mt-4 md:mt-0 inline-flex items-center text-purple-700 font-extrabold hover:text-amber-600 group text-caption shrink-0 transition-colors">
+          <Link href="/explore" className="mt-4 md:mt-0 flex items-center text-purple-600 font-semibold hover:text-purple-700 group text-body">
             View All Activities
-            <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -138,10 +145,10 @@ export function TrendingEvents() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-extrabold transition-all cursor-pointer ${
+              className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${
                 activeTab === tab
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25'
-                  : 'bg-white text-slate-800 border border-slate-200/90 hover:border-amber-400 hover:bg-amber-50/40 shadow-xs'
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-100'
               }`}
             >
               {tab}
@@ -149,22 +156,28 @@ export function TrendingEvents() {
           ))}
         </div>
 
-        {/* Event Cards Carousel with touch-swipe & desktop arrow navigation */}
+        {/* Event Cards Grid */}
         {events.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-3xl border border-slate-100 p-8 shadow-xs max-w-md mx-auto">
+          <div className="text-center py-12 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm max-w-md mx-auto">
             <p className="text-slate-600 font-semibold text-sm">No activities found for "{activeTab}".</p>
-            <p className="text-slate-400 text-xs mt-1">Try selecting 'All' to view available activities.</p>
+            <p className="text-slate-400 text-xs mt-1">Try selecting 'All' to view all available activities.</p>
           </div>
         ) : (
-          <HorizontalCarousel>
+          <motion.div
+            key={activeTab}
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            className={`grid gap-6 md:gap-8 ${gridColsClass}`}
+          >
             {events.filter(e => e && e.id).map(event => (
-              <div key={event.id} className="snap-start shrink-0 w-[280px] sm:w-[320px] lg:w-[340px] xl:w-[350px] h-full">
+              <motion.div key={event.id} variants={cardVariants}>
                 <EventCard event={event} />
-              </div>
+              </motion.div>
             ))}
-          </HorizontalCarousel>
+          </motion.div>
         )}
-
       </div>
 
       <ZigzagDivider className="text-purple-200/40" />

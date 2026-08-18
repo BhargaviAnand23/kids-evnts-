@@ -92,7 +92,7 @@ export default async function EventDetailPage({ params }: { params: { id: string
               </Badge>
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight">{event.title}</h1>
+            <h1 className="text-page-title font-bold text-slate-900 mb-4 tracking-tight">{event.title}</h1>
             
             <div className="flex items-center text-slate-600 mb-8 border-b border-slate-200 pb-8">
               {eventData.organizer_id ? (

@@ -54,15 +54,6 @@
   .shadow-heart-glow {
     box-shadow: 0 4px 14px var(--favorite-heart-shadow);
   }
-  .coral-energy-btn {
-    @apply bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 hover:from-amber-500 hover:to-rose-500 text-white font-extrabold transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-orange-500/25;
-  }
-  .shadow-coral-glow {
-    box-shadow: 0 8px 25px -4px rgba(249, 115, 22, 0.35);
-  }
-  .shadow-vibrant-glow {
-    box-shadow: 0 12px 30px -6px rgba(124, 58, 237, 0.3);
-  }
 }
 
 @layer utilities {

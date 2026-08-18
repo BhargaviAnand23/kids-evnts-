@@ -20,7 +20,6 @@ export interface Organization {
   description?: string | null
   address: string | null
   verified: boolean
-  events_hosted?: number
   created_at: string
 }
 

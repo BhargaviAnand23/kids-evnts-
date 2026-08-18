@@ -56,15 +56,13 @@ export default function CategoriesPage() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-          <span className="text-xs font-extrabold uppercase tracking-wider text-purple-700 bg-purple-100/80 px-3.5 py-1 rounded-full inline-block mb-3 shadow-2xs">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <span className="text-caption font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full inline-block mb-3">
             2-Tier Activity Directory
           </span>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 mb-3 tracking-tight leading-tight">
-            Activity Categories &amp; Formats
-          </h1>
-          <p className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-            Explore our two primary activity hubs — <strong className="text-slate-900">Sports</strong> and <strong className="text-slate-900">Talents &amp; Hobbies</strong> — or filter by activity format below.
+          <h1 className="text-page-title font-bold text-slate-900 mb-3 tracking-tight">Activity Categories &amp; Formats</h1>
+          <p className="text-slate-600 text-body">
+            Explore our two primary activity hubs — <strong>Sports</strong> and <strong>Talents &amp; Hobbies</strong> — or filter by activity format below.
           </p>
         </div>
 
@@ -88,40 +86,40 @@ export default function CategoriesPage() {
             )}
           </div>
 
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {activityTypes.map((type) => {
               const isSelected = selectedType === type.val;
               return (
                 <div
                   key={type.id}
                   onClick={() => setSelectedType(type.val)}
-                  className={`p-4 sm:p-5 lg:p-5 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between h-full ${
+                  className={`p-4 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex flex-col justify-between h-full ${
                     isSelected
-                      ? 'border-purple-600 bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 text-white shadow-lg shadow-purple-500/20'
-                      : 'border-slate-200/90 bg-slate-50/70 hover:border-purple-300 hover:bg-white text-slate-900 shadow-xs hover:shadow-md'
+                      ? 'border-purple-600 bg-purple-600 text-white shadow-md shadow-purple-500/20 scale-[1.02]'
+                      : 'border-slate-200 bg-slate-50/50 hover:border-purple-300 hover:bg-white text-slate-900'
                   }`}
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-2.5">
-                      <span className="text-2xl sm:text-3xl">{type.icon}</span>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{type.icon}</span>
                       {isSelected ? (
-                        <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-purple-700 flex items-center justify-center text-xs font-extrabold shadow-xs">
+                        <span className="w-5 h-5 rounded-full bg-white text-purple-700 flex items-center justify-center text-xs font-bold">
                           ✓
                         </span>
                       ) : null}
                     </div>
-                    <h3 className={`font-extrabold text-base sm:text-lg lg:text-xl mb-1.5 leading-snug ${isSelected ? 'text-white' : 'text-slate-900'}`}>{type.label}</h3>
-                    <p className={`text-xs sm:text-sm leading-relaxed font-medium ${isSelected ? 'text-purple-100' : 'text-slate-600'}`}>{type.desc}</p>
+                    <h3 className={`font-bold text-caption mb-1 ${isSelected ? 'text-white' : 'text-slate-900'}`}>{type.label}</h3>
+                    <p className={`text-micro leading-tight ${isSelected ? 'text-purple-100' : 'text-slate-500'}`}>{type.desc}</p>
                   </div>
 
                   <Link
                     href={getExploreUrl(undefined, type.val)}
                     onClick={(e) => e.stopPropagation()}
-                    className={`mt-4 sm:mt-5 inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold hover:underline ${
-                      isSelected ? 'text-white' : 'text-purple-700'
+                    className={`mt-4 inline-flex items-center gap-1 text-micro font-bold hover:underline ${
+                      isSelected ? 'text-white' : 'text-purple-600'
                     }`}
                   >
-                    View All {type.label} <ArrowRight className="w-3.5 h-3.5" />
+                    View All {type.label} <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
               );
@@ -178,15 +176,12 @@ export default function CategoriesPage() {
           </div>
 
           {showSportsSubmenu && (
-            <div
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pt-2 pb-3 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 sm:gap-4 sm:overflow-visible"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4 pt-2">
               {sportsSubcategories.map((subcat) => (
                 <Link
                   key={subcat.slug}
                   href={getExploreUrl(subcat.slug)}
-                  className="snap-start shrink-0 w-36 sm:w-auto group relative h-32 sm:h-36 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                  className="group relative h-32 sm:h-36 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
                 >
                   <img
                     src={subcat.photo}
@@ -250,15 +245,12 @@ export default function CategoriesPage() {
           </div>
 
           {showTalentsSubmenu && (
-            <div
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide gap-3.5 pt-2 pb-3 sm:grid sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-4 sm:overflow-visible"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
+            <div className="grid grid-cols-2 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 pt-2">
               {talentsSubcategories.map((subcat) => (
                 <Link
                   key={subcat.slug}
                   href={getExploreUrl(subcat.slug)}
-                  className="snap-start shrink-0 w-36 sm:w-auto group relative h-32 sm:h-36 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                  className="group relative h-32 sm:h-36 rounded-2xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300"
                 >
                   <img
                     src={subcat.photo}
