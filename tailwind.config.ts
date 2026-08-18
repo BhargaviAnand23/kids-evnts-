@@ -12,6 +12,9 @@ const config: Config = {
         'xxs': '360px',
         'xs': '480px',
       },
+      fontFamily: {
+        sans: ["var(--font-quicksand)", "Quicksand", "sans-serif"],
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",

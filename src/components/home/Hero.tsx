@@ -162,39 +162,39 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Micro Stats */}
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 border-t border-slate-200/60 pt-6 max-w-lg mx-auto lg:mx-0">
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-orange-100 text-orange-600 mr-3 shrink-0">
-                  <Calendar className="w-5 h-5 lg:w-6 lg:h-6" />
+            {/* Micro Stats as Pastel Cards */}
+            <div className="grid grid-cols-3 gap-2.5 sm:gap-4 border-t border-slate-200/60 pt-6 max-w-lg mx-auto lg:mx-0">
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-orange-50 border border-orange-100 shadow-sm text-center sm:text-left">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-100 text-orange-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
+                  <Calendar className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
+                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-orange-950 leading-none mb-1">
                     <CountUp end={500} suffix="+" duration={1500} />
                   </div>
-                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Events</div>
+                  <div className="text-[9px] sm:text-[10px] text-orange-700 font-bold uppercase tracking-wider">Events</div>
                 </div>
               </div>
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-purple-100 text-purple-600 mr-3 shrink-0">
-                  <Map className="w-5 h-5 lg:w-6 lg:h-6" />
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-purple-50 border border-purple-100 shadow-sm text-center sm:text-left">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-100 text-purple-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
+                  <Map className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
+                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-purple-950 leading-none mb-1">
                     <CountUp end={120} suffix="+" duration={1500} />
                   </div>
-                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Venues</div>
+                  <div className="text-[9px] sm:text-[10px] text-purple-700 font-bold uppercase tracking-wider">Venues</div>
                 </div>
               </div>
-              <div className="flex items-center">
-                <div className="flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-blue-100 text-blue-600 mr-3 shrink-0">
-                  <Star className="w-5 h-5 lg:w-6 lg:h-6" />
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-blue-50 border border-blue-100 shadow-sm text-center sm:text-left">
+                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-blue-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
+                  <Star className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg md:text-xl lg:text-2xl leading-none mb-1">
+                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-blue-950 leading-none mb-1">
                     <CountUp end={4.9} decimals={1} suffix="/5" duration={1500} />
                   </div>
-                  <div className="text-xs lg:text-sm text-slate-500 font-medium uppercase tracking-wider">Rating</div>
+                  <div className="text-[9px] sm:text-[10px] text-blue-700 font-bold uppercase tracking-wider">Rating</div>
                 </div>
               </div>
             </div>

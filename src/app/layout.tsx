@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { CookieConsentBanner } from "@/components/shared/CookieConsentBanner";
 import { PageTransition } from "@/components/layout/PageTransition";
 
-const inter = Inter({ subsets: ["latin"], display: 'swap' });
+const quicksand = Quicksand({
+  subsets: ["latin"],
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-quicksand',
+});
 
 export const metadata: Metadata = {
   title: "Kidspire | Play · Explore · Shine",
@@ -19,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={quicksand.variable}>
       <head>
         {/* 
           NOTE: PWA Service Worker registration is temporarily disabled during active development 
@@ -41,7 +46,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">

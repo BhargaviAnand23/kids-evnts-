@@ -19,7 +19,11 @@
   }
 
   body {
-    @apply bg-white text-slate-900 antialiased selection:bg-purple-200 selection:text-purple-900;
+    @apply bg-white text-slate-900 antialiased selection:bg-purple-200 selection:text-purple-900 font-medium;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
   }
 }
 
@@ -58,7 +62,7 @@
 
 @layer utilities {
   .type-hero {
-    @apply text-hero font-extrabold tracking-tight;
+    @apply text-hero font-bold tracking-tight;
   }
   .type-page-title {
     @apply text-page-title font-bold tracking-tight;
@@ -67,13 +71,13 @@
     @apply text-section-title font-bold tracking-tight;
   }
   .type-card-title {
-    @apply text-card-title font-bold;
+    @apply text-card-title font-semibold;
   }
   .type-body-lg {
-    @apply text-body-lg font-normal;
+    @apply text-body-lg font-medium;
   }
   .type-body {
-    @apply text-body font-normal;
+    @apply text-body font-medium;
   }
   .type-caption {
     @apply text-caption font-medium;

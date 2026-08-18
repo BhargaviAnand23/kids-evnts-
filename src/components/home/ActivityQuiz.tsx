@@ -95,6 +95,29 @@ function getRecommendations(answers: Record<number, string>): Recommendation[] {
   ];
 }
 
+function getRecCardStyle(categorySlug: string) {
+  switch (categorySlug) {
+    case 'football':
+      return 'bg-green-50 border-green-200 text-green-950 hover:bg-green-100/50';
+    case 'basketball':
+    case 'swimming':
+      return 'bg-blue-50 border-blue-200 text-blue-950 hover:bg-blue-100/50';
+    case 'martial-arts':
+    case 'arts':
+      return 'bg-pink-50 border-pink-200 text-pink-955 hover:bg-pink-100/50';
+    case 'dance':
+    case 'drama':
+      return 'bg-purple-50 border-purple-200 text-purple-955 hover:bg-purple-100/50';
+    case 'music':
+    case 'chess':
+      return 'bg-amber-50 border-amber-200 text-amber-955 hover:bg-amber-100/50';
+    case 'stem':
+      return 'bg-cyan-50 border-cyan-200 text-cyan-955 hover:bg-cyan-100/50';
+    default:
+      return 'bg-slate-50 border-slate-200 text-slate-900 hover:bg-slate-100/50';
+  }
+}
+
 export function ActivityQuiz() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = start, 1..3 = questions, 4 = result
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -208,18 +231,18 @@ export function ActivityQuiz() {
                   {getRecommendations(answers).map((rec, idx) => (
                     <div
                       key={idx}
-                      className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50 flex flex-col justify-between hover:shadow-md transition-shadow"
+                      className={`p-5 rounded-2xl border-2 flex flex-col justify-between hover:shadow-md transition-all duration-300 ${getRecCardStyle(rec.categorySlug)}`}
                     >
                       <div>
                         <span className={`inline-block text-micro font-bold px-2.5 py-0.5 rounded-full mb-3 ${rec.color}`}>
                           {rec.tag}
                         </span>
-                        <h4 className="font-bold text-slate-900 text-body mb-1">{rec.title}</h4>
-                        <p className="text-caption text-slate-500 mb-4">{rec.description}</p>
+                        <h4 className="font-bold text-body mb-1">{rec.title}</h4>
+                        <p className="text-caption opacity-85 mb-4 leading-relaxed">{rec.description}</p>
                       </div>
                       <Link
                         href={`/explore?category=${rec.categorySlug}`}
-                        className="text-xs font-bold text-purple-600 hover:text-purple-800 inline-flex items-center gap-1 mt-auto"
+                        className="text-xs font-extrabold hover:underline inline-flex items-center gap-1 mt-auto text-inherit"
                       >
                         Explore Events <ArrowRight className="w-3.5 h-3.5" />
                       </Link>
