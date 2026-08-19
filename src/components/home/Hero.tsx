@@ -84,22 +84,22 @@ export function Hero() {
 
       {/* ── Parallax Scattered decorative doodles ── */}
       <motion.div style={{ y: yFast }} className="pointer-events-none absolute inset-0">
-        <StarDoodle   className="absolute top-8  left-8   w-5 h-5  text-purple-400  opacity-50 rotate-12" />
-        <SparkDoodle  className="absolute top-24 right-32 w-6 h-6  text-amber-500   opacity-50 rotate-45" />
-        <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-45" />
+        <StarDoodle   className="absolute top-8  left-8   w-5 h-5  text-purple-400  opacity-50 animate-drift-1" />
+        <SparkDoodle  className="absolute top-24 right-32 w-6 h-6  text-amber-500   opacity-50 animate-drift-2" />
+        <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-45 animate-drift-4" />
       </motion.div>
 
       <motion.div style={{ y: ySlow }} className="pointer-events-none absolute inset-0">
-        <SparkDoodle  className="absolute top-16 left-24  w-4 h-4  text-amber-400   opacity-60 -rotate-6" />
-        <SparkDoodle  className="absolute top-8  right-16 w-5 h-5  text-purple-500  opacity-40 rotate-12" />
-        <StarDoodle   className="absolute bottom-24 left-12 w-4 h-4 text-purple-400 opacity-40 -rotate-12" />
+        <SparkDoodle  className="absolute top-16 left-24  w-4 h-4  text-amber-400   opacity-60 animate-drift-3" />
+        <SparkDoodle  className="absolute top-8  right-16 w-5 h-5  text-purple-500  opacity-40 animate-drift-1" />
+        <StarDoodle   className="absolute bottom-24 left-12 w-4 h-4 text-purple-400 opacity-40 animate-drift-5" />
       </motion.div>
 
       <motion.div style={{ y: yMid }} className="pointer-events-none absolute inset-0">
-        <DotDoodle    className="absolute top-6  left-48  w-3 h-3  text-pink-400    opacity-40" />
-        <DotDoodle    className="absolute top-40 right-8  w-4 h-4  text-pink-500    opacity-35" />
-        <SparkDoodle  className="absolute bottom-16 left-40 w-3 h-3 text-amber-400  opacity-50" />
-        <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 rotate-20" />
+        <DotDoodle    className="absolute top-6  left-48  w-3 h-3  text-pink-400    opacity-40 animate-drift-2" />
+        <DotDoodle    className="absolute top-40 right-8  w-4 h-4  text-pink-500    opacity-35 animate-drift-4" />
+        <SparkDoodle  className="absolute bottom-16 left-40 w-3 h-3 text-amber-400  opacity-50 animate-drift-3" />
+        <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 animate-drift-1" />
       </motion.div>
 
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
@@ -207,7 +207,7 @@ export function Hero() {
             <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-4/5 h-[85%] rounded-[40px] overflow-visible z-10 rotate-2 hover:rotate-0 transition-transform duration-500">
               <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl shadow-slate-900/20 border-8 border-white/60">
                 <img
-                  src="https://images.unsplash.com/photo-1511886929837-354d827aae26?w=800&auto=format&fit=crop&q=70"
+                  src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=800&auto=format&fit=crop&q=70"
                   alt="Child playing soccer"
                   className="w-full h-full object-cover"
                 />
@@ -215,7 +215,7 @@ export function Hero() {
             </div>
 
             {/* Floating card 1 — Hip Hop Dance */}
-            <div className="absolute left-0 top-[10%] sm:top-[15%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-xl z-20 -rotate-6 hover:-translate-y-2 transition-transform duration-300">
+            <div className="absolute left-0 top-[10%] sm:top-[15%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-1">
               <div className="w-full h-28 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=70"
@@ -230,7 +230,7 @@ export function Hero() {
             </div>
 
             {/* Floating card 2 — Chess Championship */}
-            <div className="absolute left-[5%] sm:left-[8%] bottom-[5%] sm:bottom-[8%] w-48 sm:w-56 bg-white rounded-2xl overflow-hidden shadow-xl z-20 rotate-3 hover:-translate-y-2 transition-transform duration-300">
+            <div className="absolute left-[5%] sm:left-[8%] bottom-[5%] sm:bottom-[8%] w-48 sm:w-56 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-2">
               <div className="w-full h-28 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=70"
@@ -250,7 +250,7 @@ export function Hero() {
             </div>
 
             {/* Floating card 3 — Swim Lessons */}
-            <div className="hidden sm:block absolute right-0 bottom-[20%] w-36 bg-white rounded-2xl overflow-hidden shadow-xl z-20 rotate-6 hover:-translate-y-2 transition-transform duration-300">
+            <div className="hidden sm:block absolute right-0 bottom-[20%] w-36 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-3">
               <div className="w-full h-24 overflow-hidden">
                 <img
                   src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=70"

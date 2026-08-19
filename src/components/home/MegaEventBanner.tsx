@@ -1,9 +1,22 @@
+'use client';
 import React from 'react';
 import { Trophy, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function MegaEventBanner() {
   return (
-    <section className="py-8 md:py-10 lg:py-12 bg-white">
+    <motion.section
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.65, ease: 'easeOut' }}
+      className="py-8 md:py-10 lg:py-12 bg-gradient-to-b from-white via-purple-50/15 to-white relative overflow-hidden"
+    >
+      {/* Soft abstract glow overlay for the section wrapper */}
+      <div className="absolute inset-0 -z-10 opacity-[0.03] pointer-events-none">
+        <div className="absolute -top-12 -left-12 w-64 h-64 rounded-full bg-purple-400 filter blur-3xl"></div>
+        <div className="absolute -bottom-16 -right-16 w-80 h-80 rounded-full bg-indigo-400 filter blur-3xl"></div>
+      </div>
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="relative w-full rounded-[32px] overflow-hidden min-h-[280px] sm:min-h-[320px] md:min-h-[360px] flex items-end shadow-2xl shadow-purple-900/20">
 
@@ -57,7 +70,7 @@ export function MegaEventBanner() {
             <div className="shrink-0">
               <a
                 href="#"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-purple-700 font-bold text-body hover:bg-purple-50 active:scale-95 transition-all duration-150 shadow-lg shadow-purple-900/30"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white text-purple-700 font-bold text-body hover:bg-purple-50 active:scale-95 transition-all duration-150 shadow-lg shadow-purple-900/30 hover-lift"
               >
                 Know More
                 <ArrowRight className="w-4 h-4" />
@@ -66,6 +79,6 @@ export function MegaEventBanner() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

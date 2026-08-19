@@ -128,7 +128,13 @@ export function TrendingEvents() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 mb-10">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12"
+        >
           <div>
             <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Trending Activities</h2>
             <p className="text-slate-600 text-body">Discover the most popular events and classes happening around you.</p>
@@ -137,7 +143,7 @@ export function TrendingEvents() {
             View All Activities
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* Filter Tabs */}
         <div className="flex overflow-x-auto pb-4 mb-8 space-x-2 scrollbar-hide">

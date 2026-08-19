@@ -56,9 +56,15 @@ const itemVariants = {
 
 export function Categories() {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-white">
+    <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12"
+        >
           <div>
             <h2 className="text-section-title font-bold text-slate-900 mb-3 tracking-tight">Explore by Category</h2>
             <p className="text-slate-600 text-body">Choose from our two primary activity hubs — high-energy Sports or creative Talents &amp; Hobbies.</p>
@@ -67,7 +73,7 @@ export function Categories() {
             View All Categories 
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
           </Link>
-        </div>
+        </motion.div>
 
         {/* 2 Main Parent Hub Tiles */}
         <motion.div
@@ -163,7 +169,7 @@ export function Categories() {
             <Link
               key={type.name}
               href={type.link}
-              className="group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+              className="hover-lift group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md flex flex-col justify-between overflow-hidden"
             >
               <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
               

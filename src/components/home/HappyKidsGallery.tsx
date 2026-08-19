@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Heart } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const KIDS_PHOTOS = [
   {
@@ -44,10 +45,16 @@ const KIDS_PHOTOS = [
 
 export function HappyKidsGallery() {
   return (
-    <section className="py-10 bg-white border-t border-b border-slate-100">
+    <section className="py-10 bg-mesh-purple border-t border-b border-slate-100">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8"
+        >
           <div>
             <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-purple-100 shadow-sm text-caption font-semibold text-purple-700">
               <Heart className="w-3.5 h-3.5 fill-purple-600 text-purple-600" /> Real Moments
@@ -59,10 +66,16 @@ export function HappyKidsGallery() {
           <p className="text-slate-500 text-caption max-w-md text-left sm:text-right">
             Over 5,000+ children discovering their passions through verified local activities every week.
           </p>
-        </div>
+        </motion.div>
 
         {/* Gallery row of rounded photos */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.7, ease: 'easeOut', delay: 0.1 }}
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 sm:gap-6"
+        >
           {KIDS_PHOTOS.map((item, idx) => (
             <div
               key={idx}
@@ -83,7 +96,7 @@ export function HappyKidsGallery() {
               </span>
             </div>
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </section>
