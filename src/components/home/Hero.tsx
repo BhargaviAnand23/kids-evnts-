@@ -71,7 +71,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       onMouseMove={handleMouseMoveSection}
-      className="relative overflow-hidden py-12 md:py-16 lg:py-20"
+      className="relative overflow-hidden pt-12 pb-6 md:pt-16 md:pb-8 lg:pt-20 lg:pb-10"
       style={{ background: 'linear-gradient(135deg, #ede9fe 0%, #fce7f3 40%, #fff7ed 100%)' }}
     >
       {/* ── Interactive Spotlight Glow (Desktop only) ── */}
@@ -198,17 +198,40 @@ export function Hero() {
                 </div>
               </div>
             </div>
+
+            {/* Trust Line */}
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-500 justify-center lg:justify-start">
+              <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-100">
+                <svg className="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                100% Verified Organizers
+              </span>
+              <span className="flex items-center gap-1.5 bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full border border-indigo-100">
+                <svg className="w-3.5 h-3.5 text-indigo-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Secure Booking
+              </span>
+              <span className="flex items-center gap-1.5 bg-pink-50 text-pink-700 px-2.5 py-1 rounded-full border border-pink-100">
+                <svg className="w-3.5 h-3.5 text-pink-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Flexible Cancellation
+              </span>
+            </div>
+
           </div>
 
           {/* ── Right Column — Photo collage ── */}
-          <div className="w-full lg:w-1/2 relative h-[380px] sm:h-[460px] md:h-[520px] lg:h-[580px] xl:h-[640px] 2xl:h-[700px] mt-6 lg:mt-0 pr-2 sm:pr-4">
+          <div className="w-full lg:w-1/2 relative h-[340px] sm:h-[420px] md:h-[480px] lg:h-[520px] xl:h-[580px] 2xl:h-[620px] mt-6 lg:mt-0 pr-2 sm:pr-4">
 
             {/* Main large photo */}
             <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-4/5 h-[85%] rounded-[40px] overflow-visible z-10 rotate-2 hover:rotate-0 transition-transform duration-500">
               <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl shadow-slate-900/20 border-8 border-white/60">
                 <img
-                  src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?w=800&auto=format&fit=crop&q=70"
-                  alt="Child playing soccer"
+                  src="https://images.unsplash.com/photo-1627764940620-90393d0e8c34?w=800&auto=format&fit=crop&q=70"
+                  alt="Children playing in a park"
                   className="w-full h-full object-cover"
                 />
               </div>

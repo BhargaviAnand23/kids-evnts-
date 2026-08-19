@@ -60,8 +60,7 @@ export function Categories() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
           className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12"
         >
@@ -79,8 +78,7 @@ export function Categories() {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-50px' }}
+          animate="visible"
           className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto"
         >
           {parentCategoryHubs.map((category) => (
