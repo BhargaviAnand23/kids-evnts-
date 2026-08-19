@@ -9,6 +9,8 @@ import { Testimonials } from '@/components/home/Testimonials';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { OnboardingWalkthrough } from '@/components/shared/OnboardingWalkthrough';
 import { LogoLoop } from '@/components/home/LogoLoop';
+import { StatsHighlights } from '@/components/home/StatsHighlights';
+import { FeaturedOrganizer } from '@/components/home/FeaturedOrganizer';
 
 export default function Home() {
   return (
@@ -20,9 +22,11 @@ export default function Home() {
       </div>
       <LogoLoop />
       <Categories />
+      <StatsHighlights />
       <ActivityQuiz />
       <TrendingEvents />
       <MegaEventBanner />
+      <FeaturedOrganizer />
       <HowItWorks />
       <HappyKidsGallery />
       <Testimonials />

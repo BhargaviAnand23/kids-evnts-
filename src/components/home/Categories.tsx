@@ -13,12 +13,12 @@ const parentCategoryHubs = [
     description: 'Football, Basketball, Cricket, Swimming, Skating & Cycling',
     link: '/explore?category=sports',
     photo: 'https://images.unsplash.com/photo-1517649763962-0c623266ddc0?w=800&auto=format&fit=crop&q=60',
-    overlay: 'bg-gradient-to-t from-emerald-950/90 via-emerald-900/60 to-emerald-900/20',
+    overlay: 'bg-gradient-to-t from-emerald-955 via-emerald-850/80 to-teal-800/25',
     icon: '⚽',
     animClass: 'animate-bounce-subtle',
     badge: 'Parent Hub 1',
     badgeColor: 'bg-emerald-400 text-emerald-950',
-    borderColor: 'border-emerald-300 hover:border-emerald-500',
+    borderColor: 'border-emerald-400 hover:border-emerald-500 hover:shadow-emerald-500/20',
   },
   {
     name: 'Talents & Hobbies Hub',
@@ -26,12 +26,12 @@ const parentCategoryHubs = [
     description: 'Music, Art & Crafts, Dance, Martial Arts, STEM & Robotics, Drama, Chess, Cooking & Public Speaking',
     link: '/explore?category=talents',
     photo: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&auto=format&fit=crop&q=60',
-    overlay: 'bg-gradient-to-t from-purple-950/90 via-purple-900/60 to-purple-900/20',
+    overlay: 'bg-gradient-to-t from-purple-955 via-fuchsia-900/80 to-pink-700/25',
     icon: '🎨',
     animClass: 'animate-float-subtle',
     badge: 'Parent Hub 2',
     badgeColor: 'bg-purple-400 text-purple-950',
-    borderColor: 'border-purple-300 hover:border-purple-500',
+    borderColor: 'border-purple-400 hover:border-purple-500 hover:shadow-purple-500/20',
   },
 ];
 
@@ -58,7 +58,7 @@ const itemVariants = {
 export function Categories() {
   return (
     <>
-      <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple">
+      <section className="py-12 md:py-16 lg:py-20 bg-gradient-to-b from-purple-50/50 via-slate-50 to-emerald-50/30">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

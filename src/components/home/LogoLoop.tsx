@@ -4,19 +4,19 @@ import { School, Award, Activity, Heart, ShieldCheck, Flame } from 'lucide-react
 import { motion } from 'framer-motion';
 
 const PARTNERS = [
-  { name: 'Sunnyvale Elementary School', icon: School },
-  { name: 'Greenwood Prep Academy', icon: Award },
-  { name: 'Summit Kids League', icon: Activity },
-  { name: 'Oakridge Montessori', icon: Heart },
-  { name: 'Horizon Arts Academy', icon: Flame },
-  { name: 'Pioneer Youth Sports', icon: ShieldCheck },
-  { name: 'Bright Minds Preschool', icon: School },
-  { name: 'Lakeside Coding Lab', icon: Award },
+  { name: 'Chennai Chess Academy', icon: Award },
+  { name: 'Rhythm Dance Academy', icon: Heart },
+  { name: 'Blue Wave Aquatics', icon: Activity },
+  { name: 'Metropolitan Youth Sports Club', icon: ShieldCheck },
+  { name: 'STEM Explorers Lab', icon: Flame },
+  { name: 'Greenwood Elementary School', icon: School },
+  { name: 'Riverside Academy', icon: School },
+  { name: 'Dragon Dojo Martial Arts', icon: Award },
 ];
 
 export function LogoLoop() {
-  // Triple the list to ensure there's enough content to seamlessly loop on large displays
-  const list = [...PARTNERS, ...PARTNERS, ...PARTNERS];
+  // Double the list to ensure there's enough content to loop seamlessly at -50% translation
+  const list = [...PARTNERS, ...PARTNERS];
 
   return (
     <motion.div
@@ -39,7 +39,7 @@ export function LogoLoop() {
             return (
               <div
                 key={idx}
-                className="flex items-center gap-3 text-slate-350 hover:text-white transition-colors duration-200 cursor-pointer font-bold text-sm sm:text-base tracking-wide"
+                className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors duration-200 cursor-pointer font-bold text-sm sm:text-base tracking-wide"
               >
                 <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700/50 flex items-center justify-center text-purple-400">
                   <Icon className="w-5 h-5" />
