@@ -392,3 +392,30 @@
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 12px 32px rgba(124, 58, 237, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08);
 }
+
+/* ── Scrolling Marquee & Logo Loop Animations ── */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+.mask-gradient {
+  mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, white 15%, white 85%, transparent);
+}
+
+/* ── Electric Glow hover shadows ── */
+.electric-glow-hover {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.electric-glow-hover:hover {
+  border-color: rgb(168, 85, 247) !important;
+  box-shadow: 0 0 22px 4px rgba(168, 85, 247, 0.45), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+}

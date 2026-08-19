@@ -250,7 +250,7 @@ export function EventCard({ event }: { event: Event }) {
             : 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
           transition: tilt.active ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
         }}
-        className={`bg-white overflow-hidden transition-all duration-300 h-full flex flex-col ${cardBorderClass}`}
+        className={`bg-white overflow-hidden transition-all duration-300 h-full flex flex-col electric-glow-hover ${cardBorderClass}`}
       >
 
         {/* Image */}

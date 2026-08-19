@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { EventCard } from '@/components/shared/EventCard';
 import { dbService as db, SEED_EVENTS } from '@/services/db';
 import { Event } from '@/types';
@@ -30,7 +30,6 @@ const cardVariants = {
   },
 };
 
-// ── Main TrendingEvents section ──
 import { useSelectedLocation } from '@/components/shared/LocationSelector';
 
 export function TrendingEvents() {
@@ -38,13 +37,82 @@ export function TrendingEvents() {
   const [activeTab, setActiveTab] = useState('All');
   const tabs = ['All', 'This Weekend', 'Sports', 'Arts & Crafts', 'Music'];
   const [events, setEvents] = useState<Event[]>(() =>
-    SEED_EVENTS.filter(e => e && e.status === 'approved').slice(0, 4)
+    SEED_EVENTS.filter(e => e && e.status === 'approved').slice(0, 8)
   );
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const [visibleCount, setVisibleCount] = useState(1);
+
+  React.useEffect(() => {
+    setCurrentIndex(0);
+  }, [activeTab, selectedCity]);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1280) {
+        setVisibleCount(4);
+      } else if (window.innerWidth >= 1024) {
+        setVisibleCount(3);
+      } else if (window.innerWidth >= 640) {
+        setVisibleCount(2);
+      } else {
+        setVisibleCount(1);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const maxIndex = Math.max(0, events.length - visibleCount);
+
+  const handleNext = React.useCallback(() => {
+    setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
+  }, [maxIndex]);
+
+  const handlePrev = React.useCallback(() => {
+    setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
+  }, [maxIndex]);
+
+  // Auto rotation every 4.5 seconds
+  React.useEffect(() => {
+    if (isHovered || maxIndex === 0) return;
+    const interval = setInterval(() => {
+      handleNext();
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [isHovered, maxIndex, handleNext]);
+
+  // Touch handlers for Mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsHovered(true);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    setIsHovered(false);
+    if (!touchStart || !touchEnd) return;
+    const diff = touchStart - touchEnd;
+    if (diff > 50) {
+      handleNext();
+    } else if (diff < -50) {
+      handlePrev();
+    }
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
   React.useEffect(() => {
     async function loadEvents() {
       try {
-        // Always fetch full pool of approved events for fallback
         const allApproved = await db.getEvents({ status: 'approved' });
         const validApproved = (allApproved || []).filter(e => e && e.id);
 
@@ -82,7 +150,6 @@ export function TrendingEvents() {
           });
         }
 
-        // Deduplicate & sanitize valid events
         const validEvents: Event[] = [];
         const seenIds = new Set<string>();
         for (const item of filtered) {
@@ -92,36 +159,24 @@ export function TrendingEvents() {
           }
         }
 
-        // For 'All' tab, if we have fewer than 4 events, fill up to 4 from validApproved
-        if (activeTab === 'All' && validEvents.length < 4) {
+        if (activeTab === 'All' && validEvents.length < 8) {
           for (const item of validApproved) {
             if (item && item.id && !seenIds.has(item.id)) {
               seenIds.add(item.id);
               validEvents.push(item);
             }
-            if (validEvents.length >= 4) break;
+            if (validEvents.length >= 8) break;
           }
         }
 
-        setEvents(validEvents.slice(0, 4));
+        setEvents(validEvents.slice(0, 8));
       } catch (err) {
         console.error('Error loading trending events:', err);
-        setEvents(SEED_EVENTS.filter(e => e && e.id).slice(0, 4));
+        setEvents(SEED_EVENTS.filter(e => e && e.id).slice(0, 8));
       }
     }
     loadEvents();
   }, [activeTab, selectedCity]);
-
-  // Dynamic grid column class based on actual valid cards count
-  const count = events.length;
-  const gridColsClass =
-    count === 1
-      ? 'grid-cols-1 max-w-md mx-auto'
-      : count === 2
-      ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 max-w-3xl mx-auto'
-      : count === 3
-      ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto'
-      : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
   return (
     <section className="py-12 md:py-16 lg:py-20 bg-mesh-blue-rich relative border-b border-blue-100/50">
@@ -154,7 +209,7 @@ export function TrendingEvents() {
               className={`whitespace-nowrap px-6 py-2.5 rounded-full text-sm font-medium transition-colors ${
                 activeTab === tab
                   ? 'bg-slate-900 text-white'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-100'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-350 hover:bg-slate-100'
               }`}
             >
               {tab}
@@ -162,27 +217,76 @@ export function TrendingEvents() {
           ))}
         </div>
 
-        {/* Event Cards Grid */}
+        {/* Event Cards Carousel */}
         {events.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-3xl border border-slate-100 p-8 shadow-sm max-w-md mx-auto">
             <p className="text-slate-600 font-semibold text-sm">No activities found for "{activeTab}".</p>
             <p className="text-slate-400 text-xs mt-1">Try selecting 'All' to view all available activities.</p>
           </div>
         ) : (
-          <motion.div
-            key={activeTab}
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            className={`grid gap-6 md:gap-8 ${gridColsClass}`}
+          <div
+            className="relative overflow-hidden w-full px-1 py-4"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            {events.filter(e => e && e.id).map(event => (
-              <motion.div key={event.id} variants={cardVariants}>
-                <EventCard event={event} />
+            <div className="overflow-hidden">
+              <motion.div
+                className="flex transition-transform duration-500 ease-out animate-none"
+                style={{
+                  transform: `translateX(-${currentIndex * (100 / visibleCount)}%)`,
+                }}
+              >
+                {events.filter(e => e && e.id).map((event) => (
+                  <div
+                    key={event.id}
+                    className="shrink-0 px-3 h-full"
+                    style={{ width: `${100 / visibleCount}%` }}
+                  >
+                    <EventCard event={event} />
+                  </div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+            </div>
+
+            {/* Left & Right navigation arrows */}
+            {maxIndex > 0 && (
+              <>
+                <button
+                  onClick={handlePrev}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg border border-slate-100 hover:scale-110 transition-all z-20 cursor-pointer"
+                  aria-label="Previous event"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleNext}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/95 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg border border-slate-100 hover:scale-110 transition-all z-20 cursor-pointer"
+                  aria-label="Next event"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </>
+            )}
+
+            {/* Dot indicators */}
+            {maxIndex > 0 && (
+              <div className="flex justify-center gap-2 mt-8">
+                {Array.from({ length: maxIndex + 1 }).map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentIndex(idx)}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                      currentIndex === idx ? 'bg-purple-600 w-6' : 'bg-slate-350 hover:bg-slate-400'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
 

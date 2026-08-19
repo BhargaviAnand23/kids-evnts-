@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowRight, Trophy, Palette } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { WavyDivider } from '@/components/ui/SectionDividers';
+import { TiltedCard } from '@/components/animations/TiltedCard';
 
 const parentCategoryHubs = [
   {
@@ -140,8 +141,10 @@ export function Categories() {
               name: 'Events',
               description: 'Single-day programs, camps, and local school events.',
               link: '/explore?type=event',
-              colorClass: 'from-purple-500 to-indigo-600 shadow-purple-500/20',
+              colorClass: 'from-rose-500 to-indigo-600 shadow-rose-500/20',
               icon: '🎉',
+              bgClass: 'bg-rose-50/60 border-rose-100/70 hover:bg-rose-100/50 shadow-rose-900/5',
+              accentColor: 'text-rose-700',
             },
             {
               name: 'Competitions',
@@ -149,6 +152,8 @@ export function Categories() {
               link: '/explore?type=competition',
               colorClass: 'from-amber-500 to-orange-600 shadow-amber-500/20',
               icon: '🏆',
+              bgClass: 'bg-amber-50/60 border-amber-100/70 hover:bg-amber-100/50 shadow-amber-900/5',
+              accentColor: 'text-amber-700',
             },
             {
               name: 'Courses',
@@ -156,6 +161,8 @@ export function Categories() {
               link: '/explore?type=course',
               colorClass: 'from-emerald-500 to-teal-600 shadow-emerald-500/20',
               icon: '📚',
+              bgClass: 'bg-emerald-50/60 border-emerald-100/80 hover:bg-emerald-100/50 shadow-emerald-900/5',
+              accentColor: 'text-emerald-700',
             },
             {
               name: 'Webinars',
@@ -163,30 +170,33 @@ export function Categories() {
               link: '/explore?type=webinar',
               colorClass: 'from-blue-500 to-sky-600 shadow-blue-500/20',
               icon: '💻',
+              bgClass: 'bg-blue-50/60 border-blue-100/80 hover:bg-blue-100/50 shadow-blue-900/5',
+              accentColor: 'text-blue-700',
             },
           ].map((type) => (
-            <Link
-              key={type.name}
-              href={type.link}
-              className="hover-lift group relative rounded-3xl p-6 bg-white border border-slate-100 shadow-md flex flex-col justify-between overflow-hidden"
-            >
-              <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
-              
-              <div>
-                <div className="text-3xl mb-4">{type.icon}</div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">
-                  {type.name}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                  {type.description}
-                </p>
-              </div>
+            <TiltedCard key={type.name} className="h-full">
+              <Link
+                href={type.link}
+                className={`hover-lift group relative rounded-3xl p-6 flex flex-col justify-between overflow-hidden h-full border ${type.bgClass}`}
+              >
+                <div className={`absolute -right-8 -top-8 w-24 h-24 rounded-full bg-gradient-to-br ${type.colorClass} opacity-10 group-hover:scale-150 transition-transform duration-500`} />
+                
+                <div>
+                  <div className="text-3xl mb-4">{type.icon}</div>
+                  <h3 className={`font-bold text-lg mb-2 group-hover:underline transition-colors ${type.accentColor}`}>
+                    {type.name}
+                  </h3>
+                  <p className="text-slate-500 text-sm leading-relaxed mb-6">
+                    {type.description}
+                  </p>
+                </div>
 
-              <span className="text-xs font-semibold text-purple-600 flex items-center gap-1.5 group-hover:underline">
-                Explore Listings
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </span>
-            </Link>
+                <span className={`text-xs font-semibold flex items-center gap-1.5 transition-transform ${type.accentColor}`}>
+                  Explore Listings
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Link>
+            </TiltedCard>
           ))}
         </div>
       </div>

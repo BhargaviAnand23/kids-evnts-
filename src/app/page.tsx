@@ -8,6 +8,7 @@ import { HappyKidsGallery } from '@/components/home/HappyKidsGallery';
 import { Testimonials } from '@/components/home/Testimonials';
 import { AdBanner } from '@/components/ui/AdBanner';
 import { OnboardingWalkthrough } from '@/components/shared/OnboardingWalkthrough';
+import { LogoLoop } from '@/components/home/LogoLoop';
 
 export default function Home() {
   return (
@@ -17,6 +18,7 @@ export default function Home() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-4">
         <AdBanner slot="homepage-below-hero" format="horizontal" />
       </div>
+      <LogoLoop />
       <Categories />
       <ActivityQuiz />
       <TrendingEvents />
