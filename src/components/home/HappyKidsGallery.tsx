@@ -45,7 +45,7 @@ const KIDS_PHOTOS = [
 
 export function HappyKidsGallery() {
   return (
-    <section className="py-10 bg-mesh-purple border-t border-b border-slate-100">
+    <section className="py-12 bg-mesh-coral-rich border-b border-rose-100/50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
         <motion.div

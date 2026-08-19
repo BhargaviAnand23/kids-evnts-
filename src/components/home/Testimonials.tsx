@@ -95,7 +95,7 @@ export function Testimonials() {
     : [currentIndex];
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-mesh-coral overflow-hidden">
+    <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple-rich overflow-hidden border-b border-purple-100/50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         
         {/* Section Header */}

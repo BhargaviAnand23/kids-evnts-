@@ -124,7 +124,7 @@ export function TrendingEvents() {
       : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-slate-50 relative">
+    <section className="py-12 md:py-16 lg:py-20 bg-mesh-blue-rich relative border-b border-blue-100/50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 mb-10">
 
         {/* Header */}

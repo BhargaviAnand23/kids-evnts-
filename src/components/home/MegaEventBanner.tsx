@@ -10,7 +10,7 @@ export function MegaEventBanner() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.65, ease: 'easeOut' }}
-      className="py-8 md:py-10 lg:py-12 bg-gradient-to-b from-white via-purple-50/15 to-white relative overflow-hidden"
+      className="py-6 lg:py-8 bg-mesh-purple-rich relative overflow-hidden border-b border-purple-100/40"
     >
       {/* Soft abstract glow overlay for the section wrapper */}
       <div className="absolute inset-0 -z-10 opacity-[0.03] pointer-events-none">

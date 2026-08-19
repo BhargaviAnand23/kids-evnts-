@@ -46,7 +46,7 @@ const stepVariants = {
 
 export function HowItWorks() {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple relative overflow-hidden">
+    <section className="py-12 md:py-16 lg:py-20 bg-mesh-yellow-rich relative overflow-hidden border-b border-amber-100/50">
       {/* Subtle Background Image with low opacity and blur */}
       <div className="absolute inset-0 -z-20 overflow-hidden pointer-events-none">
         <img
@@ -55,7 +55,7 @@ export function HowItWorks() {
           className="w-full h-full object-cover opacity-[0.04] filter blur-[2px]"
         />
         {/* Soft gradient to blend with sections above and below */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-purple-50/10 to-white/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-50/40 via-transparent to-amber-50/40" />
       </div>
 
       {/* Skewed decorative panel */}

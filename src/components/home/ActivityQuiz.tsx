@@ -140,7 +140,7 @@ export function ActivityQuiz() {
   const activeQuestion = QUESTIONS[currentStep - 1];
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-purple-50/60 to-white relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-purple-50/60 to-rose-50/50 relative overflow-hidden border-b border-rose-100/50">
       <div className="max-w-4xl mx-auto px-6 relative z-10">
 
         {/* Section Header */}

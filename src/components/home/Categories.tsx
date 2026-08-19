@@ -56,7 +56,8 @@ const itemVariants = {
 
 export function Categories() {
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple">
+    <>
+      <section className="py-12 md:py-16 lg:py-20 bg-mesh-purple">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -123,14 +124,14 @@ export function Categories() {
             </motion.div>
           ))}
         </motion.div>
+      </div>
+    </section>
 
-        {/* Wavy Section Divider */}
-        <WavyDivider className="my-12 text-purple-200/50" />
-
-        {/* Browse by Type */}
+    <section className="py-12 md:py-16 lg:py-20 bg-mesh-mint-rich border-t border-b border-emerald-100/70">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="mb-8 sm:mb-12">
           <h2 className="text-section-title font-bold text-slate-900 mb-4 tracking-tight">Browse by Activity Type</h2>
-          <p className="text-slate-600 text-body">Select from these four listing types to find matching opportunities for your child.</p>
+          <p className="text-slate-600 text-body font-medium">Select from these four listing types to find matching opportunities for your child.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -190,5 +191,6 @@ export function Categories() {
         </div>
       </div>
     </section>
+    </>
   );
 }

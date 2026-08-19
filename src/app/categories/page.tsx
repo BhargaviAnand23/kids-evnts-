@@ -52,7 +52,7 @@ export default function CategoriesPage() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-14 md:py-16">
+    <div className="bg-gradient-to-br from-purple-50/60 via-pink-50/30 to-orange-50/40 min-h-screen py-10 sm:py-14 md:py-16">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
         {/* Header */}

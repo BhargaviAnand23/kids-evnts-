@@ -87,7 +87,7 @@ function ExploreContent() {
   const hasActiveFilters = qParam || categoryParam || ageBracketParam || typeParam;
 
   return (
-    <div className="bg-slate-50 min-h-screen pt-8 md:pt-10 pb-24">
+    <div className="bg-gradient-to-br from-indigo-50/50 via-slate-50 to-purple-50/30 min-h-screen pt-8 md:pt-10 pb-24">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
 
         {/* Page Header */}
@@ -112,7 +112,7 @@ function ExploreContent() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <div className="w-full lg:w-1/4">
-            <Card className="sticky top-24">
+            <Card className="sticky top-24 shadow-md border-purple-100/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
