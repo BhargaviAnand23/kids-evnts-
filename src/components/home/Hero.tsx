@@ -223,67 +223,200 @@ export function Hero() {
 
           </div>
 
-          {/* ── Right Column — Photo collage ── */}
-          <div className="w-full lg:w-1/2 relative h-[340px] sm:h-[420px] md:h-[480px] lg:h-[520px] xl:h-[580px] 2xl:h-[620px] mt-6 lg:mt-0 pr-2 sm:pr-4">
+          {/* ── Right Column — Custom SVG Illustration & Overlapping Cards ── */}
+          <div className="w-full lg:w-1/2 relative h-[360px] sm:h-[450px] md:h-[500px] lg:h-[540px] xl:h-[600px] mt-6 lg:mt-0 pr-2 sm:pr-4 flex items-center justify-center">
+            
+            {/* Background Blob Glows */}
+            <div className="absolute top-[10%] right-[-5%] w-[250px] sm:w-[350px] h-[250px] sm:h-[350px] bg-pink-300/30 rounded-full blur-3xl -z-10 animate-pulse duration-[6000ms]" />
+            <div className="absolute bottom-[5%] left-[-10%] w-[280px] sm:w-[400px] h-[280px] sm:h-[400px] bg-purple-300/25 rounded-full blur-3xl -z-10 animate-pulse duration-[8000ms]" />
+            <div className="absolute top-[40%] left-[20%] w-[200px] sm:w-[300px] h-[200px] sm:h-[300px] bg-emerald-200/20 rounded-full blur-3xl -z-10" />
 
-            {/* Main large photo */}
-            <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-4/5 h-[85%] rounded-[40px] overflow-visible z-10 rotate-2 hover:rotate-0 transition-transform duration-500">
-              <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl shadow-slate-900/20 border-8 border-white/60">
-                <img
-                  src="https://images.unsplash.com/photo-1560184611-ff3e53f00e8f?w=1200&auto=format&fit=crop&q=80"
-                  alt="Children playing in a park"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            {/* Custom SVG Illustration Container */}
+            <div className="w-full h-full max-w-[450px] sm:max-w-[480px] lg:max-w-[500px] aspect-square relative z-10 flex items-center justify-center">
+              <svg viewBox="0 0 500 500" className="w-full h-full select-none drop-shadow-xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <radialGradient id="sun-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="#FEF3C7" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#FEF3C7" stopOpacity="0" />
+                  </radialGradient>
+                  <linearGradient id="hill-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#34D399" />
+                    <stop offset="100%" stopColor="#059669" />
+                  </linearGradient>
+                  <linearGradient id="hill-grad-2" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6EE7B7" />
+                    <stop offset="100%" stopColor="#10B981" />
+                  </linearGradient>
+                  <linearGradient id="sky-grad" x1="50%" y1="0%" x2="50%" y2="100%">
+                    <stop offset="0%" stopColor="#E0F2FE" />
+                    <stop offset="100%" stopColor="#F0F9FF" />
+                  </linearGradient>
+                  <linearGradient id="rainbow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#FB7185" stopOpacity="0.25" />
+                    <stop offset="50%" stopColor="#C084FC" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#60A5FA" stopOpacity="0.25" />
+                  </linearGradient>
+                  <filter id="drop-shadow" x="-15%" y="-15%" width="130%" height="130%">
+                    <feDropShadow dx="0" dy="10" stdDeviation="8" floodColor="#4C1D95" floodOpacity="0.12" />
+                  </filter>
+                </defs>
+
+                {/* Sky background circle */}
+                <circle cx="250" cy="250" r="230" fill="url(#sky-grad)" />
+
+                {/* Stylized Rainbow/Arc in background */}
+                <path d="M 90,320 A 180,180 0 0,1 410,320" stroke="url(#rainbow-grad)" strokeWidth="20" fill="none" strokeLinecap="round" />
+
+                {/* Sun */}
+                <circle cx="360" cy="140" r="50" fill="url(#sun-glow)" />
+                <circle cx="360" cy="140" r="30" fill="#FBBF24" />
+
+                {/* Decorative clouds */}
+                <path d="M 120,160 Q 135,145 155,150 Q 170,135 190,145 Q 210,145 215,160 Z" fill="#FFFFFF" opacity="0.9" />
+                <path d="M 390,210 Q 400,200 412,203 Q 425,193 438,203 Q 450,203 453,212 Z" fill="#FFFFFF" opacity="0.8" />
+
+                {/* Back Hills */}
+                <path d="M 20,400 Q 150,260 300,320 T 480,360 L 480,480 L 20,480 Z" fill="url(#hill-grad-1)" />
+
+                {/* Simple playground slide */}
+                <path d="M 60,330 L 110,250 L 120,250 L 70,330 Z" fill="#FB7185" />
+                <path d="M 110,250 L 160,380 L 170,380 L 120,250 Z" fill="#8B5CF6" />
+                <circle cx="115" cy="250" r="6" fill="#FBBF24" />
+
+                {/* Front Hills */}
+                <path d="M 20,430 Q 180,310 340,360 T 480,420 L 480,480 L 20,480 Z" fill="url(#hill-grad-2)" />
+
+                {/* Stylized colorful flowers */}
+                <circle cx="80" cy="410" r="8" fill="#F43F5E" />
+                <circle cx="74" cy="416" r="6" fill="#F43F5E" />
+                <circle cx="86" cy="416" r="6" fill="#F43F5E" />
+                <circle cx="80" cy="422" r="6" fill="#F43F5E" />
+                <circle cx="80" cy="416" r="4" fill="#FBBF24" />
+
+                <circle cx="420" cy="430" r="6" fill="#7C3AED" />
+                <circle cx="415" cy="435" r="5" fill="#7C3AED" />
+                <circle cx="425" cy="435" r="5" fill="#7C3AED" />
+                <circle cx="420" cy="435" r="3" fill="#FBBF24" />
+
+                {/* Bouncing Ball */}
+                <circle cx="350" cy="420" r="18" fill="#F43F5E" />
+                <path d="M 336,412 A 18,18 0 0,0 364,428" stroke="#FFFFFF" strokeWidth="3" fill="none" />
+
+                {/* JOYFUL CHILD CHARACTER */}
+                <g filter="url(#drop-shadow)">
+                  {/* Shadow beneath character */}
+                  <ellipse cx="250" cy="445" rx="35" ry="8" fill="#047857" opacity="0.4" />
+
+                  {/* Left Leg */}
+                  <path d="M 235,390 L 225,430 Q 220,435 215,435" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Left Shoe */}
+                  <path d="M 215,435 L 205,432 C 200,430 200,422 208,422 L 215,422 Z" fill="#7C3AED" />
+
+                  {/* Right Leg */}
+                  <path d="M 265,390 L 275,425 Q 280,432 288,432" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Right Shoe */}
+                  <path d="M 288,432 L 298,429 C 303,427 303,419 295,419 L 288,419 Z" fill="#7C3AED" />
+
+                  {/* Torso (Jumping position) */}
+                  <rect x="222" y="300" width="56" height="90" rx="20" fill="#FB7185" />
+                  {/* Collar */}
+                  <path d="M 238,300 C 238,308 262,308 262,300" stroke="#FDBA74" strokeWidth="4" fill="none" />
+
+                  {/* Left Arm (Raised high in joy) */}
+                  <path d="M 222,320 Q 180,260 165,230" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Left Hand */}
+                  <circle cx="165" cy="230" r="8" fill="#FDBA74" />
+
+                  {/* Right Arm (Raised high in joy) */}
+                  <path d="M 278,320 Q 320,260 335,230" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Right Hand */}
+                  <circle cx="335" cy="230" r="8" fill="#FDBA74" />
+
+                  {/* Neck */}
+                  <rect x="244" y="280" width="12" height="24" fill="#FDBA74" />
+
+                  {/* Head */}
+                  <circle cx="250" cy="245" r="32" fill="#FDBA74" />
+
+                  {/* Hair (Joyful stylized messy kid hair) */}
+                  <path d="M 216,235 C 210,215 225,195 240,205 C 248,190 264,195 270,210 C 285,200 292,220 284,235 C 290,248 275,255 275,255 L 225,255 Z" fill="#4C1D95" />
+
+                  {/* Eyes (Happy arcs) */}
+                  <path d="M 236,242 Q 242,238 244,244" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                  <path d="M 256,242 Q 258,238 264,244" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+
+                  {/* Rosy Cheeks */}
+                  <circle cx="228" cy="252" r="5" fill="#F43F5E" opacity="0.5" />
+                  <circle cx="272" cy="252" r="5" fill="#F43F5E" opacity="0.5" />
+
+                  {/* Smile */}
+                  <path d="M 240,254 Q 250,268 260,254" stroke="#4C1D95" strokeWidth="3" strokeLinecap="round" fill="none" />
+                  <path d="M 244,256 A 6,6 0 0,0 256,256 Z" fill="#FFFFFF" />
+                </g>
+
+                {/* Floating Sparkles / Stars (Energy / Celebration) */}
+                <g fill="#FBBF24">
+                  {/* Star 1 */}
+                  <path d="M 130,220 L 133,227 L 140,228 L 135,233 L 136,240 L 130,236 L 124,240 L 125,233 L 120,228 L 127,227 Z" />
+                  {/* Star 2 */}
+                  <path d="M 370,280 L 372,284 L 377,285 L 373,289 L 374,294 L 370,291 L 366,294 L 367,289 L 363,285 L 368,284 Z" opacity="0.8" />
+                </g>
+                <g fill="#C084FC">
+                  {/* Sparkle 1 */}
+                  <path d="M 190,180 L 192,185 L 197,186 L 192,189 L 191,194 L 187,190 L 182,191 L 186,187 L 184,182 L 188,185 Z" />
+                </g>
+              </svg>
             </div>
 
+            {/* Overlapping Floating sticker cards */}
+            
             {/* Floating card 1 — Hip Hop Dance */}
-            <div className="absolute left-0 top-[10%] sm:top-[15%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-1">
-              <div className="w-full h-28 overflow-hidden">
+            <div className="absolute left-[-16px] sm:left-0 top-[8%] sm:top-[12%] w-40 sm:w-48 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-1 rotate-[-6deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+              <div className="w-full h-24 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=70"
                   alt="Hip Hop Dance"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="p-3">
-                <h4 className="font-bold text-sm text-slate-900 leading-tight">Hip Hop Dance</h4>
-                <p className="text-xs text-purple-600 font-semibold mt-0.5">This Weekend</p>
+              <div className="p-2.5">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Hip Hop Dance</h4>
+                <p className="text-[10px] sm:text-xs text-purple-600 font-semibold mt-0.5">This Weekend</p>
               </div>
             </div>
 
             {/* Floating card 2 — Chess Championship */}
-            <div className="absolute left-[5%] sm:left-[8%] bottom-[5%] sm:bottom-[8%] w-48 sm:w-56 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-2">
-              <div className="w-full h-28 overflow-hidden">
+            <div className="absolute left-[-10px] bottom-[3%] sm:bottom-[6%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-2 rotate-[4deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+              <div className="w-full h-24 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=70"
                   alt="Chess Championship"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="p-3 flex items-center justify-between">
+              <div className="p-2.5 flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-sm text-slate-900 leading-tight">Chess Championship</h4>
-                  <p className="text-xs text-purple-600 font-semibold mt-0.5">Register Now</p>
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Chess Tournament</h4>
+                  <p className="text-[10px] sm:text-xs text-purple-600 font-semibold mt-0.5">Register Now</p>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center shrink-0 ml-2">
-                  <Star className="w-4 h-4 text-white fill-current" />
+                <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center shrink-0 ml-1.5 shadow-sm shadow-purple-600/20">
+                  <Star className="w-3.5 h-3.5 text-white fill-current" />
                 </div>
               </div>
             </div>
 
             {/* Floating card 3 — Swim Lessons */}
-            <div className="hidden sm:block absolute right-0 bottom-[20%] w-36 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-3">
-              <div className="w-full h-24 overflow-hidden">
+            <div className="hidden sm:block absolute right-[-10px] sm:right-0 top-[38%] w-32 sm:w-36 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-3 rotate-[8deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+              <div className="w-full h-20 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=70"
                   alt="Swim Lessons"
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="p-2.5">
-                <h4 className="font-bold text-xs text-slate-900 leading-tight">Swim Lessons</h4>
-                <p className="text-[10px] text-purple-600 font-semibold mt-0.5">Weekly Program</p>
+              <div className="p-2">
+                <h4 className="font-bold text-[11px] sm:text-xs text-slate-900 leading-tight">Swim Lessons</h4>
+                <p className="text-[9px] sm:text-[10px] text-purple-600 font-semibold mt-0.5">Weekly Program</p>
               </div>
             </div>
 
