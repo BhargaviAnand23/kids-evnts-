@@ -22,7 +22,7 @@ export function MegaEventBanner() {
 
           {/* ── Background photo ── */}
           <img
-            src="https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1200&auto=format&fit=crop&q=70"
+            src="/images/sports-hub.jpg"
             alt="Kids Sports Festival"
             className="absolute inset-0 w-full h-full object-cover"
           />
