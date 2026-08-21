@@ -34,6 +34,44 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { LocationSelector, useSelectedLocation } from '@/components/shared/LocationSelector';
 
+// Hot Air Balloon Component (Floating Far-Left)
+function HotAirBalloon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 130" fill="none">
+      <defs>
+        <linearGradient id="balloonStripe1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f43f5e" />
+          <stop offset="100%" stopColor="#e11d48" />
+        </linearGradient>
+        <linearGradient id="balloonStripe2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#facc15" />
+          <stop offset="100%" stopColor="#eab308" />
+        </linearGradient>
+        <linearGradient id="balloonStripe3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#a855f7" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+        <linearGradient id="balloonBasket" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#d97706" />
+          <stop offset="100%" stopColor="#92400e" />
+        </linearGradient>
+      </defs>
+      {/* Balloon Envelope */}
+      <path d="M50 8C26 8 10 28 10 50c0 18 16 38 32 50h16c16-12 32-32 32-50 0-22-16-42-40-42z" fill="url(#balloonStripe1)" />
+      <path d="M50 8c-12 0-22 18-22 42 0 18 10 38 22 50 12-12 22-32 22-50 0-24-10-42-22-42z" fill="url(#balloonStripe2)" />
+      <path d="M50 8c-6 0-11 18-11 42 0 18 5 38 11 50 6-12 11-32 11-50 0-24-5-42-11-42z" fill="url(#balloonStripe3)" />
+      {/* Ropes */}
+      <line x1="38" y1="100" x2="42" y2="114" stroke="#78350f" strokeWidth="1.5" />
+      <line x1="62" y1="100" x2="58" y2="114" stroke="#78350f" strokeWidth="1.5" />
+      <line x1="44" y1="100" x2="45" y2="114" stroke="#78350f" strokeWidth="1.5" />
+      <line x1="56" y1="100" x2="55" y2="114" stroke="#78350f" strokeWidth="1.5" />
+      {/* Basket */}
+      <rect x="40" y="114" width="20" height="14" rx="3" fill="url(#balloonBasket)" stroke="#78350f" strokeWidth="1.5" />
+      <line x1="40" y1="120" x2="60" y2="120" stroke="#78350f" strokeWidth="1" />
+    </svg>
+  );
+}
+
 // 3D Isometric & Glossy SVG Icons for the 5 Main Floating Cards
 function Soccer3DIcon() {
   return (
@@ -125,17 +163,17 @@ function Chess3DIcon() {
 }
 
 // 3D Gift Box SVG Icon
-function Gift3DIcon() {
+function Gift3DIcon({ className }: { className?: string }) {
   return (
-    <svg className="w-14 h-14 drop-shadow-lg" viewBox="0 0 64 64" fill="none">
-      <rect x="12" y="24" width="40" height="32" rx="4" fill="url(#giftBoxGrad)" />
+    <svg className={className || "w-14 h-14 drop-shadow-lg"} viewBox="0 0 64 64" fill="none">
+      <rect x="12" y="24" width="40" height="32" rx="4" fill="url(#giftBoxGradHero)" />
       <rect x="8" y="16" width="48" height="12" rx="3" fill="#38bdf8" />
       <rect x="28" y="16" width="8" height="40" fill="#ef4444" />
       <rect x="8" y="20" width="48" height="4" fill="#ef4444" opacity="0.3" />
       <path d="M24 16c-4-8-12-6-10 0 2 6 14 0 14 0s12 6 14 0c2-6-6-8-10 0" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" />
       <circle cx="32" cy="16" r="3" fill="#dc2626" />
       <defs>
-        <linearGradient id="giftBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="giftBoxGradHero" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#38bdf8" />
           <stop offset="100%" stopColor="#0284c7" />
         </linearGradient>
@@ -187,73 +225,104 @@ export function Hero() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#f9f8ff] via-[#f7f5ff] to-[#f1edff]/70 pt-6 pb-12 md:pt-10 md:pb-16 lg:pt-12 lg:pb-16">
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#f5eaff] via-[#f7f2fe] to-[#ebe1fc]/80 pt-6 pb-8 md:pt-8 md:pb-12 lg:pt-10 lg:pb-14">
       
-      {/* ── Ambient Background Glow & Doodles ── */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[640px] bg-gradient-to-tr from-purple-100/30 via-pink-100/20 to-sky-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
+      {/* ── Ambient Background Glow & Decorative Gradients ── */}
+      <div className="absolute -top-16 -left-16 w-[420px] h-[420px] bg-purple-300/40 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-1/4 -right-16 w-[460px] h-[460px] bg-pink-300/35 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 left-1/3 w-[500px] h-[300px] bg-indigo-200/30 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Sun Doodle (Top-Left) */}
-      <div className="absolute top-10 left-8 sm:left-12 text-amber-400 opacity-90 pointer-events-none hidden sm:block">
-        <svg className="w-12 h-12 animate-spin-slow" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <circle cx="32" cy="32" r="14" strokeWidth="3" />
-          <path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6" strokeLinecap="round" />
+      {/* ── Hot Air Balloon (Floating Far-Left with smooth bobbing & sway) ── */}
+      <motion.div
+        animate={{ 
+          y: [0, -14, 0],
+          rotate: [-2, 2, -2]
+        }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-12 left-3 sm:left-6 z-20 pointer-events-none hidden sm:block"
+      >
+        <HotAirBalloon className="w-16 h-20 drop-shadow-xl" />
+      </motion.div>
+
+      {/* ── Golden Twinkle Stars ── */}
+      <motion.div
+        animate={{ scale: [1, 1.25, 1], rotate: [0, 15, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-16 left-5 sm:left-8 text-amber-400 z-20 pointer-events-none hidden sm:block"
+      >
+        <span className="text-2xl drop-shadow-md">⭐</span>
+      </motion.div>
+
+      {/* Decorative Star Doodle Under Header */}
+      <motion.div
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-28 left-[40%] text-amber-400 opacity-90 pointer-events-none hidden lg:block"
+      >
+        <svg className="w-9 h-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
         </svg>
-      </div>
+      </motion.div>
 
       {/* Dotted Grid Pattern (Top Center) */}
-      <div className="absolute top-8 left-[48%] opacity-35 pointer-events-none hidden lg:block">
+      <div className="absolute top-6 left-[48%] opacity-35 pointer-events-none hidden lg:block">
         <div className="grid grid-cols-6 gap-2">
           {Array.from({ length: 18 }).map((_, i) => (
-            <span key={i} className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+            <span key={i} className="w-1.5 h-1.5 rounded-full bg-purple-500" />
           ))}
         </div>
       </div>
 
       {/* Paper Airplane with Flight Trail (Top-Right) */}
-      <div className="absolute top-6 right-[28%] text-blue-400 opacity-75 pointer-events-none hidden lg:block">
-        <svg className="w-16 h-16 rotate-12" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2">
+      <motion.div
+        animate={{ y: [0, -8, 0], x: [0, 4, 0] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-6 right-[26%] text-purple-500 opacity-85 pointer-events-none hidden lg:block"
+      >
+        <svg className="w-16 h-16 rotate-12 drop-shadow-md" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.2">
           <path d="M8 32l48-24-20 48-6-20-22-4z" />
           <path d="M30 36l26-28" />
         </svg>
-      </div>
-
-      {/* Rocket Doodle (Far Right) */}
-      <div className="absolute top-12 right-6 sm:right-10 text-purple-500 opacity-85 pointer-events-none hidden lg:block">
-        <div className="relative">
-          <svg className="w-14 h-14 rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" fill="#f59e0b" />
-            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" fill="#ec4899" />
-            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
-            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
-          </svg>
-        </div>
-      </div>
+      </motion.div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* ── Main Top Row: Left Content + Right Visual ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center mb-8 lg:mb-10">
+        {/* ── Main Top Row: Left Content + Center Photo Blob + Right Promo Card ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-2 items-center mb-6 lg:mb-8">
           
           {/* ── Left Column (5 Cols): Typography, Value Props & CTA Buttons ── */}
           <div className="lg:col-span-5 text-center lg:text-left pt-2 lg:pt-0">
             
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100/90 border border-purple-200 text-purple-800 text-xs sm:text-sm font-bold mb-5 shadow-2xs">
-              <span className="text-amber-500">✨</span>
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-purple-200/80 text-purple-900 text-xs sm:text-sm font-bold mb-4 shadow-sm"
+            >
+              <span className="text-amber-500 animate-pulse">✨</span>
               <span>The #1 Platform for Kids Activities & Events</span>
-            </div>
+            </motion.div>
 
-            {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[48px] font-black text-slate-900 leading-[1.12] tracking-tight mb-4">
-              <span>Discover. Book. Enjoy.</span>
-              <span className="block text-purple-600 font-extrabold mt-1">
+            {/* Main Headline with Smooth Animated Entrance */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-4xl sm:text-5xl lg:text-[46px] font-black text-slate-900 leading-[1.12] tracking-tight mb-4"
+            >
+              <span className="block">Discover. Book. Enjoy.</span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-700 font-extrabold mt-1">
                 Amazing Activities
               </span>
               <span className="relative inline-block mt-1">
                 for Your Kids
-                <span className="inline-block text-pink-500 font-normal ml-2 transform -rotate-12 text-3xl sm:text-4xl align-middle">
+                <motion.span 
+                  animate={{ scale: [1, 1.25, 1, 1.15, 1] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-block text-pink-500 font-normal ml-2 transform -rotate-12 text-3xl sm:text-4xl align-middle"
+                >
                   ♡
-                </span>
+                </motion.span>
                 {/* Yellow Hand-drawn Underline Stroke */}
                 <svg 
                   className="absolute -bottom-2 left-0 w-full h-3 text-amber-300 opacity-90 -z-10 pointer-events-none" 
@@ -269,17 +338,17 @@ export function Hero() {
                   />
                 </svg>
               </span>
-            </h1>
+            </motion.h1>
 
             {/* Subtext */}
             <p className="text-slate-600 text-sm sm:text-base mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
               Find the best events, classes, and activities that inspire, engage, and help your child grow.
             </p>
 
-            {/* ── 4 Mini Value Props Row (From Reference) ── */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7 max-w-lg mx-auto lg:mx-0 text-left">
+            {/* ── 4 Mini Value Props Row ── */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 max-w-lg mx-auto lg:mx-0 text-left">
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-lg bg-purple-100 text-purple-700 shrink-0 mt-0.5">
+                <div className="p-1.5 rounded-xl bg-purple-100/90 text-purple-700 shrink-0 mt-0.5 shadow-2xs">
                   <ShieldCheck className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -289,7 +358,7 @@ export function Hero() {
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-lg bg-pink-100 text-pink-700 shrink-0 mt-0.5">
+                <div className="p-1.5 rounded-xl bg-pink-100/90 text-pink-700 shrink-0 mt-0.5 shadow-2xs">
                   <Award className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -299,7 +368,7 @@ export function Hero() {
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-lg bg-indigo-100 text-indigo-700 shrink-0 mt-0.5">
+                <div className="p-1.5 rounded-xl bg-indigo-100/90 text-indigo-700 shrink-0 mt-0.5 shadow-2xs">
                   <Clock className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -309,7 +378,7 @@ export function Hero() {
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-lg bg-amber-100 text-amber-700 shrink-0 mt-0.5">
+                <div className="p-1.5 rounded-xl bg-amber-100/90 text-amber-700 shrink-0 mt-0.5 shadow-2xs">
                   <Users className="w-3.5 h-3.5" />
                 </div>
                 <div>
@@ -319,49 +388,55 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Action Buttons */}
+            {/* ── Action Buttons with Micro-Animations ── */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.04, boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.4)" }}
+                whileTap={{ scale: 0.96 }}
                 onClick={() => router.push('/explore')}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-600/25 hover:shadow-purple-600/35 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base group cursor-pointer"
+                className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-600 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-600/30 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base group cursor-pointer"
               >
+                {/* Shimmer sweep effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <span>Explore Activities</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03, backgroundColor: "#ffffff" }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => router.push('/how-it-works')}
-                className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3.5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2.5 text-sm sm:text-base cursor-pointer"
+                className="bg-white/95 hover:bg-white text-slate-800 font-bold px-6 py-3.5 rounded-2xl border border-slate-200/90 shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2.5 text-sm sm:text-base cursor-pointer"
               >
-                <div className="w-6 h-6 rounded-full border-2 border-slate-700 flex items-center justify-center text-slate-700">
-                  <Play className="w-3 h-3 fill-current ml-0.5" />
+                <div className="relative flex items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-6 w-6 rounded-full bg-purple-400 opacity-30" />
+                  <div className="w-6 h-6 rounded-full border-2 border-purple-700 flex items-center justify-center text-purple-700 bg-purple-50">
+                    <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                  </div>
                 </div>
                 <span>Watch How It Works</span>
-              </button>
+              </motion.button>
             </div>
 
           </div>
 
-          {/* ── Right Column (7 Cols): Organic Hero Child Photo + 5 Floating Category Cards ── */}
-          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[460px] sm:min-h-[500px] lg:min-h-[520px]">
+          {/* ── Right Column (7 Cols): Hero Child Photo with Vibrant Purple/Fuchsia Halo + 5 Category Cards + 20% First Booking Promo Card ── */}
+          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[460px] sm:min-h-[480px] lg:min-h-[500px]">
             
-            <div className="relative w-full max-w-[600px] h-[460px] sm:h-[500px] flex items-center justify-center">
+            <div className="relative w-full max-w-[620px] h-[450px] sm:h-[480px] flex items-center justify-center">
               
-              {/* Back Fluid Sky-Blue Organic Blob Ring */}
+              {/* Back Vibrant Magenta / Fuchsia Halo Ring (From Reference) */}
               <div 
-                className="absolute inset-6 sm:inset-4 bg-gradient-to-tr from-sky-400/80 via-blue-400/80 to-purple-400/70 shadow-2xl opacity-85"
+                className="absolute inset-4 sm:inset-2 bg-gradient-to-tr from-fuchsia-500/90 via-purple-600/90 to-pink-500/85 shadow-2xl opacity-90"
                 style={{
-                  borderRadius: '52% 48% 62% 38% / 45% 58% 42% 55%',
-                  transform: 'scale(1.06) rotate(3deg)',
+                  borderRadius: '50% 50% 50% 50% / 50% 50% 50% 50%',
+                  transform: 'scale(1.05)',
                 }}
               />
 
-              {/* Main Photo Mask with Organic Shape */}
+              {/* Main Photo Mask with Crisp Circular Frame (Zoomed in on smiling boy & raised fist) */}
               <div 
-                className="relative w-[78%] sm:w-[82%] h-[78%] sm:h-[82%] overflow-hidden shadow-2xl z-10 border-4 border-white/95"
-                style={{
-                  borderRadius: '48% 52% 42% 58% / 54% 44% 56% 46%',
-                }}
+                className="relative w-[78%] sm:w-[80%] h-[78%] sm:h-[80%] overflow-hidden shadow-2xl z-10 border-4 border-white/95 rounded-full"
               >
                 <img 
                   src="/images/hero-kid.jpg" 
@@ -370,14 +445,15 @@ export function Hero() {
                 />
               </div>
 
-              {/* ── 5 Floating Category Cards (Solid Opaque White) ── */}
+              {/* ── 5 Floating Category Cards (Solid Opaque White with Micro-Animations) ── */}
 
               {/* 1. Sports Card (Top-Left of boy) */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Sports')}
-                className="absolute top-2 left-0 sm:left-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-emerald-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
+                className="absolute top-2 left-0 sm:left-2 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-emerald-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-30 sm:w-34 opacity-100"
               >
                 <div className="mb-1">
                   <Soccer3DIcon />
@@ -390,8 +466,9 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Arts & Crafts')}
-                className="absolute bottom-12 -left-2 sm:left-0 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-36 sm:w-40 opacity-100"
+                className="absolute bottom-10 -left-2 sm:left-0 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-34 sm:w-38 opacity-100"
               >
                 <div className="mb-1">
                   <Palette3DIcon />
@@ -404,8 +481,9 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Dance')}
-                className="absolute top-4 right-0 sm:right-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
+                className="absolute top-2 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Dance3DIcon />
@@ -418,8 +496,9 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Swimming')}
-                className="absolute top-40 -right-3 sm:-right-1 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
+                className="absolute top-36 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Swimming3DIcon />
@@ -432,8 +511,9 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+                whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Chess')}
-                className="absolute -bottom-2 right-4 sm:right-6 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
+                className="absolute -bottom-2 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Chess3DIcon />
@@ -442,25 +522,46 @@ export function Hero() {
                 <div className="text-[11px] text-amber-700 font-bold">Think Smart</div>
               </motion.div>
 
+              {/* ── Right-Side 20% First Booking Promo Card (From Reference) ── */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+                whileHover={{ scale: 1.05 }}
+                onClick={() => router.push('/explore?offer=first-booking')}
+                className="absolute top-16 -right-2 sm:-right-4 z-40 bg-gradient-to-b from-purple-700 via-indigo-700 to-purple-900 text-white p-3.5 sm:p-4 rounded-3xl shadow-2xl border border-purple-400/30 flex flex-col items-center text-center w-34 sm:w-38 cursor-pointer hidden md:flex"
+              >
+                <div className="text-[11px] font-bold text-purple-200 mb-0.5">Get Up to</div>
+                <div className="text-xl sm:text-2xl font-black text-amber-300 leading-none mb-1">20% OFF</div>
+                <div className="text-[10px] text-purple-100 font-medium mb-2.5">on your first booking!</div>
+                
+                <div className="w-full py-1 px-2 rounded-xl bg-amber-400 text-slate-950 font-black text-[11px] shadow-sm mb-2 hover:bg-amber-300 transition-colors">
+                  Use Code: KID20
+                </div>
+
+                <div className="relative">
+                  <Gift3DIcon className="w-10 h-10" />
+                </div>
+              </motion.div>
+
             </div>
 
           </div>
 
         </div>
 
-        {/* ── Section 1: Popular Categories Horizontal Quick Strip (From Reference) ── */}
+        {/* ── Section 1: Popular Categories Horizontal Quick Strip ── */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3 px-1">
             <h2 className="font-extrabold text-slate-900 text-base sm:text-lg flex items-center gap-1.5">
               <span>Popular Categories</span>
-              <Sparkles className="w-4 h-4 text-amber-500" />
+              <Sparkles className="w-4 h-4 text-amber-500 animate-spin-slow" />
             </h2>
             <button
               onClick={() => router.push('/categories')}
-              className="text-xs sm:text-sm font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
+              className="text-xs sm:text-sm font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 cursor-pointer group"
             >
               <span>View All Categories</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
@@ -469,12 +570,14 @@ export function Hero() {
               const isActive = activeCategoryTab === cat.name;
               const IconComponent = cat.icon;
               return (
-                <button
+                <motion.button
                   key={idx}
+                  whileHover={{ y: -3, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   onClick={() => handleCategoryClick(cat.name)}
                   className={`flex flex-col items-center justify-center px-3 py-2.5 rounded-2xl min-w-[92px] sm:min-w-[102px] h-[78px] transition-all duration-200 border cursor-pointer shrink-0 ${
                     isActive 
-                      ? 'bg-purple-50 border-purple-300 shadow-sm text-purple-900 font-extrabold' 
+                      ? 'bg-purple-100/90 border-purple-400 shadow-md text-purple-950 font-extrabold' 
                       : 'bg-white hover:bg-slate-50 border-slate-100 hover:border-purple-200 text-slate-700 font-bold shadow-2xs hover:shadow-sm'
                   }`}
                 >
@@ -484,19 +587,20 @@ export function Hero() {
                   <span className="text-[11px] font-bold text-center leading-tight whitespace-nowrap">
                     {cat.name}
                   </span>
-                </button>
+                </motion.button>
               );
             })}
           </div>
         </div>
 
-        {/* ── Section 2: Interactive Promo & Value Banner Grid (From Reference) ── */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 mb-7">
+        {/* ── Section 2: Interactive Promo & Value Banner Grid ── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 mb-6">
           
           {/* Promo Card 1: Weekend Fun 10% OFF */}
-          <div 
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -3 }}
             onClick={() => router.push('/explore?offer=weekend')}
-            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 text-white shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
           >
             <div className="z-10 max-w-[62%]">
               <div className="flex items-center gap-1 text-[11px] font-extrabold text-amber-300 mb-1">
@@ -516,14 +620,15 @@ export function Hero() {
                 alt="Weekend rock climbing fun" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 via-transparent to-transparent" />
             </div>
-          </div>
+          </motion.div>
 
           {/* Promo Card 2: Summer Camp Special Up to 20% OFF */}
-          <div 
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -3 }}
             onClick={() => router.push('/explore?offer=summer-camp')}
-            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
           >
             <div className="z-10 max-w-[62%]">
               <div className="flex items-center gap-1 text-[11px] font-extrabold text-yellow-200 mb-1">
@@ -545,12 +650,13 @@ export function Hero() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-transparent to-transparent" />
             </div>
-          </div>
+          </motion.div>
 
           {/* Promo Card 3: Refer & Earn Get ₹100 */}
-          <div 
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -3 }}
             onClick={() => router.push('/dashboard/parent/profile')}
-            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md hover:shadow-xl transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
           >
             <div className="z-10 max-w-[65%]">
               <div className="flex items-center gap-1 text-[11px] font-extrabold text-sky-100 mb-1">
@@ -564,12 +670,15 @@ export function Hero() {
             </div>
             {/* 3D Gift Box Icon */}
             <div className="relative pr-1 group-hover:scale-110 transition-transform duration-300">
-              <Gift3DIcon />
+              <Gift3DIcon className="w-14 h-14" />
             </div>
-          </div>
+          </motion.div>
 
-          {/* Value Card 4: Why Parents Love Kidspire (From Reference) */}
-          <div className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-br from-purple-700 via-indigo-700 to-violet-800 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
+          {/* Value Card 4: Why Parents Love Kidspire */}
+          <motion.div 
+            whileHover={{ scale: 1.02, y: -3 }}
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-br from-purple-700 via-indigo-700 to-violet-900 text-white shadow-md relative overflow-hidden flex flex-col justify-between"
+          >
             <div>
               <div className="flex items-center gap-1.5 text-xs font-black text-amber-300 mb-2">
                 <span>🎉</span>
@@ -603,16 +712,16 @@ export function Hero() {
                 <div className="w-5 h-5 rounded-full ring-1 ring-white bg-emerald-400 text-white font-bold text-[8px] flex items-center justify-center">A</div>
                 <div className="w-5 h-5 rounded-full ring-1 ring-white bg-sky-400 text-white font-bold text-[8px] flex items-center justify-center">S</div>
               </div>
-              <div className="flex items-center gap-1 bg-amber-400/90 text-slate-900 px-2 py-0.5 rounded-full font-black text-[10px]">
+              <div className="flex items-center gap-1 bg-amber-400/95 text-slate-900 px-2 py-0.5 rounded-full font-black text-[10px]">
                 <span>⭐ 4.8/5</span>
               </div>
             </div>
-          </div>
+          </motion.div>
 
         </div>
 
-        {/* ── Section 3: 5-Field Search Bar (Matching Reference) ── */}
-        <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xl shadow-purple-900/5 border border-slate-100 max-w-6xl mx-auto">
+        {/* ── Section 3: 5-Field Search Bar ── */}
+        <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xl shadow-purple-900/10 border border-purple-100/60 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
             
             {/* Field 1: Search text */}
@@ -687,18 +796,29 @@ export function Hero() {
               <div className="flex-1 min-w-0">
                 <LocationSelector variant="searchBar" className="w-full" />
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05, boxShadow: "0 8px 20px -4px rgba(124, 58, 237, 0.4)" }}
+                whileTap={{ scale: 0.95 }}
                 onClick={handleSearch}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-purple-600/25 hover:shadow-purple-600/35 transition-all text-sm shrink-0 cursor-pointer"
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-purple-600/30 transition-all text-sm shrink-0 cursor-pointer"
               >
                 Search
-              </button>
+              </motion.button>
             </div>
 
           </div>
         </div>
 
       </div>
+
+      {/* ── Flowing Bottom Wavy Ribbon (From Reference) ── */}
+      <div className="w-full overflow-hidden leading-none mt-6 pointer-events-none">
+        <svg className="relative block w-full h-8 sm:h-12 text-purple-700/85" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0 C150,90 350,-40 500,60 C650,140 900,10 1200,40 L1200,120 L0,120 Z" fill="currentColor" opacity="0.9" />
+          <path d="M0,20 C200,100 450,10 700,70 C950,130 1100,30 1200,50 L1200,120 L0,120 Z" fill="#8b5cf6" opacity="0.4" />
+        </svg>
+      </div>
+
     </section>
   );
 }
