@@ -483,7 +483,7 @@ export function Hero() {
                 transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
                 whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Dance')}
-                className="absolute top-2 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
+                className="absolute top-2 right-4 sm:right-8 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Dance3DIcon />
@@ -498,7 +498,7 @@ export function Hero() {
                 transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
                 whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Swimming')}
-                className="absolute top-36 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
+                className="absolute top-36 -right-1 sm:right-3 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Swimming3DIcon />
@@ -513,34 +513,13 @@ export function Hero() {
                 transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
                 whileHover={{ scale: 1.08, y: -8 }}
                 onClick={() => handleCategoryClick('Chess')}
-                className="absolute -bottom-2 right-32 sm:right-36 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
+                className="absolute -bottom-2 right-4 sm:right-8 z-30 bg-white px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-28 sm:w-32 opacity-100"
               >
                 <div className="mb-1">
                   <Chess3DIcon />
                 </div>
                 <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Chess</div>
                 <div className="text-[11px] text-amber-700 font-bold">Think Smart</div>
-              </motion.div>
-
-              {/* ── Right-Side 20% First Booking Promo Card (From Reference) ── */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                whileHover={{ scale: 1.05 }}
-                onClick={() => router.push('/explore?offer=first-booking')}
-                className="absolute top-16 -right-2 sm:-right-4 z-40 bg-gradient-to-b from-purple-700 via-indigo-700 to-purple-900 text-white p-3.5 sm:p-4 rounded-3xl shadow-2xl border border-purple-400/30 flex flex-col items-center text-center w-34 sm:w-38 cursor-pointer hidden md:flex"
-              >
-                <div className="text-[11px] font-bold text-purple-200 mb-0.5">Get Up to</div>
-                <div className="text-xl sm:text-2xl font-black text-amber-300 leading-none mb-1">20% OFF</div>
-                <div className="text-[10px] text-purple-100 font-medium mb-2.5">on your first booking!</div>
-                
-                <div className="w-full py-1 px-2 rounded-xl bg-amber-400 text-slate-950 font-black text-[11px] shadow-sm mb-2 hover:bg-amber-300 transition-colors">
-                  Use Code: KID20
-                </div>
-
-                <div className="relative">
-                  <Gift3DIcon className="w-10 h-10" />
-                </div>
               </motion.div>
 
             </div>
