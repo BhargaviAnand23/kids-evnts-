@@ -12,16 +12,32 @@ import {
   ShieldCheck, 
   Lock, 
   Heart,
-  Sparkles
+  Sparkles,
+  Award,
+  Clock,
+  Gift,
+  Check,
+  Flame,
+  Tent,
+  Smile,
+  Music,
+  Atom,
+  BookOpen,
+  Mountain,
+  MoreHorizontal,
+  Palette,
+  Trophy,
+  Waves,
+  Crown
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { LocationSelector, useSelectedLocation } from '@/components/shared/LocationSelector';
 
-// 3D Isometric & Glossy SVG Icons for the 5 Category Cards
+// 3D Isometric & Glossy SVG Icons for the 5 Main Floating Cards
 function Soccer3DIcon() {
   return (
-    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+    <svg className="w-11 h-11 drop-shadow-md" viewBox="0 0 64 64" fill="none">
       <circle cx="32" cy="32" r="28" fill="url(#soccerBallGrad)" stroke="#e2e8f0" strokeWidth="2" />
       <polygon points="32,20 23,27 26,38 38,38 41,27" fill="#1e293b" />
       <polygon points="32,4 27,10 32,20 37,10" fill="#334155" opacity="0.9" />
@@ -42,7 +58,7 @@ function Soccer3DIcon() {
 
 function Palette3DIcon() {
   return (
-    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+    <svg className="w-11 h-11 drop-shadow-md" viewBox="0 0 64 64" fill="none">
       <path 
         d="M32 6C17.6 6 6 17.6 6 32c0 14.4 11.6 26 26 26 5.8 0 9-4.2 9-8 0-3.2-2.2-5.4-2.2-8 0-3 2.5-5 5.5-5H52c6.6 0 12-5.4 12-12C64 15.6 49.6 6 32 6z" 
         fill="url(#paletteWoodGrad)" 
@@ -54,7 +70,6 @@ function Palette3DIcon() {
       <circle cx="44" cy="22" r="4.5" fill="#10b981" />
       <circle cx="18" cy="36" r="4.5" fill="#3b82f6" />
       <circle cx="26" cy="46" r="4.5" fill="#8b5cf6" />
-      {/* Wooden brush */}
       <path d="M48 36l10 16c1 1.6.5 3.6-1.1 4.6s-3.6.5-4.6-1.1L42 39l6-3z" fill="#78350f" />
       <path d="M57 53c1 1.6.5 3.6-1.1 4.6-1.6 1-3.6.5-4.6-1.1l2-2 3.7-1.5z" fill="#ec4899" />
       <defs>
@@ -69,7 +84,7 @@ function Palette3DIcon() {
 
 function Dance3DIcon() {
   return (
-    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+    <svg className="w-11 h-11 drop-shadow-md" viewBox="0 0 64 64" fill="none">
       <circle cx="32" cy="12" r="7" fill="#a855f7" />
       <path d="M30 20c-4 0-8 3-8 8v6l-8-3c-1.5-.6-3 .2-3.6 1.7-.6 1.5.2 3 1.7 3.6l12 5c1 .4 2.1.2 2.9-.5l7-6v14l-8 10c-1 1.3-.8 3.2.5 4.2 1.3 1 3.2.8 4.2-.5l9.3-11.6L54 60c1 1.3 2.9 1.5 4.2.5 1.3-1 1.5-2.9.5-4.2l-10.7-14V28c0-4.4-3.6-8-8-8h-10z" fill="url(#dancePurpleGrad)" />
       <path d="M42 22l6-4c1.3-.9 3.1-.6 4 .7s.6 3.1-.7 4l-7 4.7-2.3-5.4z" fill="#c084fc" />
@@ -85,7 +100,7 @@ function Dance3DIcon() {
 
 function Swimming3DIcon() {
   return (
-    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+    <svg className="w-11 h-11 drop-shadow-md" viewBox="0 0 64 64" fill="none">
       <circle cx="38" cy="18" r="6" fill="#38bdf8" />
       <path d="M10 36c5-3 11-3 16 0s11 3 16 0 11-3 16 0" stroke="#0284c7" strokeWidth="4.5" strokeLinecap="round" />
       <path d="M6 46c5-3 11-3 16 0s11 3 16 0 11-3 16 0" stroke="#38bdf8" strokeWidth="4.5" strokeLinecap="round" />
@@ -96,17 +111,35 @@ function Swimming3DIcon() {
 
 function Chess3DIcon() {
   return (
-    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
-      {/* Dark King Piece */}
+    <svg className="w-11 h-11 drop-shadow-md" viewBox="0 0 64 64" fill="none">
       <path d="M26 12h4v-4h-4V4h-4v4h-4v4h4v4h4v-4z" fill="#1e293b" />
       <path d="M14 20c0-2 4-4 8-4s8 2 8 4-3 12-3 20h-10c0-8-3-18-3-20z" fill="#334155" />
       <path d="M11 44h22v6H11v-6z" fill="#1e293b" />
       <path d="M9 50h26v6H9v-6z" fill="#0f172a" />
-      {/* Light Wooden Pawn Piece */}
       <circle cx="44" cy="24" r="6" fill="#fde68a" stroke="#d97706" strokeWidth="1.5" />
       <path d="M38 32c0-2 3-3 6-3s6 1 6 3-2 10-2 16H39c0-6-1-14-1-16z" fill="#fef3c7" stroke="#d97706" strokeWidth="1.5" />
       <path d="M35 48h18v5H35v-5z" fill="#fde68a" stroke="#d97706" strokeWidth="1.5" />
       <path d="M33 53h22v5H33v-5z" fill="#fcd34d" stroke="#b45309" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+// 3D Gift Box SVG Icon
+function Gift3DIcon() {
+  return (
+    <svg className="w-14 h-14 drop-shadow-lg" viewBox="0 0 64 64" fill="none">
+      <rect x="12" y="24" width="40" height="32" rx="4" fill="url(#giftBoxGrad)" />
+      <rect x="8" y="16" width="48" height="12" rx="3" fill="#38bdf8" />
+      <rect x="28" y="16" width="8" height="40" fill="#ef4444" />
+      <rect x="8" y="20" width="48" height="4" fill="#ef4444" opacity="0.3" />
+      <path d="M24 16c-4-8-12-6-10 0 2 6 14 0 14 0s12 6 14 0c2-6-6-8-10 0" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <circle cx="32" cy="16" r="3" fill="#dc2626" />
+      <defs>
+        <linearGradient id="giftBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#38bdf8" />
+          <stop offset="100%" stopColor="#0284c7" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
@@ -116,6 +149,7 @@ export function Hero() {
   const [selectedActivity, setSelectedActivity] = useState('All');
   const [selectedAge, setSelectedAge] = useState('All Ages');
   const [selectedDate, setSelectedDate] = useState('');
+  const [activeCategoryTab, setActiveCategoryTab] = useState('All Activities');
   const { selectedCity } = useSelectedLocation();
   const router = useRouter();
 
@@ -129,25 +163,45 @@ export function Hero() {
     router.push(`/explore?${params.toString()}`);
   };
 
-  const handleCategoryCardClick = (categoryName: string) => {
-    router.push(`/explore?category=${encodeURIComponent(categoryName.toLowerCase())}`);
+  const handleCategoryClick = (categoryName: string) => {
+    setActiveCategoryTab(categoryName);
+    if (categoryName === 'All Activities') {
+      router.push('/explore');
+    } else {
+      router.push(`/explore?category=${encodeURIComponent(categoryName.toLowerCase())}`);
+    }
   };
+
+  const popularCategoriesList = [
+    { name: 'All Activities', icon: Grid, color: 'text-purple-600' },
+    { name: 'Sports', icon: Trophy, color: 'text-emerald-600' },
+    { name: 'Dance', icon: Sparkles, color: 'text-purple-600' },
+    { name: 'Swimming', icon: Waves, color: 'text-sky-600' },
+    { name: 'Arts & Crafts', icon: Palette, color: 'text-pink-600' },
+    { name: 'Music', icon: Music, color: 'text-amber-600' },
+    { name: 'STEM', icon: Atom, color: 'text-indigo-600' },
+    { name: 'Academic', icon: BookOpen, color: 'text-blue-600' },
+    { name: 'Adventure', icon: Mountain, color: 'text-emerald-600' },
+    { name: 'Chess', icon: Crown, color: 'text-amber-700' },
+    { name: 'Others', icon: MoreHorizontal, color: 'text-slate-600' },
+  ];
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-[#f9f8ff] via-[#f7f5ff] to-[#f1edff]/70 pt-6 pb-12 md:pt-10 md:pb-16 lg:pt-12 lg:pb-16">
       
       {/* ── Ambient Background Glow & Doodles ── */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[620px] bg-gradient-to-tr from-purple-100/30 via-pink-100/20 to-sky-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[640px] bg-gradient-to-tr from-purple-100/30 via-pink-100/20 to-sky-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
-      {/* Decorative Star Doodle (Top Left) */}
-      <div className="absolute top-10 left-[41%] text-amber-400 opacity-85 pointer-events-none hidden lg:block">
-        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+      {/* Sun Doodle (Top-Left) */}
+      <div className="absolute top-10 left-8 sm:left-12 text-amber-400 opacity-90 pointer-events-none hidden sm:block">
+        <svg className="w-12 h-12 animate-spin-slow" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <circle cx="32" cy="32" r="14" strokeWidth="3" />
+          <path d="M32 4v8M32 52v8M4 32h8M52 32h8M12 12l6 6M46 46l6 6M12 52l6-6M46 18l6-6" strokeLinecap="round" />
         </svg>
       </div>
 
-      {/* Decorative Dotted Grid Pattern (Top Center) */}
-      <div className="absolute top-12 left-[48%] opacity-35 pointer-events-none hidden lg:block">
+      {/* Dotted Grid Pattern (Top Center) */}
+      <div className="absolute top-8 left-[48%] opacity-35 pointer-events-none hidden lg:block">
         <div className="grid grid-cols-6 gap-2">
           {Array.from({ length: 18 }).map((_, i) => (
             <span key={i} className="w-1.5 h-1.5 rounded-full bg-purple-400" />
@@ -155,17 +209,23 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Decorative Paper Airplane Doodle (Top Right) */}
-      <div className="absolute top-8 right-[24%] text-blue-400 opacity-70 pointer-events-none hidden lg:block">
-        <svg className="w-14 h-14 rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeDasharray="3 3">
-          <path d="M2 12l20-9-9 20-2-8-9-3z" />
+      {/* Paper Airplane with Flight Trail (Top-Right) */}
+      <div className="absolute top-6 right-[28%] text-blue-400 opacity-75 pointer-events-none hidden lg:block">
+        <svg className="w-16 h-16 rotate-12" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M8 32l48-24-20 48-6-20-22-4z" />
+          <path d="M30 36l26-28" />
         </svg>
       </div>
 
-      {/* Decorative Sparkle Badge (Far Right) */}
-      <div className="absolute top-14 right-[6%] text-amber-500 opacity-80 pointer-events-none hidden lg:block">
-        <div className="w-10 h-10 rounded-full bg-amber-100/90 border border-amber-300 flex items-center justify-center text-amber-600 shadow-sm">
-          <Sparkles className="w-5 h-5" />
+      {/* Rocket Doodle (Far Right) */}
+      <div className="absolute top-12 right-6 sm:right-10 text-purple-500 opacity-85 pointer-events-none hidden lg:block">
+        <div className="relative">
+          <svg className="w-14 h-14 rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" fill="#f59e0b" />
+            <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" fill="#ec4899" />
+            <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+            <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+          </svg>
         </div>
       </div>
 
@@ -174,7 +234,7 @@ export function Hero() {
         {/* ── Main Top Row: Left Content + Right Visual ── */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center mb-8 lg:mb-10">
           
-          {/* ── Left Column (5 Cols): Typography & CTA Buttons ── */}
+          {/* ── Left Column (5 Cols): Typography, Value Props & CTA Buttons ── */}
           <div className="lg:col-span-5 text-center lg:text-left pt-2 lg:pt-0">
             
             {/* Top Badge */}
@@ -184,20 +244,19 @@ export function Hero() {
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[50px] font-black text-slate-900 leading-[1.12] tracking-tight mb-5">
+            <h1 className="text-4xl sm:text-5xl lg:text-[48px] font-black text-slate-900 leading-[1.12] tracking-tight mb-4">
               <span>Discover. Book. Enjoy.</span>
               <span className="block text-purple-600 font-extrabold mt-1">
                 Amazing Activities
               </span>
               <span className="relative inline-block mt-1">
                 for Your Kids
-                {/* Cute Pink Heart Doodle */}
                 <span className="inline-block text-pink-500 font-normal ml-2 transform -rotate-12 text-3xl sm:text-4xl align-middle">
                   ♡
                 </span>
-                {/* Hand-drawn Yellow Underline Stroke */}
+                {/* Yellow Hand-drawn Underline Stroke */}
                 <svg 
-                  className="absolute -bottom-2.5 left-0 w-full h-3 text-amber-300 opacity-90 -z-10 pointer-events-none" 
+                  className="absolute -bottom-2 left-0 w-full h-3 text-amber-300 opacity-90 -z-10 pointer-events-none" 
                   viewBox="0 0 240 12" 
                   fill="none" 
                   preserveAspectRatio="none"
@@ -213,15 +272,58 @@ export function Hero() {
             </h1>
 
             {/* Subtext */}
-            <p className="text-slate-600 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+            <p className="text-slate-600 text-sm sm:text-base mb-6 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
               Find the best events, classes, and activities that inspire, engage, and help your child grow.
             </p>
+
+            {/* ── 4 Mini Value Props Row (From Reference) ── */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7 max-w-lg mx-auto lg:mx-0 text-left">
+              <div className="flex items-start gap-2">
+                <div className="p-1 rounded-lg bg-purple-100 text-purple-700 shrink-0 mt-0.5">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="font-bold text-xs text-slate-900 leading-tight">Trusted & Safe</div>
+                  <div className="text-[10px] text-slate-500">Verified organizers</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <div className="p-1 rounded-lg bg-pink-100 text-pink-700 shrink-0 mt-0.5">
+                  <Award className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="font-bold text-xs text-slate-900 leading-tight">Quality Activities</div>
+                  <div className="text-[10px] text-slate-500">Curated with care</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <div className="p-1 rounded-lg bg-indigo-100 text-indigo-700 shrink-0 mt-0.5">
+                  <Clock className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="font-bold text-xs text-slate-900 leading-tight">Easy Booking</div>
+                  <div className="text-[10px] text-slate-500">Quick & hassle-free</div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <div className="p-1 rounded-lg bg-amber-100 text-amber-700 shrink-0 mt-0.5">
+                  <Users className="w-3.5 h-3.5" />
+                </div>
+                <div>
+                  <div className="font-bold text-xs text-slate-900 leading-tight">Loved by Parents</div>
+                  <div className="text-[10px] text-slate-500">4.8 ⭐ rating</div>
+                </div>
+              </div>
+            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
               <button
                 onClick={() => router.push('/explore')}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-600/25 hover:shadow-purple-600/35 transition-all duration-200 flex items-center gap-2 text-base group cursor-pointer"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-600/25 hover:shadow-purple-600/35 transition-all duration-200 flex items-center gap-2 text-sm sm:text-base group cursor-pointer"
               >
                 <span>Explore Activities</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -229,7 +331,7 @@ export function Hero() {
 
               <button
                 onClick={() => router.push('/how-it-works')}
-                className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3.5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2.5 text-base cursor-pointer"
+                className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3.5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2.5 text-sm sm:text-base cursor-pointer"
               >
                 <div className="w-6 h-6 rounded-full border-2 border-slate-700 flex items-center justify-center text-slate-700">
                   <Play className="w-3 h-3 fill-current ml-0.5" />
@@ -243,7 +345,6 @@ export function Hero() {
           {/* ── Right Column (7 Cols): Organic Hero Child Photo + 5 Floating Category Cards ── */}
           <div className="lg:col-span-7 relative flex items-center justify-center min-h-[460px] sm:min-h-[500px] lg:min-h-[520px]">
             
-            {/* Visual Stage Container */}
             <div className="relative w-full max-w-[600px] h-[460px] sm:h-[500px] flex items-center justify-center">
               
               {/* Back Fluid Sky-Blue Organic Blob Ring */}
@@ -269,13 +370,13 @@ export function Hero() {
                 />
               </div>
 
-              {/* ── 5 Floating Category Cards (Always Solid Opaque White & Floating) ── */}
+              {/* ── 5 Floating Category Cards (Solid Opaque White) ── */}
 
               {/* 1. Sports Card (Top-Left of boy) */}
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                onClick={() => handleCategoryCardClick('sports')}
+                onClick={() => handleCategoryClick('Sports')}
                 className="absolute top-2 left-0 sm:left-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-emerald-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
                 <div className="mb-1">
@@ -289,7 +390,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 6, 0] }}
                 transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
-                onClick={() => handleCategoryCardClick('arts-and-crafts')}
+                onClick={() => handleCategoryClick('Arts & Crafts')}
                 className="absolute bottom-12 -left-2 sm:left-0 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-36 sm:w-40 opacity-100"
               >
                 <div className="mb-1">
@@ -303,7 +404,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-                onClick={() => handleCategoryCardClick('dance')}
+                onClick={() => handleCategoryClick('Dance')}
                 className="absolute top-4 right-0 sm:right-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
                 <div className="mb-1">
@@ -317,7 +418,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, 5, 0] }}
                 transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-                onClick={() => handleCategoryCardClick('swimming')}
+                onClick={() => handleCategoryClick('Swimming')}
                 className="absolute top-40 -right-3 sm:-right-1 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
                 <div className="mb-1">
@@ -331,7 +432,7 @@ export function Hero() {
               <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
-                onClick={() => handleCategoryCardClick('chess')}
+                onClick={() => handleCategoryClick('Chess')}
                 className="absolute -bottom-2 right-4 sm:right-6 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
                 <div className="mb-1">
@@ -347,8 +448,171 @@ export function Hero() {
 
         </div>
 
-        {/* ── Bottom Section: 5-Field Search Bar (Matching Reference) ── */}
-        <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xl shadow-purple-900/5 border border-slate-100 mb-8 max-w-6xl mx-auto">
+        {/* ── Section 1: Popular Categories Horizontal Quick Strip (From Reference) ── */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3 px-1">
+            <h2 className="font-extrabold text-slate-900 text-base sm:text-lg flex items-center gap-1.5">
+              <span>Popular Categories</span>
+              <Sparkles className="w-4 h-4 text-amber-500" />
+            </h2>
+            <button
+              onClick={() => router.push('/categories')}
+              className="text-xs sm:text-sm font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1 cursor-pointer"
+            >
+              <span>View All Categories</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5">
+            {popularCategoriesList.map((cat, idx) => {
+              const isActive = activeCategoryTab === cat.name;
+              const IconComponent = cat.icon;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => handleCategoryClick(cat.name)}
+                  className={`flex flex-col items-center justify-center px-3 py-2.5 rounded-2xl min-w-[92px] sm:min-w-[102px] h-[78px] transition-all duration-200 border cursor-pointer shrink-0 ${
+                    isActive 
+                      ? 'bg-purple-50 border-purple-300 shadow-sm text-purple-900 font-extrabold' 
+                      : 'bg-white hover:bg-slate-50 border-slate-100 hover:border-purple-200 text-slate-700 font-bold shadow-2xs hover:shadow-sm'
+                  }`}
+                >
+                  <div className="mb-1.5 flex items-center justify-center">
+                    <IconComponent className={`w-5 h-5 ${cat.color || 'text-purple-600'}`} />
+                  </div>
+                  <span className="text-[11px] font-bold text-center leading-tight whitespace-nowrap">
+                    {cat.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── Section 2: Interactive Promo & Value Banner Grid (From Reference) ── */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 mb-7">
+          
+          {/* Promo Card 1: Weekend Fun 10% OFF */}
+          <div 
+            onClick={() => router.push('/explore?offer=weekend')}
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+          >
+            <div className="z-10 max-w-[62%]">
+              <div className="flex items-center gap-1 text-[11px] font-extrabold text-amber-300 mb-1">
+                <Flame className="w-3.5 h-3.5" />
+                <span>Weekend Fun</span>
+              </div>
+              <div className="text-base sm:text-lg font-black leading-tight mb-0.5">10% OFF</div>
+              <div className="text-[10px] text-purple-200 font-medium mb-1.5 leading-tight">On selected activities</div>
+              <span className="inline-block px-2 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-[10px] font-extrabold tracking-wider border border-white/20">
+                Use code: FUN10
+              </span>
+            </div>
+            {/* Cutout Photo */}
+            <div className="absolute right-0 top-0 bottom-0 w-[42%] overflow-hidden">
+              <img 
+                src="/images/promo-climbing.jpg" 
+                alt="Weekend rock climbing fun" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-transparent to-transparent" />
+            </div>
+          </div>
+
+          {/* Promo Card 2: Summer Camp Special Up to 20% OFF */}
+          <div 
+            onClick={() => router.push('/explore?offer=summer-camp')}
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+          >
+            <div className="z-10 max-w-[62%]">
+              <div className="flex items-center gap-1 text-[11px] font-extrabold text-yellow-200 mb-1">
+                <Tent className="w-3.5 h-3.5" />
+                <span>Summer Camp Special</span>
+              </div>
+              <div className="text-base sm:text-lg font-black leading-tight mb-0.5">Up to 20% OFF</div>
+              <div className="text-[10px] text-amber-100 font-medium mb-1.5 leading-tight">Early bird offers!</div>
+              <span className="inline-block px-2 py-0.5 rounded-md bg-white/25 backdrop-blur-md text-[10px] font-extrabold tracking-wider border border-white/20">
+                Limited time only
+              </span>
+            </div>
+            {/* Cutout Photo */}
+            <div className="absolute right-0 top-0 bottom-0 w-[42%] overflow-hidden">
+              <img 
+                src="/images/promo-camp.jpg" 
+                alt="Summer camp kids" 
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500 via-transparent to-transparent" />
+            </div>
+          </div>
+
+          {/* Promo Card 3: Refer & Earn Get ₹100 */}
+          <div 
+            onClick={() => router.push('/dashboard/parent/profile')}
+            className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden flex items-center justify-between min-h-[120px] group"
+          >
+            <div className="z-10 max-w-[65%]">
+              <div className="flex items-center gap-1 text-[11px] font-extrabold text-sky-100 mb-1">
+                <Users className="w-3.5 h-3.5" />
+                <span>Refer & Earn</span>
+              </div>
+              <div className="text-base sm:text-lg font-black leading-tight mb-0.5">Get ₹100 Credit</div>
+              <div className="text-[10px] text-sky-100 font-medium leading-tight">
+                Refer a friend & both get the reward!
+              </div>
+            </div>
+            {/* 3D Gift Box Icon */}
+            <div className="relative pr-1 group-hover:scale-110 transition-transform duration-300">
+              <Gift3DIcon />
+            </div>
+          </div>
+
+          {/* Value Card 4: Why Parents Love Kidspire (From Reference) */}
+          <div className="md:col-span-3 rounded-3xl p-4 bg-gradient-to-br from-purple-700 via-indigo-700 to-violet-800 text-white shadow-md relative overflow-hidden flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-1.5 text-xs font-black text-amber-300 mb-2">
+                <span>🎉</span>
+                <span>Why Parents Love Kidspire</span>
+              </div>
+              <ul className="space-y-1 text-[11px] text-purple-100 font-medium">
+                <li className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-full bg-white/20 flex items-center justify-center text-[9px] text-emerald-300 font-bold shrink-0">✓</span>
+                  <span>Curated activities for every age</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-full bg-white/20 flex items-center justify-center text-[9px] text-emerald-300 font-bold shrink-0">✓</span>
+                  <span>Safe & verified organizers</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-full bg-white/20 flex items-center justify-center text-[9px] text-emerald-300 font-bold shrink-0">✓</span>
+                  <span>Easy booking & secure payments</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="w-3.5 h-3.5 rounded-full bg-white/20 flex items-center justify-center text-[9px] text-emerald-300 font-bold shrink-0">✓</span>
+                  <span>Real reviews from real parents</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Bottom Rating Pill + Avatar Stack */}
+            <div className="pt-2.5 border-t border-white/10 flex items-center justify-between mt-2">
+              <div className="flex -space-x-1.5 overflow-hidden">
+                <div className="w-5 h-5 rounded-full ring-1 ring-white bg-amber-400 text-slate-900 font-bold text-[8px] flex items-center justify-center">M</div>
+                <div className="w-5 h-5 rounded-full ring-1 ring-white bg-pink-400 text-white font-bold text-[8px] flex items-center justify-center">P</div>
+                <div className="w-5 h-5 rounded-full ring-1 ring-white bg-emerald-400 text-white font-bold text-[8px] flex items-center justify-center">A</div>
+                <div className="w-5 h-5 rounded-full ring-1 ring-white bg-sky-400 text-white font-bold text-[8px] flex items-center justify-center">S</div>
+              </div>
+              <div className="flex items-center gap-1 bg-amber-400/90 text-slate-900 px-2 py-0.5 rounded-full font-black text-[10px]">
+                <span>⭐ 4.8/5</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* ── Section 3: 5-Field Search Bar (Matching Reference) ── */}
+        <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xl shadow-purple-900/5 border border-slate-100 max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
             
             {/* Field 1: Search text */}
@@ -429,57 +693,6 @@ export function Hero() {
               >
                 Search
               </button>
-            </div>
-
-          </div>
-        </div>
-
-        {/* ── Bottom Stats & Trust Highlights Row (Matching Reference) ── */}
-        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-100 max-w-5xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
-            
-            {/* Stat 1: 500+ Activities */}
-            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1">
-              <div className="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">500+</div>
-                <div className="text-xs text-slate-500 font-medium">Activities</div>
-              </div>
-            </div>
-
-            {/* Stat 2: Verified Organizers */}
-            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Verified</div>
-                <div className="text-xs text-slate-500 font-medium">Organizers</div>
-              </div>
-            </div>
-
-            {/* Stat 3: Safe & Secure Payments */}
-            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
-              <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div>
-                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Safe & Secure</div>
-                <div className="text-xs text-slate-500 font-medium">Payments</div>
-              </div>
-            </div>
-
-            {/* Stat 4: Loved by Parents */}
-            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
-              <div className="w-11 h-11 rounded-2xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
-                <Heart className="w-5 h-5 fill-current" />
-              </div>
-              <div>
-                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Loved by</div>
-                <div className="text-xs text-slate-500 font-medium">Parents</div>
-              </div>
             </div>
 
           </div>
