@@ -1,674 +1,490 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Search, 
   MapPin, 
   Calendar, 
-  Star, 
-  Map, 
-  Heart, 
-  Sparkles, 
-  ShieldCheck, 
   Users, 
   ArrowRight, 
-  ChevronLeft, 
-  ChevronRight, 
-  Clock, 
-  Flame, 
-  CheckCircle2 
+  Play, 
+  Grid, 
+  ChevronDown, 
+  ShieldCheck, 
+  Lock, 
+  Heart,
+  Sparkles
 } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
-import { Button } from '../ui/Button';
-import { CountUp } from '@/components/animations/CountUp';
-import { LocationSelector, useSelectedLocation } from '@/components/shared/LocationSelector';
-import { MagneticButton } from '@/components/ui/MagneticButton';
+import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { LocationSelector, useSelectedLocation } from '@/components/shared/LocationSelector';
 
-// Decorative SVG doodles
-function StarDoodle({ className }: { className?: string }) {
+// 3D Isometric & Glossy SVG Icons for the 5 Category Cards
+function Soccer3DIcon() {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+      <circle cx="32" cy="32" r="28" fill="url(#soccerBallGrad)" stroke="#e2e8f0" strokeWidth="2" />
+      <polygon points="32,20 23,27 26,38 38,38 41,27" fill="#1e293b" />
+      <polygon points="32,4 27,10 32,20 37,10" fill="#334155" opacity="0.9" />
+      <polygon points="4,24 10,21 23,27 18,36" fill="#334155" opacity="0.9" />
+      <polygon points="12,56 12,48 26,38 29,48" fill="#334155" opacity="0.9" />
+      <polygon points="52,56 52,48 38,38 35,48" fill="#334155" opacity="0.9" />
+      <polygon points="60,24 54,21 41,27 46,36" fill="#334155" opacity="0.9" />
+      <defs>
+        <radialGradient id="soccerBallGrad" cx="30%" cy="25%" r="75%">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="70%" stopColor="#f8fafc" />
+          <stop offset="100%" stopColor="#cbd5e1" />
+        </radialGradient>
+      </defs>
     </svg>
   );
 }
 
-function SparkDoodle({ className }: { className?: string }) {
+function Palette3DIcon() {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 0l1.5 9.5L23 12l-9.5 1.5L12 24l-1.5-10.5L0 12l10.5-1.5z" />
+    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+      <path 
+        d="M32 6C17.6 6 6 17.6 6 32c0 14.4 11.6 26 26 26 5.8 0 9-4.2 9-8 0-3.2-2.2-5.4-2.2-8 0-3 2.5-5 5.5-5H52c6.6 0 12-5.4 12-12C64 15.6 49.6 6 32 6z" 
+        fill="url(#paletteWoodGrad)" 
+        stroke="#ea580c" 
+        strokeWidth="1.5" 
+      />
+      <circle cx="20" cy="22" r="4.5" fill="#ef4444" />
+      <circle cx="32" cy="16" r="4.5" fill="#f59e0b" />
+      <circle cx="44" cy="22" r="4.5" fill="#10b981" />
+      <circle cx="18" cy="36" r="4.5" fill="#3b82f6" />
+      <circle cx="26" cy="46" r="4.5" fill="#8b5cf6" />
+      {/* Wooden brush */}
+      <path d="M48 36l10 16c1 1.6.5 3.6-1.1 4.6s-3.6.5-4.6-1.1L42 39l6-3z" fill="#78350f" />
+      <path d="M57 53c1 1.6.5 3.6-1.1 4.6-1.6 1-3.6.5-4.6-1.1l2-2 3.7-1.5z" fill="#ec4899" />
+      <defs>
+        <linearGradient id="paletteWoodGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ffedd5" />
+          <stop offset="100%" stopColor="#fed7aa" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
 
-function DotDoodle({ className }: { className?: string }) {
+function Dance3DIcon() {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <circle cx="12" cy="12" r="10" />
+    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+      <circle cx="32" cy="12" r="7" fill="#a855f7" />
+      <path d="M30 20c-4 0-8 3-8 8v6l-8-3c-1.5-.6-3 .2-3.6 1.7-.6 1.5.2 3 1.7 3.6l12 5c1 .4 2.1.2 2.9-.5l7-6v14l-8 10c-1 1.3-.8 3.2.5 4.2 1.3 1 3.2.8 4.2-.5l9.3-11.6L54 60c1 1.3 2.9 1.5 4.2.5 1.3-1 1.5-2.9.5-4.2l-10.7-14V28c0-4.4-3.6-8-8-8h-10z" fill="url(#dancePurpleGrad)" />
+      <path d="M42 22l6-4c1.3-.9 3.1-.6 4 .7s.6 3.1-.7 4l-7 4.7-2.3-5.4z" fill="#c084fc" />
+      <defs>
+        <linearGradient id="dancePurpleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#9333ea" />
+          <stop offset="100%" stopColor="#7e22ce" />
+        </linearGradient>
+      </defs>
     </svg>
   );
 }
 
-interface HeroDeckEvent {
-  id: string;
-  category: string;
-  categoryIcon: string;
-  badge: string;
-  badgeBg: string;
-  title: string;
-  subtitle: string;
-  organizer: string;
-  organizerInitial: string;
-  rating: number;
-  reviewsCount: number;
-  time: string;
-  location: string;
-  age: string;
-  price: string;
-  originalPrice?: string;
-  spotsLeft: number;
-  gradientTheme: string;
-  accentBg: string;
-  accentText: string;
-  imageThumbnail: string;
+function Swimming3DIcon() {
+  return (
+    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+      <circle cx="38" cy="18" r="6" fill="#38bdf8" />
+      <path d="M10 36c5-3 11-3 16 0s11 3 16 0 11-3 16 0" stroke="#0284c7" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M6 46c5-3 11-3 16 0s11 3 16 0 11-3 16 0" stroke="#38bdf8" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M22 28c3-3 8-5 13-4l9 3c1.5.5 2.5 2 2 3.5s-2 2.5-3.5 2l-7-2.3-5 3.3-8 1.5c-1.6.3-3.2-.7-3.5-2.3-.3-1.6.7-3.2 2.3-3.5" fill="#0369a1" />
+    </svg>
+  );
 }
 
-const HERO_DECK_EVENTS: HeroDeckEvent[] = [
-  {
-    id: 'evt-robotics',
-    category: 'Robotics & STEM',
-    categoryIcon: '🤖',
-    badge: '🚀 Top Rated STEM',
-    badgeBg: 'bg-violet-500/15 text-violet-700 border-violet-300/40',
-    title: 'Junior Robotics & AI Creators Lab',
-    subtitle: 'Hands-on sensor coding, autonomous bots & logic puzzles',
-    organizer: 'TechTinkers Academy',
-    organizerInitial: 'TT',
-    rating: 4.9,
-    reviewsCount: 148,
-    time: 'Sat & Sun, 10:30 AM',
-    location: 'Koramangala Hub',
-    age: '7–12 yrs',
-    price: '₹750',
-    originalPrice: '₹1,200',
-    spotsLeft: 3,
-    gradientTheme: 'from-violet-600 via-purple-600 to-indigo-700',
-    accentBg: 'bg-violet-50',
-    accentText: 'text-violet-700',
-    imageThumbnail: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'evt-soccer',
-    category: 'Sports & Fitness',
-    categoryIcon: '⚽',
-    badge: '🏆 Bestseller',
-    badgeBg: 'bg-emerald-500/15 text-emerald-800 border-emerald-300/40',
-    title: 'Premier Youth Soccer Camp & League',
-    subtitle: 'Pro coaching, footwork drills, agility & mini tournament',
-    organizer: 'Metropolitan Sports Club',
-    organizerInitial: 'MS',
-    rating: 4.9,
-    reviewsCount: 224,
-    time: 'Every Weekend, 8:00 AM',
-    location: 'Indiranagar Arena',
-    age: '5–14 yrs',
-    price: '₹599',
-    originalPrice: '₹999',
-    spotsLeft: 4,
-    gradientTheme: 'from-emerald-600 via-teal-600 to-cyan-700',
-    accentBg: 'bg-emerald-50',
-    accentText: 'text-emerald-700',
-    imageThumbnail: 'https://images.unsplash.com/photo-1511886929837-354d827aae26?w=400&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'evt-dance',
-    category: 'Dance & Rhythm',
-    categoryIcon: '💃',
-    badge: '✨ Trending Now',
-    badgeBg: 'bg-pink-500/15 text-pink-700 border-pink-300/40',
-    title: 'Kids Hip-Hop & Breakdance Groove',
-    subtitle: 'Dynamic beat choreography, body balance & stage confidence',
-    organizer: 'Rhythm Dance Studio',
-    organizerInitial: 'RD',
-    rating: 4.8,
-    reviewsCount: 112,
-    time: 'Sat, 4:00 PM',
-    location: 'HSR Studio Space',
-    age: '6–13 yrs',
-    price: '₹499',
-    originalPrice: '₹850',
-    spotsLeft: 2,
-    gradientTheme: 'from-pink-500 via-rose-500 to-orange-500',
-    accentBg: 'bg-pink-50',
-    accentText: 'text-pink-700',
-    imageThumbnail: 'https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'evt-arts',
-    category: 'Arts & Crafts',
-    categoryIcon: '🎨',
-    badge: '🌟 Creative Masterclass',
-    badgeBg: 'bg-amber-500/15 text-amber-800 border-amber-300/40',
-    title: 'Pottery Wheel & Canvas Painting Fiesta',
-    subtitle: 'Ceramic sculpting, acrylic blending & takeaway keepsake',
-    organizer: 'Artisan Kids Collective',
-    organizerInitial: 'AK',
-    rating: 5.0,
-    reviewsCount: 94,
-    time: 'Sun, 11:00 AM',
-    location: 'Whitefield Arts Center',
-    age: '4–11 yrs',
-    price: '₹650',
-    originalPrice: '₹1,050',
-    spotsLeft: 5,
-    gradientTheme: 'from-amber-500 via-orange-500 to-rose-500',
-    accentBg: 'bg-amber-50',
-    accentText: 'text-amber-700',
-    imageThumbnail: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'evt-chess',
-    category: 'Chess Tactics',
-    categoryIcon: '♟️',
-    badge: '🧠 Strategic Mind',
-    badgeBg: 'bg-blue-500/15 text-blue-700 border-blue-300/40',
-    title: 'Junior Grandmaster Tactics & Blitz Cup',
-    subtitle: 'Opening repertoire, endgame strategy & blitz tournaments',
-    organizer: 'Chennai Chess Academy',
-    organizerInitial: 'CC',
-    rating: 4.9,
-    reviewsCount: 176,
-    time: 'Sat & Sun, 3:30 PM',
-    location: 'Online + In-Person Hub',
-    age: '6–15 yrs',
-    price: '₹450',
-    originalPrice: '₹750',
-    spotsLeft: 6,
-    gradientTheme: 'from-blue-600 via-indigo-600 to-violet-700',
-    accentBg: 'bg-blue-50',
-    accentText: 'text-blue-700',
-    imageThumbnail: 'https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=60',
-  },
-];
+function Chess3DIcon() {
+  return (
+    <svg className="w-12 h-12 drop-shadow-md" viewBox="0 0 64 64" fill="none">
+      {/* Dark King Piece */}
+      <path d="M26 12h4v-4h-4V4h-4v4h-4v4h4v4h4v-4z" fill="#1e293b" />
+      <path d="M14 20c0-2 4-4 8-4s8 2 8 4-3 12-3 20h-10c0-8-3-18-3-20z" fill="#334155" />
+      <path d="M11 44h22v6H11v-6z" fill="#1e293b" />
+      <path d="M9 50h26v6H9v-6z" fill="#0f172a" />
+      {/* Light Wooden Pawn Piece */}
+      <circle cx="44" cy="24" r="6" fill="#fde68a" stroke="#d97706" strokeWidth="1.5" />
+      <path d="M38 32c0-2 3-3 6-3s6 1 6 3-2 10-2 16H39c0-6-1-14-1-16z" fill="#fef3c7" stroke="#d97706" strokeWidth="1.5" />
+      <path d="M35 48h18v5H35v-5z" fill="#fde68a" stroke="#d97706" strokeWidth="1.5" />
+      <path d="M33 53h22v5H33v-5z" fill="#fcd34d" stroke="#b45309" strokeWidth="1.5" />
+    </svg>
+  );
+}
 
 export function Hero() {
   const [searchValue, setSearchValue] = useState('');
+  const [selectedActivity, setSelectedActivity] = useState('All');
+  const [selectedAge, setSelectedAge] = useState('All Ages');
+  const [selectedDate, setSelectedDate] = useState('');
   const { selectedCity } = useSelectedLocation();
-  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
-  const [activeDeckIndex, setActiveDeckIndex] = useState(0);
-  const [isHoveredDeck, setIsHoveredDeck] = useState(false);
-  const [likedEvents, setLikedEvents] = useState<Record<string, boolean>>({});
-  const [cardTilt, setCardTilt] = useState({ rotateX: 0, rotateY: 0 });
-  const sectionRef = useRef<HTMLElement>(null);
   const router = useRouter();
-
-  // Parallax Scroll Y Offsets
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ['start start', 'end start']
-  });
-
-  const yFast = useTransform(scrollYProgress, [0, 1], [0, -140]);
-  const ySlow = useTransform(scrollYProgress, [0, 1], [0, 70]);
-  const yMid = useTransform(scrollYProgress, [0, 1], [0, -70]);
-
-  // Auto-cycle deck every 4.5 seconds if not hovered
-  useEffect(() => {
-    if (isHoveredDeck) return;
-    const interval = setInterval(() => {
-      setActiveDeckIndex(prev => (prev + 1) % HERO_DECK_EVENTS.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [isHoveredDeck]);
-
-  const handleMouseMoveSection = (e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
-  const handleDeckMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
-    // Subtle 3D tilt calculation
-    const rotY = (x / (rect.width / 2)) * 6;
-    const rotX = -(y / (rect.height / 2)) * 6;
-    setCardTilt({ rotateX: rotX, rotateY: rotY });
-  };
-
-  const handleDeckMouseLeave = () => {
-    setCardTilt({ rotateX: 0, rotateY: 0 });
-    setIsHoveredDeck(false);
-  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
     if (searchValue.trim()) params.set('q', searchValue.trim());
+    if (selectedActivity && selectedActivity !== 'All') params.set('category', selectedActivity);
+    if (selectedAge && selectedAge !== 'All Ages') params.set('age', selectedAge);
+    if (selectedDate) params.set('date', selectedDate);
     if (selectedCity && selectedCity !== 'All') params.set('location', selectedCity);
     router.push(`/explore?${params.toString()}`);
   };
 
-  const toggleLike = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    setLikedEvents(prev => ({ ...prev, [id]: !prev[id] }));
+  const handleCategoryCardClick = (categoryName: string) => {
+    router.push(`/explore?category=${encodeURIComponent(categoryName.toLowerCase())}`);
   };
 
-  const activeEvent = HERO_DECK_EVENTS[activeDeckIndex];
-
-  const headingWords = [
-    { text: "Make", isGradient: false },
-    { text: "Every", isGradient: false },
-    { text: "Weekend", isGradient: true },
-    { text: "Special!", isGradient: false },
-  ];
-
   return (
-    <section
-      ref={sectionRef}
-      onMouseMove={handleMouseMoveSection}
-      className="relative overflow-hidden pt-10 pb-8 md:pt-14 md:pb-12 lg:pt-16 lg:pb-16 bg-gradient-to-br from-violet-100/90 via-pink-50/70 to-amber-50/70"
-    >
-      {/* ── Background Dynamic Mesh Pattern ── */}
-      <div className="absolute inset-0 bg-[radial-gradient(#7c3aed18_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none opacity-60" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#f9f8ff] via-[#f7f5ff] to-[#f1edff]/70 pt-6 pb-12 md:pt-10 md:pb-16 lg:pt-12 lg:pb-16">
       
-      {/* ── Ambient Floating Glow Blobs ── */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-purple-300/35 rounded-full blur-3xl pointer-events-none animate-pulse duration-[7000ms]" />
-      <div className="absolute top-1/3 -right-24 w-[28rem] h-[28rem] bg-pink-300/30 rounded-full blur-3xl pointer-events-none animate-pulse duration-[9000ms]" />
-      <div className="absolute -bottom-20 left-1/3 w-96 h-96 bg-emerald-200/25 rounded-full blur-3xl pointer-events-none" />
+      {/* ── Ambient Background Glow & Doodles ── */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[620px] bg-gradient-to-tr from-purple-100/30 via-pink-100/20 to-sky-100/30 rounded-full blur-3xl -z-10 pointer-events-none" />
 
-      {/* ── Interactive Spotlight Glow (Desktop) ── */}
-      <div
-        className="pointer-events-none absolute inset-0 transition-opacity duration-300 hidden md:block"
-        style={{
-          background: `radial-gradient(750px circle at ${mousePos.x}px ${mousePos.y}px, rgba(124, 58, 237, 0.12), transparent 75%)`,
-        }}
-      />
+      {/* Decorative Star Doodle (Top Left) */}
+      <div className="absolute top-10 left-[41%] text-amber-400 opacity-85 pointer-events-none hidden lg:block">
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+        </svg>
+      </div>
 
-      {/* ── Parallax Scattered decorative doodles ── */}
-      <motion.div style={{ y: yFast }} className="pointer-events-none absolute inset-0">
-        <StarDoodle   className="absolute top-6  left-10  w-6 h-6  text-purple-500/50 opacity-60 animate-drift-1" />
-        <SparkDoodle  className="absolute top-20 right-28 w-7 h-7  text-amber-500/50  opacity-60 animate-drift-2" />
-        <DotDoodle    className="absolute bottom-8 right-44 w-3.5 h-3.5 text-purple-400 opacity-60 animate-drift-4" />
-      </motion.div>
+      {/* Decorative Dotted Grid Pattern (Top Center) */}
+      <div className="absolute top-12 left-[48%] opacity-35 pointer-events-none hidden lg:block">
+        <div className="grid grid-cols-6 gap-2">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <span key={i} className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+          ))}
+        </div>
+      </div>
 
-      <motion.div style={{ y: ySlow }} className="pointer-events-none absolute inset-0">
-        <SparkDoodle  className="absolute top-14 left-20  w-5 h-5  text-amber-400/60  opacity-70 animate-drift-3" />
-        <SparkDoodle  className="absolute top-10 right-12 w-6 h-6  text-purple-600/40 opacity-50 animate-drift-1" />
-        <StarDoodle   className="absolute bottom-20 left-8  w-5 h-5  text-pink-400/50   opacity-50 animate-drift-5" />
-      </motion.div>
+      {/* Decorative Paper Airplane Doodle (Top Right) */}
+      <div className="absolute top-8 right-[24%] text-blue-400 opacity-70 pointer-events-none hidden lg:block">
+        <svg className="w-14 h-14 rotate-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeDasharray="3 3">
+          <path d="M2 12l20-9-9 20-2-8-9-3z" />
+        </svg>
+      </div>
 
-      <motion.div style={{ y: yMid }} className="pointer-events-none absolute inset-0">
-        <DotDoodle    className="absolute top-4  left-44  w-3.5 h-3.5 text-pink-400/40   opacity-50 animate-drift-2" />
-        <DotDoodle    className="absolute top-36 right-6  w-4 h-4  text-purple-400/40 opacity-50 animate-drift-4" />
-        <SparkDoodle  className="absolute bottom-12 left-36 w-4 h-4  text-amber-400/50  opacity-60 animate-drift-3" />
-        <StarDoodle   className="absolute bottom-28 right-20 w-6 h-6  text-amber-500/40  opacity-50 animate-drift-1" />
-      </motion.div>
+      {/* Decorative Sparkle Badge (Far Right) */}
+      <div className="absolute top-14 right-[6%] text-amber-500 opacity-80 pointer-events-none hidden lg:block">
+        <div className="w-10 h-10 rounded-full bg-amber-100/90 border border-amber-300 flex items-center justify-center text-amber-600 shadow-sm">
+          <Sparkles className="w-5 h-5" />
+        </div>
+      </div>
 
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
-        <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-12 xl:gap-16">
-
-          {/* ── Left Column: Value Proposition & Search ── */}
-          <div className="flex-1 text-center lg:text-left">
-
-            {/* Live Active Badge */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-purple-300/40 text-purple-900 text-xs sm:text-sm font-bold mb-5 shadow-sm relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/50 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-purple-600"></span>
-              </span>
-              <span className="tracking-wide">🔥 OVER 10,000+ KIDS BOOKED THIS MONTH</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* ── Main Top Row: Left Content + Right Visual ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-4 items-center mb-8 lg:mb-10">
+          
+          {/* ── Left Column (5 Cols): Typography & CTA Buttons ── */}
+          <div className="lg:col-span-5 text-center lg:text-left pt-2 lg:pt-0">
+            
+            {/* Top Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100/90 border border-purple-200 text-purple-800 text-xs sm:text-sm font-bold mb-5 shadow-2xs">
+              <span className="text-amber-500">✨</span>
+              <span>The #1 Platform for Kids Activities & Events</span>
             </div>
 
-            {/* Animated Reveal Heading */}
-            <h1 className="text-hero font-extrabold text-slate-900 leading-[1.12] tracking-tight mb-5 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
-              {headingWords.map((word, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.12, ease: 'easeOut' }}
-                  className={word.isGradient ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 font-black" : ""}
+            {/* Main Headline */}
+            <h1 className="text-4xl sm:text-5xl lg:text-[50px] font-black text-slate-900 leading-[1.12] tracking-tight mb-5">
+              <span>Discover. Book. Enjoy.</span>
+              <span className="block text-purple-600 font-extrabold mt-1">
+                Amazing Activities
+              </span>
+              <span className="relative inline-block mt-1">
+                for Your Kids
+                {/* Cute Pink Heart Doodle */}
+                <span className="inline-block text-pink-500 font-normal ml-2 transform -rotate-12 text-3xl sm:text-4xl align-middle">
+                  ♡
+                </span>
+                {/* Hand-drawn Yellow Underline Stroke */}
+                <svg 
+                  className="absolute -bottom-2.5 left-0 w-full h-3 text-amber-300 opacity-90 -z-10 pointer-events-none" 
+                  viewBox="0 0 240 12" 
+                  fill="none" 
+                  preserveAspectRatio="none"
                 >
-                  {word.text}
-                </motion.span>
-              ))}
+                  <path 
+                    d="M3 8.5C50 3.5 120 4 237 7.5" 
+                    stroke="currentColor" 
+                    strokeWidth="5" 
+                    strokeLinecap="round" 
+                  />
+                </svg>
+              </span>
             </h1>
 
-            <p className="text-slate-600 text-body-lg mb-7 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed font-medium">
-              Discover, book, and track top-rated sports camps, robotics labs, performing arts, and creative workshops designed for kids ages 4–16.
+            {/* Subtext */}
+            <p className="text-slate-600 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+              Find the best events, classes, and activities that inspire, engage, and help your child grow.
             </p>
 
-            {/* Glassmorphic Search Bar */}
-            <div className="bg-white/90 backdrop-blur-xl p-2 rounded-3xl md:rounded-full shadow-2xl shadow-purple-950/10 border border-white/80 flex flex-col md:flex-row items-stretch md:items-center gap-1.5 mb-8 max-w-xl lg:max-w-2xl mx-auto lg:mx-0 hover:border-purple-300 hover:shadow-purple-500/15 transition-all duration-300">
-              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto flex-1 border-b md:border-b-0 md:border-r border-slate-200/70">
-                <Search className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Try 'Robotics', 'Soccer', 'Chess', 'Dance'..."
-                  value={searchValue}
-                  onChange={e => setSearchValue(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="w-full bg-transparent text-sm md:text-base focus:outline-none text-slate-800 placeholder-slate-400 font-semibold"
-                />
-              </div>
-              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto shrink-0">
-                <LocationSelector variant="searchBar" className="w-full md:w-auto" />
-              </div>
-              <div className="pt-2 md:pt-0 w-full md:w-auto shrink-0">
-                <MagneticButton className="w-full md:w-auto shrink-0">
-                  <Button
-                    size="lg"
-                    onClick={handleSearch}
-                    className="w-full md:w-auto md:ml-1 rounded-2xl md:rounded-full h-12 md:h-13 px-7 text-sm md:text-base font-bold shadow-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white shadow-purple-500/25 transition-transform active:scale-95 duration-150"
-                  >
-                    Explore
-                  </Button>
-                </MagneticButton>
-              </div>
-            </div>
+            {/* Action Buttons */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4">
+              <button
+                onClick={() => router.push('/explore')}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-purple-600/25 hover:shadow-purple-600/35 transition-all duration-200 flex items-center gap-2 text-base group cursor-pointer"
+              >
+                <span>Explore Activities</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </button>
 
-            {/* Key Platform Stats */}
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-4 border-t border-purple-200/50 pt-5 max-w-lg mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row items-center p-2.5 sm:p-3 rounded-2xl bg-orange-50/80 border border-orange-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
-                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-100 text-orange-700 mb-1.5 sm:mb-0 sm:mr-3 shrink-0">
-                  <Calendar className="w-4 h-4 sm:w-5 sm:h-5" />
+              <button
+                onClick={() => router.push('/how-it-works')}
+                className="bg-white hover:bg-slate-50 text-slate-800 font-bold px-6 py-3.5 rounded-2xl border border-slate-200 shadow-sm hover:shadow transition-all duration-200 flex items-center gap-2.5 text-base cursor-pointer"
+              >
+                <div className="w-6 h-6 rounded-full border-2 border-slate-700 flex items-center justify-center text-slate-700">
+                  <Play className="w-3 h-3 fill-current ml-0.5" />
                 </div>
-                <div>
-                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-orange-950 leading-none mb-1">
-                    <CountUp end={500} suffix="+" duration={1500} />
-                  </div>
-                  <div className="text-[9px] sm:text-[10px] text-orange-700 font-bold uppercase tracking-wider">Events</div>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center p-2.5 sm:p-3 rounded-2xl bg-purple-50/80 border border-purple-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
-                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-100 text-purple-700 mb-1.5 sm:mb-0 sm:mr-3 shrink-0">
-                  <Map className="w-4 h-4 sm:w-5 sm:h-5" />
-                </div>
-                <div>
-                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-purple-950 leading-none mb-1">
-                    <CountUp end={120} suffix="+" duration={1500} />
-                  </div>
-                  <div className="text-[9px] sm:text-[10px] text-purple-700 font-bold uppercase tracking-wider">Venues</div>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-center p-2.5 sm:p-3 rounded-2xl bg-blue-50/80 border border-blue-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
-                <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-blue-700 mb-1.5 sm:mb-0 sm:mr-3 shrink-0">
-                  <Star className="w-4 h-4 sm:w-5 sm:h-5" />
-                </div>
-                <div>
-                  <div className="font-extrabold text-sm sm:text-base lg:text-lg text-blue-950 leading-none mb-1">
-                    <CountUp end={4.9} decimals={1} suffix="/5" duration={1500} />
-                  </div>
-                  <div className="text-[9px] sm:text-[10px] text-blue-700 font-bold uppercase tracking-wider">Rating</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Trust Pill Row */}
-            <div className="mt-6 flex flex-wrap items-center gap-x-3.5 gap-y-2 text-xs font-semibold text-slate-500 justify-center lg:justify-start">
-              <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200/70 shadow-2xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                100% Verified Academies
-              </span>
-              <span className="flex items-center gap-1.5 bg-indigo-50 text-indigo-800 px-3 py-1 rounded-full border border-indigo-200/70 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
-                Instant Seat Confirmation
-              </span>
-              <span className="flex items-center gap-1.5 bg-pink-50 text-pink-800 px-3 py-1 rounded-full border border-pink-200/70 shadow-2xs">
-                <CheckCircle2 className="w-3.5 h-3.5 text-pink-600 shrink-0" />
-                Easy Free Cancellation
-              </span>
+                <span>Watch How It Works</span>
+              </button>
             </div>
 
           </div>
 
-          {/* ── Right Column: Interactive 3D Category & Event Deck ── */}
-          <div className="w-full lg:w-1/2 relative flex flex-col items-center justify-center">
+          {/* ── Right Column (7 Cols): Organic Hero Child Photo + 5 Floating Category Cards ── */}
+          <div className="lg:col-span-7 relative flex items-center justify-center min-h-[460px] sm:min-h-[500px] lg:min-h-[520px]">
             
-            {/* Interactive Category Selector Tabs */}
-            <div className="w-full max-w-[480px] mb-3 flex items-center justify-between gap-1.5 overflow-x-auto no-scrollbar py-1 px-1 bg-white/70 backdrop-blur-md rounded-2xl border border-white/80 shadow-sm">
-              {HERO_DECK_EVENTS.map((item, index) => {
-                const isActive = index === activeDeckIndex;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => setActiveDeckIndex(index)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 shrink-0 relative ${
-                      isActive 
-                        ? 'text-white shadow-md shadow-purple-600/20' 
-                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                    }`}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeCategoryPill"
-                        className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl -z-10"
-                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      />
-                    )}
-                    <span>{item.categoryIcon}</span>
-                    <span className="hidden sm:inline">{item.category}</span>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Visual Stage Container */}
+            <div className="relative w-full max-w-[600px] h-[460px] sm:h-[500px] flex items-center justify-center">
+              
+              {/* Back Fluid Sky-Blue Organic Blob Ring */}
+              <div 
+                className="absolute inset-6 sm:inset-4 bg-gradient-to-tr from-sky-400/80 via-blue-400/80 to-purple-400/70 shadow-2xl opacity-85"
+                style={{
+                  borderRadius: '52% 48% 62% 38% / 45% 58% 42% 55%',
+                  transform: 'scale(1.06) rotate(3deg)',
+                }}
+              />
 
-            {/* 3D Card Stack Container with Interactive Tilt */}
-            <div 
-              className="w-full max-w-[480px] h-[460px] sm:h-[480px] relative perspective-[1200px]"
-              onMouseMove={handleDeckMouseMove}
-              onMouseEnter={() => setIsHoveredDeck(true)}
-              onMouseLeave={handleDeckMouseLeave}
-            >
-              {/* Floating Live Enrolled Pill (Top Right) */}
-              <motion.div 
+              {/* Main Photo Mask with Organic Shape */}
+              <div 
+                className="relative w-[78%] sm:w-[82%] h-[78%] sm:h-[82%] overflow-hidden shadow-2xl z-10 border-4 border-white/95"
+                style={{
+                  borderRadius: '48% 52% 42% 58% / 54% 44% 56% 46%',
+                }}
+              >
+                <img 
+                  src="/images/hero-kid.jpg" 
+                  alt="Joyful child celebrating activities"
+                  className="w-full h-full object-cover object-[center_12%] scale-135 sm:scale-130"
+                />
+              </div>
+
+              {/* ── 5 Floating Category Cards (Always Solid Opaque White & Floating) ── */}
+
+              {/* 1. Sports Card (Top-Left of boy) */}
+              <motion.div
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-4 -right-2 sm:-right-4 z-40 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2.5 pointer-events-none"
+                onClick={() => handleCategoryCardClick('sports')}
+                className="absolute top-2 left-0 sm:left-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-emerald-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
-                <div className="flex -space-x-2 overflow-hidden">
-                  <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-purple-500 text-white text-[9px] font-extrabold flex items-center justify-center">A</div>
-                  <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-pink-500 text-white text-[9px] font-extrabold flex items-center justify-center">S</div>
-                  <div className="inline-block h-6 w-6 rounded-full ring-2 ring-white bg-amber-500 text-white text-[9px] font-extrabold flex items-center justify-center">R</div>
+                <div className="mb-1">
+                  <Soccer3DIcon />
                 </div>
-                <div className="text-left">
-                  <div className="text-[11px] font-extrabold text-slate-900 leading-tight">1,240+ Enrolled</div>
-                  <div className="text-[9px] text-emerald-600 font-bold flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                    Live Booking Fast
-                  </div>
-                </div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Sports</div>
+                <div className="text-[11px] text-emerald-600 font-bold">Build Strength</div>
               </motion.div>
 
-              {/* Floating Verified Coach Badge (Bottom Left) */}
-              <motion.div 
+              {/* 2. Arts & Crafts Card (Bottom-Left of boy) */}
+              <motion.div
                 animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -bottom-4 -left-2 sm:-left-4 z-40 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-xl border border-slate-100 flex items-center gap-2 pointer-events-none"
+                transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}
+                onClick={() => handleCategoryCardClick('arts-and-crafts')}
+                className="absolute bottom-12 -left-2 sm:left-0 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-36 sm:w-40 opacity-100"
               >
-                <div className="w-7 h-7 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs">
-                  ★
+                <div className="mb-1">
+                  <Palette3DIcon />
                 </div>
-                <div className="text-left">
-                  <div className="text-[11px] font-bold text-slate-900 leading-tight">4.9 / 5.0 Rating</div>
-                  <div className="text-[9px] text-slate-500 font-semibold">from 1,800+ Parents</div>
-                </div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Arts & Crafts</div>
+                <div className="text-[11px] text-pink-600 font-bold">Unleash Creativity</div>
               </motion.div>
 
-              {/* Stack Background Layer 2 (Deepest) */}
-              <div 
-                className="absolute inset-x-8 top-10 bottom-0 rounded-3xl bg-purple-200/40 backdrop-blur-sm border border-white/40 transform scale-[0.88] translate-y-6 -rotate-3 transition-transform duration-500 -z-10 shadow-lg pointer-events-none"
-              />
-
-              {/* Stack Background Layer 1 (Middle) */}
-              <div 
-                className="absolute inset-x-4 top-5 bottom-2 rounded-3xl bg-white/60 backdrop-blur-md border border-white/60 transform scale-[0.94] translate-y-3 rotate-2 transition-transform duration-500 z-10 shadow-xl pointer-events-none"
-              />
-
-              {/* Active Foreground 3D Card */}
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeEvent.id}
-                  initial={{ opacity: 0, scale: 0.95, rotateY: -12, y: 15 }}
-                  animate={{ 
-                    opacity: 1, 
-                    scale: 1, 
-                    rotateY: cardTilt.rotateY, 
-                    rotateX: cardTilt.rotateX, 
-                    y: 0 
-                  }}
-                  exit={{ opacity: 0, scale: 0.95, rotateY: 12, y: -15 }}
-                  transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  style={{ transformStyle: "preserve-3d" }}
-                  className="absolute inset-0 bg-white rounded-3xl shadow-2xl shadow-purple-900/15 border-2 border-white/90 overflow-hidden flex flex-col justify-between z-20 transition-shadow duration-300"
-                >
-                  {/* Card Visual Header with Thumbnail & Badges */}
-                  <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-900">
-                    <img 
-                      src={activeEvent.imageThumbnail} 
-                      alt={activeEvent.title}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 opacity-90"
-                    />
-                    
-                    {/* Gradient scrim */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent" />
-
-                    {/* Top Badges Row */}
-                    <div className="absolute top-3 inset-x-3 flex items-center justify-between z-10">
-                      <span className={`px-2.5 py-1 rounded-full text-[11px] font-extrabold border backdrop-blur-md ${activeEvent.badgeBg}`}>
-                        {activeEvent.badge}
-                      </span>
-                      
-                      {/* Heart Wishlist Button */}
-                      <button
-                        onClick={(e) => toggleLike(e, activeEvent.id)}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 shadow-md ${
-                          likedEvents[activeEvent.id]
-                            ? 'bg-rose-500 text-white scale-110'
-                            : 'bg-white/80 hover:bg-white text-slate-700 backdrop-blur-sm'
-                        }`}
-                        title="Save to Wishlist"
-                      >
-                        <Heart className={`w-4 h-4 ${likedEvents[activeEvent.id] ? 'fill-current' : ''}`} />
-                      </button>
-                    </div>
-
-                    {/* Urgent Spots Banner */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white z-10">
-                      <div className="flex items-center gap-1.5 text-xs font-bold bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10">
-                        <Clock className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{activeEvent.time}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-[11px] font-extrabold bg-rose-500/90 text-white px-2.5 py-1 rounded-lg shadow-sm">
-                        <Flame className="w-3.5 h-3.5 animate-bounce" />
-                        <span>{activeEvent.spotsLeft} spots left</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Content Body */}
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      {/* Category & Rating */}
-                      <div className="flex items-center justify-between text-xs mb-1.5">
-                        <span className={`font-extrabold uppercase tracking-wider text-[10px] ${activeEvent.accentText}`}>
-                          {activeEvent.categoryIcon} {activeEvent.category}
-                        </span>
-                        <div className="flex items-center gap-1 font-bold text-slate-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/60">
-                          <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
-                          <span>{activeEvent.rating}</span>
-                          <span className="text-slate-400 text-[10px]">({activeEvent.reviewsCount})</span>
-                        </div>
-                      </div>
-
-                      {/* Event Title */}
-                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug line-clamp-1 mb-1">
-                        {activeEvent.title}
-                      </h3>
-
-                      {/* Subtitle */}
-                      <p className="text-xs text-slate-500 line-clamp-1 mb-3">
-                        {activeEvent.subtitle}
-                      </p>
-
-                      {/* Location & Age metadata chips */}
-                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-600 mb-3">
-                        <span className="flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-md font-semibold">
-                          <MapPin className="w-3 h-3 text-purple-600" />
-                          {activeEvent.location}
-                        </span>
-                        <span className="flex items-center gap-1 bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md font-semibold">
-                          <Users className="w-3 h-3 text-purple-600" />
-                          {activeEvent.age}
-                        </span>
-                        <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md">
-                          Verified Coach ✓
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Price & Action Row */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
-                      <div>
-                        <div className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Per Child</div>
-                        <div className="flex items-baseline gap-1.5">
-                          <span className="text-lg sm:text-xl font-black text-slate-900">{activeEvent.price}</span>
-                          {activeEvent.originalPrice && (
-                            <span className="text-xs text-slate-400 line-through font-semibold">{activeEvent.originalPrice}</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <Button
-                        onClick={() => router.push(`/explore?q=${encodeURIComponent(activeEvent.title)}`)}
-                        className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-4 sm:px-5 py-2.5 rounded-xl shadow-md shadow-purple-600/20 text-xs sm:text-sm flex items-center gap-1.5 group cursor-pointer"
-                      >
-                        <span>Book Pass</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-
-              {/* Navigation Arrows for Card Deck */}
-              <button
-                onClick={() => setActiveDeckIndex(prev => (prev - 1 + HERO_DECK_EVENTS.length) % HERO_DECK_EVENTS.length)}
-                className="absolute -left-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-white/90 shadow-lg border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-white hover:scale-110 transition-all cursor-pointer"
-                title="Previous Activity"
+              {/* 3. Dance Card (Top-Right of boy) */}
+              <motion.div
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+                onClick={() => handleCategoryCardClick('dance')}
+                className="absolute top-4 right-0 sm:right-2 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-purple-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
+                <div className="mb-1">
+                  <Dance3DIcon />
+                </div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Dance</div>
+                <div className="text-[11px] text-purple-600 font-bold">Move & Groove</div>
+              </motion.div>
 
-              <button
-                onClick={() => setActiveDeckIndex(prev => (prev + 1) % HERO_DECK_EVENTS.length)}
-                className="absolute -right-3 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-white/90 shadow-lg border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-white hover:scale-110 transition-all cursor-pointer"
-                title="Next Activity"
+              {/* 4. Swimming Card (Mid-Right of boy) */}
+              <motion.div
+                animate={{ y: [0, 5, 0] }}
+                transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
+                onClick={() => handleCategoryCardClick('swimming')}
+                className="absolute top-40 -right-3 sm:-right-1 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-sky-300 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
               >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+                <div className="mb-1">
+                  <Swimming3DIcon />
+                </div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Swimming</div>
+                <div className="text-[11px] text-sky-600 font-bold">Learn & Grow</div>
+              </motion.div>
 
-            {/* Deck Progress Dots Indicator */}
-            <div className="flex items-center gap-1.5 mt-4">
-              {HERO_DECK_EVENTS.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveDeckIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === activeDeckIndex 
-                      ? 'w-6 bg-purple-600' 
-                      : 'w-2 bg-purple-200 hover:bg-purple-300'
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+              {/* 5. Chess Card (Bottom-Right of boy) */}
+              <motion.div
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 4.6, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}
+                onClick={() => handleCategoryCardClick('chess')}
+                className="absolute -bottom-2 right-4 sm:right-6 z-30 bg-white px-4 py-3.5 rounded-3xl shadow-xl shadow-purple-950/10 border border-slate-100 hover:border-amber-400 hover:scale-105 transition-all duration-300 cursor-pointer flex flex-col items-center text-center w-32 sm:w-36 opacity-100"
+              >
+                <div className="mb-1">
+                  <Chess3DIcon />
+                </div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm">Chess</div>
+                <div className="text-[11px] text-amber-700 font-bold">Think Smart</div>
+              </motion.div>
+
             </div>
 
           </div>
 
         </div>
+
+        {/* ── Bottom Section: 5-Field Search Bar (Matching Reference) ── */}
+        <div className="bg-white rounded-3xl p-3 sm:p-4 shadow-xl shadow-purple-900/5 border border-slate-100 mb-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+            
+            {/* Field 1: Search text */}
+            <div className="md:col-span-3 flex items-center px-3.5 py-2.5 bg-slate-50/70 rounded-2xl md:bg-transparent md:border-r border-slate-200">
+              <Search className="w-5 h-5 text-slate-400 mr-2.5 shrink-0" />
+              <input
+                type="text"
+                placeholder="Search activities, events..."
+                value={searchValue}
+                onChange={e => setSearchValue(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                className="w-full bg-transparent text-sm font-semibold text-slate-800 placeholder-slate-400 focus:outline-none"
+              />
+            </div>
+
+            {/* Field 2: Activity Dropdown */}
+            <div className="md:col-span-2 flex items-center px-3.5 py-2 bg-slate-50/70 rounded-2xl md:bg-transparent md:border-r border-slate-200">
+              <Grid className="w-4 h-4 text-purple-600 mr-2 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Activity</div>
+                <select
+                  value={selectedActivity}
+                  onChange={e => setSelectedActivity(e.target.value)}
+                  className="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer truncate"
+                >
+                  <option value="All">All</option>
+                  <option value="sports">Sports</option>
+                  <option value="stem">STEM & Coding</option>
+                  <option value="dance">Dance & Music</option>
+                  <option value="arts">Arts & Crafts</option>
+                  <option value="chess">Chess</option>
+                  <option value="swimming">Swimming</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Field 3: Age Dropdown */}
+            <div className="md:col-span-2 flex items-center px-3.5 py-2 bg-slate-50/70 rounded-2xl md:bg-transparent md:border-r border-slate-200">
+              <Users className="w-4 h-4 text-purple-600 mr-2 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Age</div>
+                <select
+                  value={selectedAge}
+                  onChange={e => setSelectedAge(e.target.value)}
+                  className="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer truncate"
+                >
+                  <option value="All Ages">All Ages</option>
+                  <option value="toddlers_2_4">2–4 yrs (Toddlers)</option>
+                  <option value="early_5_8">5–8 yrs (Early)</option>
+                  <option value="kids_9_12">9–12 yrs (Tweens)</option>
+                  <option value="teens_13_plus">13+ yrs (Teens)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Field 4: Date Picker */}
+            <div className="md:col-span-2 flex items-center px-3.5 py-2 bg-slate-50/70 rounded-2xl md:bg-transparent md:border-r border-slate-200">
+              <Calendar className="w-4 h-4 text-purple-600 mr-2 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Date</div>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={e => setSelectedDate(e.target.value)}
+                  className="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Field 5: Location Picker & Search Button */}
+            <div className="md:col-span-3 flex items-center justify-between gap-2 px-1">
+              <div className="flex-1 min-w-0">
+                <LocationSelector variant="searchBar" className="w-full" />
+              </div>
+              <button
+                onClick={handleSearch}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-6 py-3 rounded-xl shadow-md shadow-purple-600/25 hover:shadow-purple-600/35 transition-all text-sm shrink-0 cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ── Bottom Stats & Trust Highlights Row (Matching Reference) ── */}
+        <div className="bg-white/80 backdrop-blur-md rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-100 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 divide-y md:divide-y-0 md:divide-x divide-slate-100">
+            
+            {/* Stat 1: 500+ Activities */}
+            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1">
+              <div className="w-11 h-11 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">500+</div>
+                <div className="text-xs text-slate-500 font-medium">Activities</div>
+              </div>
+            </div>
+
+            {/* Stat 2: Verified Organizers */}
+            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Verified</div>
+                <div className="text-xs text-slate-500 font-medium">Organizers</div>
+              </div>
+            </div>
+
+            {/* Stat 3: Safe & Secure Payments */}
+            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
+              <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Safe & Secure</div>
+                <div className="text-xs text-slate-500 font-medium">Payments</div>
+              </div>
+            </div>
+
+            {/* Stat 4: Loved by Parents */}
+            <div className="flex items-center gap-3.5 px-2 sm:px-4 py-1 pt-3 md:pt-1">
+              <div className="w-11 h-11 rounded-2xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+                <Heart className="w-5 h-5 fill-current" />
+              </div>
+              <div>
+                <div className="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">Loved by</div>
+                <div className="text-xs text-slate-500 font-medium">Parents</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </section>
   );
