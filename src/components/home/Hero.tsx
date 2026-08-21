@@ -230,7 +230,7 @@ export function Hero() {
             <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-4/5 h-[85%] rounded-[40px] overflow-visible z-10 rotate-2 hover:rotate-0 transition-transform duration-500">
               <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl shadow-slate-900/20 border-8 border-white/60">
                 <img
-                  src="https://images.unsplash.com/photo-1627764940620-90393d0e8c34?w=800&auto=format&fit=crop&q=70"
+                  src="https://images.unsplash.com/photo-1560184611-ff3e53f00e8f?w=1200&auto=format&fit=crop&q=80"
                   alt="Children playing in a park"
                   className="w-full h-full object-cover"
                 />
