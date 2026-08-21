@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useRef } from 'react';
-import { Search, MapPin, Calendar, Star, Map } from 'lucide-react';
+import { Search, MapPin, Calendar, Star, Map, Heart } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { CountUp } from '@/components/animations/CountUp';
@@ -67,39 +67,40 @@ export function Hero() {
     { text: "Special!", isGradient: false },
   ];
 
-  return (
-    <section
+  return (    <section
       ref={sectionRef}
       onMouseMove={handleMouseMoveSection}
-      className="relative overflow-hidden pt-12 pb-6 md:pt-16 md:pb-8 lg:pt-20 lg:pb-10"
-      style={{ background: 'linear-gradient(135deg, #ede9fe 0%, #fce7f3 40%, #fff7ed 100%)' }}
+      className="relative overflow-hidden pt-12 pb-6 md:pt-16 md:pb-8 lg:pt-20 lg:pb-10 bg-gradient-to-br from-violet-100 via-pink-50 to-orange-50/70"
     >
+      {/* ── Background Grid & Decorative Elements ── */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      
       {/* ── Interactive Spotlight Glow (Desktop only) ── */}
       <div
         className="pointer-events-none absolute inset-0 transition-opacity duration-300 hidden md:block"
         style={{
-          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(168, 85, 247, 0.15), transparent 80%)`,
+          background: `radial-gradient(800px circle at ${mousePos.x}px ${mousePos.y}px, rgba(139, 92, 246, 0.15), transparent 80%)`,
         }}
       />
 
       {/* ── Parallax Scattered decorative doodles ── */}
       <motion.div style={{ y: yFast }} className="pointer-events-none absolute inset-0">
-        <StarDoodle   className="absolute top-8  left-8   w-5 h-5  text-purple-400  opacity-50 animate-drift-1" />
-        <SparkDoodle  className="absolute top-24 right-32 w-6 h-6  text-amber-500   opacity-50 animate-drift-2" />
-        <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-45 animate-drift-4" />
+        <StarDoodle   className="absolute top-8  left-8   w-6 h-6  text-purple-400/60  opacity-60 animate-drift-1" />
+        <SparkDoodle  className="absolute top-24 right-32 w-7 h-7  text-amber-500/60   opacity-60 animate-drift-2" />
+        <DotDoodle    className="absolute bottom-10 right-48 w-3 h-3 text-purple-300 opacity-60 animate-drift-4" />
       </motion.div>
 
       <motion.div style={{ y: ySlow }} className="pointer-events-none absolute inset-0">
-        <SparkDoodle  className="absolute top-16 left-24  w-4 h-4  text-amber-400   opacity-60 animate-drift-3" />
-        <SparkDoodle  className="absolute top-8  right-16 w-5 h-5  text-purple-500  opacity-40 animate-drift-1" />
-        <StarDoodle   className="absolute bottom-24 left-12 w-4 h-4 text-purple-400 opacity-40 animate-drift-5" />
+        <SparkDoodle  className="absolute top-16 left-24  w-5 h-5  text-amber-400/70   opacity-70 animate-drift-3" />
+        <SparkDoodle  className="absolute top-8  right-16 w-6 h-6  text-purple-500/50  opacity-50 animate-drift-1" />
+        <StarDoodle   className="absolute bottom-24 left-12 w-5 h-5 text-purple-400/50 opacity-50 animate-drift-5" />
       </motion.div>
 
       <motion.div style={{ y: yMid }} className="pointer-events-none absolute inset-0">
-        <DotDoodle    className="absolute top-6  left-48  w-3 h-3  text-pink-400    opacity-40 animate-drift-2" />
-        <DotDoodle    className="absolute top-40 right-8  w-4 h-4  text-pink-500    opacity-35 animate-drift-4" />
-        <SparkDoodle  className="absolute bottom-16 left-40 w-3 h-3 text-amber-400  opacity-50 animate-drift-3" />
-        <StarDoodle   className="absolute bottom-32 right-24 w-5 h-5 text-amber-500 opacity-40 animate-drift-1" />
+        <DotDoodle    className="absolute top-6  left-48  w-3.5 h-3.5  text-pink-400/50    opacity-50 animate-drift-2" />
+        <DotDoodle    className="absolute top-40 right-8  w-4.5 h-4.5  text-pink-500/50    opacity-50 animate-drift-4" />
+        <SparkDoodle  className="absolute bottom-16 left-40 w-4 h-4 text-amber-400/60  opacity-60 animate-drift-3" />
+        <StarDoodle   className="absolute bottom-32 right-24 w-6 h-6 text-amber-500/50 opacity-50 animate-drift-1" />
       </motion.div>
 
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 relative z-10">
@@ -109,33 +110,37 @@ export function Hero() {
           <div className="flex-1 text-center lg:text-left">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100/80 text-purple-700 text-caption font-semibold mb-6 shadow-sm">
-              <SparkDoodle className="w-4 h-4 text-purple-500" />
-              <span>The #1 Youth Activity Platform</span>
+            <div className="inline-flex items-center gap-2.5 px-4.5 py-2.5 rounded-full bg-white/70 backdrop-blur-md border border-purple-500/20 text-purple-800 text-caption font-bold mb-6 shadow-sm relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/40 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
+              </span>
+              <span className="tracking-wide">THE #1 YOUTH ACTIVITY HUB</span>
             </div>
 
             {/* Word-by-Word Reveal Heading */}
-            <h1 className="text-hero font-extrabold text-slate-900 leading-[1.15] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
+            <h1 className="text-hero font-extrabold text-slate-900 leading-[1.12] tracking-tight mb-6 flex flex-wrap justify-center lg:justify-start gap-x-3 gap-y-1">
               {headingWords.map((word, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: i * 0.12, ease: 'easeOut' }}
-                  className={word.isGradient ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-violet-500" : ""}
+                  className={word.isGradient ? "text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-amber-500 font-black" : ""}
                 >
                   {word.text}
                 </motion.span>
               ))}
             </h1>
 
-            <p className="text-slate-600 text-body-lg mb-8 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-slate-600 text-body-lg mb-8 max-w-2xl lg:max-w-3xl mx-auto lg:mx-0 leading-relaxed font-medium">
               Discover, book, and track top-rated sports, arts, music, and learning programs designed for children of all ages — all in one seamless place.
             </p>
 
             {/* Search Bar */}
-            <div className="bg-white p-3 md:p-3 rounded-2xl md:rounded-full shadow-lg border border-slate-100 flex flex-col md:flex-row items-stretch md:items-center gap-0 md:gap-2 mb-10 max-w-xl lg:max-w-2xl mx-auto lg:mx-0">
-              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto flex-1 border-b md:border-b-0 md:border-r border-slate-100">
+            <div className="bg-white/80 backdrop-blur-xl p-2.5 rounded-3xl md:rounded-full shadow-2xl shadow-purple-950/5 border border-white/60 flex flex-col md:flex-row items-stretch md:items-center gap-1.5 mb-10 max-w-xl lg:max-w-2xl mx-auto lg:mx-0 hover:border-purple-300 hover:shadow-purple-500/10 transition-all duration-300">
+              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto flex-1 border-b md:border-b-0 md:border-r border-slate-100/80">
                 <Search className="w-5 h-5 text-purple-600 mr-3 shrink-0" />
                 <input
                   type="text"
@@ -143,10 +148,10 @@ export function Hero() {
                   value={searchValue}
                   onChange={e => setSearchValue(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
-                  className="w-full bg-transparent text-sm md:text-base lg:text-lg focus:outline-none text-slate-800 placeholder-slate-400"
+                  className="w-full bg-transparent text-sm md:text-base lg:text-lg focus:outline-none text-slate-800 placeholder-slate-400 font-semibold"
                 />
               </div>
-              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto shrink-0 border-b md:border-b-0 border-slate-100">
+              <div className="flex items-center px-4 py-3 md:py-2 w-full md:w-auto shrink-0">
                 <LocationSelector variant="searchBar" className="w-full md:w-auto" />
               </div>
               <div className="pt-2 md:pt-0 w-full md:w-auto shrink-0">
@@ -154,7 +159,7 @@ export function Hero() {
                   <Button
                     size="lg"
                     onClick={handleSearch}
-                    className="w-full md:w-auto md:ml-2 rounded-xl md:rounded-full h-12 md:h-14 px-8 text-sm md:text-base lg:text-lg shadow-md shadow-purple-500/25"
+                    className="w-full md:w-auto md:ml-2 rounded-2xl md:rounded-full h-12 md:h-14 px-8 text-sm md:text-base lg:text-lg font-bold shadow-lg bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white shadow-purple-500/25 transition-transform active:scale-95 duration-150"
                   >
                     Search
                   </Button>
@@ -164,7 +169,7 @@ export function Hero() {
 
             {/* Micro Stats as Pastel Cards */}
             <div className="grid grid-cols-3 gap-2.5 sm:gap-4 border-t border-slate-200/60 pt-6 max-w-lg mx-auto lg:mx-0">
-              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-orange-50 border border-orange-100 shadow-sm text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-orange-50 border border-orange-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
                 <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-orange-100 text-orange-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
                   <Calendar className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
@@ -175,7 +180,7 @@ export function Hero() {
                   <div className="text-[9px] sm:text-[10px] text-orange-700 font-bold uppercase tracking-wider">Events</div>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-purple-50 border border-purple-100 shadow-sm text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-purple-50 border border-purple-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
                 <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-purple-100 text-purple-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
                   <Map className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
@@ -186,7 +191,7 @@ export function Hero() {
                   <div className="text-[9px] sm:text-[10px] text-purple-700 font-bold uppercase tracking-wider">Venues</div>
                 </div>
               </div>
-              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-blue-50 border border-blue-100 shadow-sm text-center sm:text-left">
+              <div className="flex flex-col sm:flex-row items-center p-3 rounded-2xl bg-blue-50 border border-blue-100 shadow-sm text-center sm:text-left transition-all hover:scale-[1.03] duration-300">
                 <div className="flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-100 text-blue-700 mb-2 sm:mb-0 sm:mr-3 shrink-0">
                   <Star className="w-4.5 h-4.5 sm:w-5 sm:h-5" />
                 </div>
@@ -233,11 +238,15 @@ export function Hero() {
 
             {/* Custom SVG Illustration Container */}
             <div className="w-full h-full max-w-[450px] sm:max-w-[480px] lg:max-w-[500px] aspect-square relative z-10 flex items-center justify-center">
-              <svg viewBox="0 0 500 500" className="w-full h-full select-none drop-shadow-xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg viewBox="0 0 500 500" className="w-full h-full select-none drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <radialGradient id="sun-glow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#FEF3C7" stopOpacity="0.8" />
+                    <stop offset="0%" stopColor="#FEF3C7" stopOpacity="0.85" />
                     <stop offset="100%" stopColor="#FEF3C7" stopOpacity="0" />
+                  </radialGradient>
+                  <radialGradient id="balloon-grad" cx="30%" cy="30%" r="70%">
+                    <stop offset="0%" stopColor="#FF8A8A" />
+                    <stop offset="100%" stopColor="#F43F5E" />
                   </radialGradient>
                   <linearGradient id="hill-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#34D399" />
@@ -248,122 +257,207 @@ export function Hero() {
                     <stop offset="100%" stopColor="#10B981" />
                   </linearGradient>
                   <linearGradient id="sky-grad" x1="50%" y1="0%" x2="50%" y2="100%">
-                    <stop offset="0%" stopColor="#E0F2FE" />
+                    <stop offset="0%" stopColor="#BAE6FD" />
+                    <stop offset="50%" stopColor="#E0F2FE" />
                     <stop offset="100%" stopColor="#F0F9FF" />
                   </linearGradient>
                   <linearGradient id="rainbow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#FB7185" stopOpacity="0.25" />
-                    <stop offset="50%" stopColor="#C084FC" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#60A5FA" stopOpacity="0.25" />
+                    <stop offset="0%" stopColor="#FB7185" stopOpacity="0.3" />
+                    <stop offset="35%" stopColor="#F43F5E" stopOpacity="0.3" />
+                    <stop offset="70%" stopColor="#C084FC" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.3" />
                   </linearGradient>
-                  <filter id="drop-shadow" x="-15%" y="-15%" width="130%" height="130%">
-                    <feDropShadow dx="0" dy="10" stdDeviation="8" floodColor="#4C1D95" floodOpacity="0.12" />
+                  <filter id="illustration-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="12" stdDeviation="10" floodColor="#312E81" floodOpacity="0.15" />
                   </filter>
                 </defs>
 
-                {/* Sky background circle */}
-                <circle cx="250" cy="250" r="230" fill="url(#sky-grad)" />
+                {/* Sky background circle with outline */}
+                <circle cx="250" cy="250" r="235" fill="url(#sky-grad)" stroke="#E2E8F0" strokeWidth="4" />
+                {/* Dotted radial grid behind sky */}
+                <circle cx="250" cy="250" r="210" stroke="#CBD5E1" strokeWidth="2" strokeDasharray="6 8" opacity="0.5" />
 
-                {/* Stylized Rainbow/Arc in background */}
-                <path d="M 90,320 A 180,180 0 0,1 410,320" stroke="url(#rainbow-grad)" strokeWidth="20" fill="none" strokeLinecap="round" />
+                {/* Rainbow Arc in background */}
+                <path d="M 75,320 A 190,190 0 0,1 425,320" stroke="url(#rainbow-grad)" strokeWidth="24" fill="none" strokeLinecap="round" />
 
-                {/* Sun */}
-                <circle cx="360" cy="140" r="50" fill="url(#sun-glow)" />
-                <circle cx="360" cy="140" r="30" fill="#FBBF24" />
+                {/* Sun with radiating rays */}
+                <circle cx="370" cy="120" r="60" fill="url(#sun-glow)" />
+                <circle cx="370" cy="120" r="32" fill="#FBBF24" />
+                <path d="M 370,80 L 370,72 M 370,160 L 370,168 M 330,120 L 322,120 M 410,120 L 418,120 M 342,92 L 336,86 M 398,148 L 404,154 M 342,148 L 336,154 M 398,92 L 404,86" stroke="#FBBF24" strokeWidth="3" strokeLinecap="round" />
 
-                {/* Decorative clouds */}
-                <path d="M 120,160 Q 135,145 155,150 Q 170,135 190,145 Q 210,145 215,160 Z" fill="#FFFFFF" opacity="0.9" />
-                <path d="M 390,210 Q 400,200 412,203 Q 425,193 438,203 Q 450,203 453,212 Z" fill="#FFFFFF" opacity="0.8" />
+                {/* Stylized clouds with shadow */}
+                <g filter="url(#illustration-shadow)" opacity="0.95">
+                  <path d="M 100,150 Q 115,135 135,140 Q 150,125 170,135 Q 190,135 195,150 Q 210,155 205,170 Q 195,180 170,180 L 120,180 Q 95,180 100,150 Z" fill="#FFFFFF" />
+                  <path d="M 380,200 Q 392,190 405,193 Q 418,180 430,190 Q 442,190 445,200 Q 455,205 450,215 Q 442,225 420,225 L 390,225 Q 375,225 380,200 Z" fill="#FFFFFF" opacity="0.85" />
+                </g>
 
-                {/* Back Hills */}
-                <path d="M 20,400 Q 150,260 300,320 T 480,360 L 480,480 L 20,480 Z" fill="url(#hill-grad-1)" />
+                {/* Distant mountains / Hills */}
+                <path d="M -10,380 Q 140,230 290,300 T 510,330 L 510,510 L -10,510 Z" fill="url(#hill-grad-1)" />
 
-                {/* Simple playground slide */}
-                <path d="M 60,330 L 110,250 L 120,250 L 70,330 Z" fill="#FB7185" />
-                <path d="M 110,250 L 160,380 L 170,380 L 120,250 Z" fill="#8B5CF6" />
-                <circle cx="115" cy="250" r="6" fill="#FBBF24" />
+                {/* Playground Slide */}
+                <g strokeLinejoin="round" strokeLinecap="round">
+                  {/* Slide Ladder/Poles */}
+                  <path d="M 60,330 L 105,240 M 80,330 L 80,290 M 105,240 L 105,380" stroke="#94A3B8" strokeWidth="4" />
+                  {/* Ladder Steps */}
+                  <path d="M 70,310 L 82,310 M 78,290 L 90,290 M 87,270 L 98,270 M 96,250 L 106,250" stroke="#64748B" strokeWidth="3" />
+                  {/* Slide Board */}
+                  <path d="M 105,240 L 120,240 Q 165,310 200,380" stroke="#F43F5E" strokeWidth="12" fill="none" />
+                  <path d="M 105,244 L 120,244 Q 165,314 200,384" stroke="#FB7185" strokeWidth="8" fill="none" />
+                  <circle cx="105" cy="240" r="6" fill="#FBBF24" />
+                </g>
 
-                {/* Front Hills */}
-                <path d="M 20,430 Q 180,310 340,360 T 480,420 L 480,480 L 20,480 Z" fill="url(#hill-grad-2)" />
-
-                {/* Stylized colorful flowers */}
-                <circle cx="80" cy="410" r="8" fill="#F43F5E" />
-                <circle cx="74" cy="416" r="6" fill="#F43F5E" />
-                <circle cx="86" cy="416" r="6" fill="#F43F5E" />
-                <circle cx="80" cy="422" r="6" fill="#F43F5E" />
-                <circle cx="80" cy="416" r="4" fill="#FBBF24" />
-
-                <circle cx="420" cy="430" r="6" fill="#7C3AED" />
-                <circle cx="415" cy="435" r="5" fill="#7C3AED" />
-                <circle cx="425" cy="435" r="5" fill="#7C3AED" />
-                <circle cx="420" cy="435" r="3" fill="#FBBF24" />
+                {/* Front Rolling Hills */}
+                <path d="M -10,420 Q 170,290 330,340 T 510,400 L 510,510 L -10,510 Z" fill="url(#hill-grad-2)" />
 
                 {/* Bouncing Ball */}
-                <circle cx="350" cy="420" r="18" fill="#F43F5E" />
-                <path d="M 336,412 A 18,18 0 0,0 364,428" stroke="#FFFFFF" strokeWidth="3" fill="none" />
+                <g filter="url(#illustration-shadow)">
+                  <circle cx="340" cy="425" r="20" fill="#FB923C" />
+                  <path d="M 324,417 A 20,20 0 0,0 356,433" stroke="#FFFFFF" strokeWidth="4.5" fill="none" />
+                  <path d="M 330,410 Q 340,425 350,440" stroke="#FFFFFF" strokeWidth="3" strokeDasharray="3 3" fill="none" />
+                </g>
 
-                {/* JOYFUL CHILD CHARACTER */}
-                <g filter="url(#drop-shadow)">
-                  {/* Shadow beneath character */}
-                  <ellipse cx="250" cy="445" rx="35" ry="8" fill="#047857" opacity="0.4" />
+                {/* Stylized Flowers */}
+                <g fill="#F43F5E">
+                  <circle cx="70" cy="440" r="7" /> <circle cx="64" cy="445" r="5" /> <circle cx="76" cy="445" r="5" /> <circle cx="70" cy="450" r="5" />
+                  <circle cx="70" cy="445" r="3" fill="#FBBF24" />
+                </g>
+                <g fill="#A855F7">
+                  <circle cx="430" cy="430" r="7" /> <circle cx="424" cy="435" r="5" /> <circle cx="436" cy="435" r="5" /> <circle cx="430" cy="440" r="5" />
+                  <circle cx="430" cy="435" r="3" fill="#FBBF24" />
+                </g>
 
-                  {/* Left Leg */}
-                  <path d="M 235,390 L 225,430 Q 220,435 215,435" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                {/* Balloon floating from hand */}
+                <g filter="url(#illustration-shadow)">
+                  {/* Balloon String */}
+                  <path d="M 165,225 Q 150,170 135,110 Q 120,60 145,25" stroke="#94A3B8" strokeWidth="2.5" strokeDasharray="2 2" fill="none" />
+                  {/* Balloon Connection */}
+                  <path d="M 143,23 L 147,27 L 141,27 Z" fill="#F43F5E" />
+                  {/* Balloon Body */}
+                  <ellipse cx="145" cy="5" rx="20" ry="24" fill="url(#balloon-grad)" />
+                  {/* Highlight */}
+                  <ellipse cx="138" cy="-3" rx="5" ry="8" fill="#FFFFFF" opacity="0.4" transform="rotate(-15 138 -3)" />
+                </g>
+
+                {/* JOYFUL CHILD CHARACTER (Jumping in joy) */}
+                <g filter="url(#illustration-shadow)">
+                  {/* Motion lines behind character */}
+                  <path d="M 230,420 L 230,435 M 270,420 L 270,435 M 250,425 L 250,440" stroke="#10B981" strokeWidth="3.5" strokeLinecap="round" opacity="0.6" />
+                  {/* Shadow beneath character (Smaller because they are high in the air) */}
+                  <ellipse cx="250" cy="440" rx="24" ry="6" fill="#065F46" opacity="0.3" />
+
+                  {/* Left Leg (bent, jumping) */}
+                  <path d="M 232,380 L 215,410 L 200,405" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                   {/* Left Shoe */}
-                  <path d="M 215,435 L 205,432 C 200,430 200,422 208,422 L 215,422 Z" fill="#7C3AED" />
+                  <path d="M 200,405 L 192,408 C 187,410 185,402 192,398 L 202,398 Z" fill="#7C3AED" />
 
-                  {/* Right Leg */}
-                  <path d="M 265,390 L 275,425 Q 280,432 288,432" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Right Leg (extended, jumping) */}
+                  <path d="M 268,380 L 285,415 L 302,420" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                   {/* Right Shoe */}
-                  <path d="M 288,432 L 298,429 C 303,427 303,419 295,419 L 288,419 Z" fill="#7C3AED" />
+                  <path d="M 302,420 L 312,423 C 317,425 319,417 312,413 L 302,413 Z" fill="#7C3AED" />
 
-                  {/* Torso (Jumping position) */}
-                  <rect x="222" y="300" width="56" height="90" rx="20" fill="#FB7185" />
-                  {/* Collar */}
-                  <path d="M 238,300 C 238,308 262,308 262,300" stroke="#FDBA74" strokeWidth="4" fill="none" />
+                  {/* Torso (Jumping posture, pink hoodie) */}
+                  <rect x="220" y="290" width="60" height="95" rx="22" fill="#FB7185" />
+                  {/* Hoodie Pocket */}
+                  <path d="M 230,350 L 270,350 L 265,370 L 235,370 Z" fill="#F43F5E" opacity="0.8" />
+                  {/* Collar / Neck */}
+                  <path d="M 238,290 C 238,298 262,298 262,290" stroke="#FDBA74" strokeWidth="4" fill="none" />
 
-                  {/* Left Arm (Raised high in joy) */}
-                  <path d="M 222,320 Q 180,260 165,230" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Left Arm (Holding string) */}
+                  <path d="M 220,310 Q 185,270 165,225" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
                   {/* Left Hand */}
-                  <circle cx="165" cy="230" r="8" fill="#FDBA74" />
+                  <circle cx="165" cy="225" r="8" fill="#FDBA74" />
 
-                  {/* Right Arm (Raised high in joy) */}
-                  <path d="M 278,320 Q 320,260 335,230" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
+                  {/* Right Arm (Raised high in triumph) */}
+                  <path d="M 280,310 Q 320,260 335,215" stroke="#FDBA74" strokeWidth="12" strokeLinecap="round" fill="none" />
                   {/* Right Hand */}
-                  <circle cx="335" cy="230" r="8" fill="#FDBA74" />
-
-                  {/* Neck */}
-                  <rect x="244" y="280" width="12" height="24" fill="#FDBA74" />
+                  <circle cx="335" cy="215" r="8" fill="#FDBA74" />
 
                   {/* Head */}
-                  <circle cx="250" cy="245" r="32" fill="#FDBA74" />
-
-                  {/* Hair (Joyful stylized messy kid hair) */}
-                  <path d="M 216,235 C 210,215 225,195 240,205 C 248,190 264,195 270,210 C 285,200 292,220 284,235 C 290,248 275,255 275,255 L 225,255 Z" fill="#4C1D95" />
-
-                  {/* Eyes (Happy arcs) */}
-                  <path d="M 236,242 Q 242,238 244,244" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-                  <path d="M 256,242 Q 258,238 264,244" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                  <circle cx="250" cy="235" r="32" fill="#FDBA74" />
 
                   {/* Rosy Cheeks */}
-                  <circle cx="228" cy="252" r="5" fill="#F43F5E" opacity="0.5" />
-                  <circle cx="272" cy="252" r="5" fill="#F43F5E" opacity="0.5" />
+                  <circle cx="228" cy="242" r="5.5" fill="#F43F5E" opacity="0.6" />
+                  <circle cx="272" cy="242" r="5.5" fill="#F43F5E" opacity="0.6" />
 
-                  {/* Smile */}
-                  <path d="M 240,254 Q 250,268 260,254" stroke="#4C1D95" strokeWidth="3" strokeLinecap="round" fill="none" />
-                  <path d="M 244,256 A 6,6 0 0,0 256,256 Z" fill="#FFFFFF" />
+                  {/* Smile (Big joyful mouth showing teeth) */}
+                  <path d="M 238,245 C 238,258 262,258 262,245 Z" fill="#4C1D95" />
+                  <path d="M 242,246 C 242,250 258,250 258,246 Z" fill="#FFFFFF" />
+
+                  {/* Eyes (Happy arch lines) */}
+                  <path d="M 234,233 Q 240,229 242,235" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                  <path d="M 258,233 Q 260,229 266,235" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+
+                  {/* Messy Kid Hair & Cap */}
+                  {/* Cap base */}
+                  <path d="M 218,225 C 218,198 282,198 282,225 Z" fill="#8B5CF6" />
+                  {/* Cap brim/visor */}
+                  <path d="M 215,225 C 210,225 210,215 235,215 Z" fill="#7C3AED" />
+                  {/* Cap button */}
+                  <circle cx="250" cy="205" r="4.5" fill="#FBBF24" />
+                  {/* Stylized messy hair peeking out */}
+                  <path d="M 216,225 C 216,232 222,235 224,230" stroke="#4C1D95" strokeWidth="4" strokeLinecap="round" />
+                  <path d="M 284,225 C 284,232 278,235 276,230" stroke="#4C1D95" strokeWidth="4" strokeLinecap="round" />
                 </g>
 
-                {/* Floating Sparkles / Stars (Energy / Celebration) */}
+                {/* JOYFUL PUPPY RUNNING ALONGSIDE */}
+                <g filter="url(#illustration-shadow)">
+                  {/* Puppy shadow */}
+                  <ellipse cx="370" cy="442" rx="20" ry="5" fill="#065F46" opacity="0.3" />
+                  
+                  {/* Torso (Amber/Yellow body) */}
+                  <rect x="350" y="405" width="36" height="24" rx="10" fill="#FBBF24" />
+                  
+                  {/* Legs */}
+                  <path d="M 356,425 L 354,438 M 362,425 L 364,438 M 374,425 L 372,438 M 380,425 L 382,438" stroke="#FBBF24" strokeWidth="5.5" strokeLinecap="round" />
+                  {/* Puppy Shoes / Paws */}
+                  <circle cx="354" cy="438" r="3.5" fill="#4C1D95" />
+                  <circle cx="364" cy="438" r="3.5" fill="#4C1D95" />
+                  <circle cx="372" cy="438" r="3.5" fill="#4C1D95" />
+                  <circle cx="382" cy="438" r="3.5" fill="#4C1D95" />
+
+                  {/* Head */}
+                  <circle cx="385" cy="400" r="13" fill="#FBBF24" />
+                  
+                  {/* Floppy Ear */}
+                  <path d="M 378,395 Q 370,402 374,412" stroke="#D97706" strokeWidth="6" strokeLinecap="round" fill="none" />
+                  
+                  {/* Snout & Nose --> */}
+                  <path d="M 390,402 Q 396,402 396,400" stroke="#4C1D95" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+                  <circle cx="396" cy="400" r="2.5" fill="#4C1D95" />
+
+                  {/* Eye (Happy arc) */}
+                  <path d="M 382,396 Q 385,393 386,396" stroke="#4C1D95" strokeWidth="2" strokeLinecap="round" fill="none" />
+                  
+                  {/* Tail (Wagging, curved up) */}
+                  <path d="M 350,410 Q 338,400 342,390" stroke="#FBBF24" strokeWidth="5.5" strokeLinecap="round" fill="none" />
+                  {/* Wag lines */}
+                  <path d="M 334,392 L 338,390 M 338,382 L 342,384" stroke="#F59E0B" strokeWidth="2" strokeLinecap="round" />
+                </g>
+
+                {/* Stars & Confetti Celebrations */}
                 <g fill="#FBBF24">
                   {/* Star 1 */}
-                  <path d="M 130,220 L 133,227 L 140,228 L 135,233 L 136,240 L 130,236 L 124,240 L 125,233 L 120,228 L 127,227 Z" />
+                  <path d="M 250,60 L 253,67 L 260,68 L 255,73 L 256,80 L 250,76 L 244,80 L 245,73 L 240,68 L 247,67 Z" />
                   {/* Star 2 */}
-                  <path d="M 370,280 L 372,284 L 377,285 L 373,289 L 374,294 L 370,291 L 366,294 L 367,289 L 363,285 L 368,284 Z" opacity="0.8" />
+                  <path d="M 90,260 L 92,264 L 97,265 L 93,269 L 94,274 L 90,271 L 86,274 L 87,269 L 83,265 L 88,264 Z" />
+                  {/* Star 3 */}
+                  <path d="M 400,280 L 402,284 L 407,285 L 403,289 L 404,294 L 400,291 L 396,294 L 397,289 L 393,285 L 398,284 Z" opacity="0.8" />
                 </g>
-                <g fill="#C084FC">
-                  {/* Sparkle 1 */}
-                  <path d="M 190,180 L 192,185 L 197,186 L 192,189 L 191,194 L 187,190 L 182,191 L 186,187 L 184,182 L 188,185 Z" />
+                <g fill="#F43F5E">
+                  {/* Confetti Dot 1 */}
+                  <circle cx="180" cy="100" r="4.5" />
+                  {/* Confetti Dot 2 */}
+                  <circle cx="310" cy="70" r="4" />
+                </g>
+                <g fill="#10B981">
+                  {/* Confetti Dot 3 */}
+                  <circle cx="280" cy="180" r="5" />
+                  {/* Confetti Dot 4 */}
+                  <circle cx="200" cy="270" r="4" />
+                </g>
+                <g fill="#38BDF8">
+                  {/* Confetti Dot 5 */}
+                  <circle cx="330" cy="260" r="4.5" />
                 </g>
               </svg>
             </div>
@@ -371,7 +465,10 @@ export function Hero() {
             {/* Overlapping Floating sticker cards */}
             
             {/* Floating card 1 — Hip Hop Dance */}
-            <div className="absolute left-[-16px] sm:left-0 top-[8%] sm:top-[12%] w-40 sm:w-48 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-1 rotate-[-6deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+            <div className="absolute left-[-16px] sm:left-0 top-[8%] sm:top-[12%] w-40 sm:w-48 bg-white rounded-2xl overflow-hidden shadow-2xl z-20 animate-card-float-1 rotate-[-6deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-white/80 backdrop-blur-md">
+              <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors z-30">
+                <Heart className="w-3.5 h-3.5 fill-current" />
+              </button>
               <div className="w-full h-24 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1547153760-18fc86324498?w=400&auto=format&fit=crop&q=70"
@@ -380,13 +477,21 @@ export function Hero() {
                 />
               </div>
               <div className="p-2.5">
-                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Hip Hop Dance</h4>
-                <p className="text-[10px] sm:text-xs text-purple-600 font-semibold mt-0.5">This Weekend</p>
+                <div className="flex items-center justify-between">
+                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Hip Hop Dance</h4>
+                </div>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-[10px] sm:text-xs text-purple-600 font-bold">This Weekend</p>
+                  <span className="text-[9px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded-full font-bold">★ 4.8</span>
+                </div>
               </div>
             </div>
 
             {/* Floating card 2 — Chess Championship */}
-            <div className="absolute left-[-10px] bottom-[3%] sm:bottom-[6%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-2 rotate-[4deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+            <div className="absolute left-[-10px] bottom-[3%] sm:bottom-[6%] w-44 sm:w-52 bg-white rounded-2xl overflow-hidden shadow-2xl z-20 animate-card-float-2 rotate-[4deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-white/80 backdrop-blur-md">
+              <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors z-30">
+                <Heart className="w-3.5 h-3.5 fill-current" />
+              </button>
               <div className="w-full h-24 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1529699211952-734e80c4d42b?w=400&auto=format&fit=crop&q=70"
@@ -394,19 +499,20 @@ export function Hero() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="p-2.5 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Chess Tournament</h4>
-                  <p className="text-[10px] sm:text-xs text-purple-600 font-semibold mt-0.5">Register Now</p>
-                </div>
-                <div className="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center shrink-0 ml-1.5 shadow-sm shadow-purple-600/20">
-                  <Star className="w-3.5 h-3.5 text-white fill-current" />
+              <div className="p-2.5">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">Chess Tournament</h4>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-[10px] sm:text-xs text-amber-600 font-bold">Register Now</p>
+                  <span className="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded-full font-bold">★ 4.9</span>
                 </div>
               </div>
             </div>
 
             {/* Floating card 3 — Swim Lessons */}
-            <div className="hidden sm:block absolute right-[-10px] sm:right-0 top-[38%] w-32 sm:w-36 bg-white rounded-2xl overflow-hidden shadow-xl z-20 animate-card-float-3 rotate-[8deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-slate-100">
+            <div className="hidden sm:block absolute right-[-10px] sm:right-0 top-[38%] w-32 sm:w-36 bg-white rounded-2xl overflow-hidden shadow-2xl z-20 animate-card-float-3 rotate-[8deg] hover:rotate-0 hover:scale-105 transition-all duration-300 border border-white/80 backdrop-blur-md">
+              <button className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur-sm shadow-sm border border-slate-100 flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors z-30">
+                <Heart className="w-3.5 h-3.5 fill-current" />
+              </button>
               <div className="w-full h-20 overflow-hidden relative">
                 <img
                   src="https://images.unsplash.com/photo-1530549387789-4c1017266635?w=400&auto=format&fit=crop&q=70"
@@ -416,7 +522,10 @@ export function Hero() {
               </div>
               <div className="p-2">
                 <h4 className="font-bold text-[11px] sm:text-xs text-slate-900 leading-tight">Swim Lessons</h4>
-                <p className="text-[9px] sm:text-[10px] text-purple-600 font-semibold mt-0.5">Weekly Program</p>
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-[9px] sm:text-[10px] text-blue-600 font-bold">Weekly</p>
+                  <span className="text-[8px] bg-blue-50 text-blue-700 px-1 py-0.5 rounded-full font-bold">★ 4.7</span>
+                </div>
               </div>
             </div>
 
